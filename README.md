@@ -38,6 +38,6 @@
 
 - 와이어프레임
 
-![img](./image%20(1).png)
+![img](./src/README(와이어프레임).png)
 
 이후 ERD등 추가 예정.
