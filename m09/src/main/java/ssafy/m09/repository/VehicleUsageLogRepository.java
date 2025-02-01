@@ -1,4 +1,6 @@
 package ssafy.m09.repository;
 
-public interface VehicleUsageLogRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface VehicleUsageLogRepository extends JpaRepository<VehicleUsageLogRepository, Integer> {
 }

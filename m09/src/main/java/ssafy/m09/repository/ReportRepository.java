@@ -1,4 +1,7 @@
 package ssafy.m09.repository;
 
-public interface ReportRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import ssafy.m09.domain.Report;
+
+public interface ReportRepository extends JpaRepository<Report, Integer> {
 }

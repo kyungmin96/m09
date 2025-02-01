@@ -1,4 +1,6 @@
 package ssafy.m09.repository;
 
-public interface TaskRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TaskRepository extends JpaRepository<TaskRepository, Integer> {
 }

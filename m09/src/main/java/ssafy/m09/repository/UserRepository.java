@@ -1,4 +1,6 @@
 package ssafy.m09.repository;
 
-public interface UserRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<UserRepository, Integer> {
 }
