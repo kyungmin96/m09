@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name= "rfid", uniqueConstraints = {@UniqueConstraint(columnNames= "card_key")})
+@Table(name= "rfid")
 @Getter
 @Setter
 @NoArgsConstructor @AllArgsConstructor

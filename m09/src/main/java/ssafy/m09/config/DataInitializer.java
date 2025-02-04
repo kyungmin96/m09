@@ -20,11 +20,11 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // 이미 존재하는 유저인지 확인
-        if (userRepository.findByUsername("testuser").isEmpty()) {
+        if (userRepository.findByUsername("testuser1").isEmpty()) {
             User user = User.builder()
-                    .username("testuser")
+                    .username("testuser1")
                     .password("password123") // 실제 사용 시 비밀번호 암호화 필요
-                    .name("Test User")
+                    .name("Test User1")
                     .is_enabled(true)
                     .created_at(LocalDateTime.now())
                     .build();
@@ -32,7 +32,8 @@ public class DataInitializer implements CommandLineRunner {
 
             RFID rfid = RFID.builder()
                     .user(user)
-                    .cardKey("0xd30x470xc20xbd") // RFID 카드 키 설정
+//                    .cardKey("0xd30x470xc20xbd") // RFID 카드 키 설정
+                    .cardKey("0x820x9d0x800x4e") // RFID 카드 키 설정
                     .created_at(LocalDateTime.now())
                     .build();
             rfidRepository.save(rfid);

@@ -17,14 +17,12 @@ public class RFIDLoginController {
     private final RFIDLoginService rfidLoginService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginWithRFID(@RequestBody RFIDLoginRequest request) {
-        String cardKey = request.getUid(); // JSON에서 UID 값을 추출
-        Optional<User> user = rfidLoginService.loginWithRFID(cardKey);
-
-        if (user.isPresent()) {
-            return ResponseEntity.ok(user.get());
-        } else {
-            return ResponseEntity.status(401).body("Invalid RFID card");
+    public ResponseEntity<String> login(@RequestBody RFIDLoginRequest request) {
+        if (request.getUid() == null || request.getUid().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Invalid UID received.");
         }
+        System.out.println(request.getUid());
+        System.out.println(rfidLoginService.loginWithRFID(request.getUid()));
+        return ResponseEntity.ok("Login Success: " + request.getUid());
     }
 }
