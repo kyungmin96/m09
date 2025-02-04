@@ -1,0 +1,23 @@
+package ssafy.m09.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "companions")
+@Setter
+@Getter
+@NoArgsConstructor @AllArgsConstructor
+@Builder
+public class Companions {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column(columnDefinition = "JSON")
+    private String users;
+
+    @ManyToOne
+    @JoinColumn(name ="task_id")
+    private Task task;
+}
