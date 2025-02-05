@@ -1,0 +1,139 @@
+from m09_motor import *
+import cv2
+import torch
+import torchvision.transforms as tvt
+from PIL import Image
+from numpy import min as npmin
+from ultralytics import YOLO
+from threading import Thread
+
+# 추적 구조체
+class trace:
+    def __init__(self, motor_control, _headless, yolo_model, cam_width=640, cam_height=480):
+        self.motor_controller = motor_control
+        self._headless = _headless
+        # 모델 설정
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.yolo = YOLO(yolo_model)
+        self.yolo.to(self.device)
+        self.midas = torch.hub.load("intel-isl/MiDaS", "MiDaS_small", pretrained=True)
+        self.midas.to(self.device)
+        self.midas.eval()
+        self._initiated = True
+        # 카메라 0 = 웹캡
+        self.cap = cv2.VideoCapture(0)
+        self.cam_width = cam_width
+        self.cam_height = cam_height
+        self._thread = None
+
+    def _run(self):
+        # GPU에서 CUDA 사용 가능 여부
+        use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
+
+        if use_cuda:
+            print("[OrinCar] CUDA activated.")
+        else:
+            print("[OrinCar] Unable to activate CUDA, Using CPU...")
+
+        depth_radius = self.cam_width // 32
+        known_width = 0.3
+        focal_length = 493
+        depth_width = 384
+        depth_height = 384
+        depth_radius = 15
+        midas_transform = tvt.Compose([
+            tvt.Resize((384, 384)),  # 튜플로 크기 지정
+            tvt.ToTensor(),
+            tvt.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+
+        while self._initiated:
+            ret, frame = self.cap.read()
+            if not ret:
+                print("[OrinCar] Error: Could not read frame.")
+                break
+
+            # 구 프레임 버리기
+            for _ in range(2):
+                self.cap.grab()
+            
+            # 프레임 변환
+            frame = cv2.resize(frame, (self.cam_width, self.cam_height))
+
+            # GPU를 사용한 이미지 처리
+            if use_cuda:
+                gpu_frame = cv2.cuda_GpuMat()
+                gpu_frame.upload(frame)
+
+                # GPU에서 컬러 변환 (BGR to HSV) -> 다시 BGR로 변환하여 출력
+                gpu_hsv = cv2.cuda.cvtColor(gpu_frame, cv2.COLOR_BGR2HSV)
+                gpu_processed = cv2.cuda.cvtColor(gpu_hsv, cv2.COLOR_HSV2BGR)
+                frame = gpu_processed.download()  # 다시 CPU 메모리로 가져오기
+            else:
+                frame = frame
+
+            midas_input = midas_transform(Image.fromarray(frame)).unsqueeze(0)
+            mi_gpu = midas_input.to(self.device)
+            with torch.no_grad():
+                depth_map = self.midas(mi_gpu)
+            depth_map = depth_map.squeeze().cpu().numpy()
+            
+            frame_center_x = self.cam_width // 2
+            frame_center_y = self.cam_height // 2
+            frame_center_depth = npmin(depth_map[frame_center_y - depth_radius:frame_center_y + depth_radius, frame_center_x - depth_radius:frame_center_x + depth_radius])
+            
+            # 중앙 범위의 실제 거리 계산
+            frame_center_distance = (focal_length * known_width) / frame_center_depth if frame_center_depth > 0 else float('inf')
+            print(F"[OrinCar] Distance Center: {frame_center_distance}")
+            # YOLO 모델을 사용하여 객체 감지
+            yolo_results = self.yolo(frame)
+            speed = 0
+            for result in yolo_results:
+                for box in result.boxes:
+                    x1, y1, x2, y2 = box.xyxy[0].tolist()
+                    confidence = box.conf[0].item()
+                    class_id = box.cls[0].item()
+                    label = f"{self.yolo.names[int(class_id)]}: {confidence:.2f}"
+                    
+                    object_center_x = int((x1 + x2) // 2 * depth_width / self.cam_width)
+                    object_center_y = int((y1 + y2) // 2 * depth_height / self.cam_height)
+                    object_distance = depth_map[object_center_y, object_center_x]
+
+                    if self.yolo.names[int(class_id)] == "person":
+                        print("[OrinCar] Hey! There's a Person!")
+                        
+                        person_center_x = (x1 + x2) // 2
+                        speed = 0.3
+
+                        if object_distance < 100:
+                            speed = 0
+                        elif object_distance > 500:
+                            speed = 0.5
+
+                        if person_center_x < frame_center_x - 30:   
+                            print("[OrinCar] Turn left")
+                            self.motor_controller.left()
+                        elif person_center_x > frame_center_x + 30: 
+                            print("[OrinCar] Turn right")
+                            self.motor_controller.right()
+                        
+                        if not self._headless:
+                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                            cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+            self.motor_controller.set_throttle(speed)
+            if not self._headless:
+                cv2.imshow("OrinCar MO9", frame)
+                if cv2.waitKey(1) & 0xFF == ord("q"):
+                    break
+
+    def start(self):
+        if self._thread and self._thread.is_active():
+            self.stop()
+        self._thread = Thread(target=self._run)
+        self._thread.start()
+
+    def stop(self):
+        self._initiated = False
+        if self._thread and self._thread.is_alive():
+            self._thread.join()
