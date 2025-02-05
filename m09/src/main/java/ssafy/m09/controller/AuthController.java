@@ -49,7 +49,7 @@ public class AuthController {
         Optional<User> userOptional = userService.getUserByUsername(username);
 
         return userOptional
-                .map(user-> ResponseEntity.ok(user))
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(404).build());
     }
 }
