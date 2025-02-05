@@ -9,6 +9,8 @@ import ssafy.m09.dto.UserRegisterRequest;
 import ssafy.m09.repository.RFIDRepository;
 import ssafy.m09.repository.UserRepository;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -33,5 +35,9 @@ public class UserService {
         rfidRepository.save(rfid);
 
         return user;
+    }
+
+    public Optional<User> getUserByUsername(String username){
+        return userRepository.findByUsername(username);
     }
 }
