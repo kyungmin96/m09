@@ -21,8 +21,8 @@ public class Task {
     @Lob
     private String content;
 
-    @Column(columnDefinition = "JSON")
-    private String tags;
+    @Lob
+    private String comment;
 
     @Column(nullable = false)
     private String location;
