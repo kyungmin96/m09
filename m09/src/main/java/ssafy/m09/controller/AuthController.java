@@ -41,8 +41,11 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> me(@RequestHeader("Authorization") String token){
         String jwtToken = token.replace("Bearer ", "");
-        String username = jwtTokenProvider.getUsername(jwtToken);
+        if(authService.isTokenBlacklisted(jwtToken)){
+            return ResponseEntity.status(401).body("Token is blacklisted");
+        }
 
+        String username = jwtTokenProvider.getUsername(jwtToken);
         Optional<User> userOptional = userService.getUserByUsername(username);
 
         return userOptional
