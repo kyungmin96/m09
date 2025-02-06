@@ -1,65 +1,38 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import react from 'eslint-plugin-react';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
-import tseslint from 'typescript-eslint';
-import prettier from 'eslint-plugin-prettier';
+import js from '@eslint/js'
+import globals from 'globals'
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist/**', 'node_modules/**', 'build/**', 'coverage/**'] },
+  { ignores: ['dist'] },
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
+    files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
-      },
-      parser: tseslint.parser,
+      globals: globals.browser,
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
       },
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
+    settings: { react: { version: '18.3' } },
     plugins: {
-      '@typescript-eslint': tseslint.plugin,
-      react: react,
+      react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
-      prettier: prettier,
     },
     rules: {
-      // JavaScript와 TypeScript 기본 규칙
       ...js.configs.recommended.rules,
-      ...tseslint.configs.recommended.rules,
-
-      // React Hooks 규칙
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-
-      // React Refresh 규칙
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
+      ...reactHooks.configs.recommended.rules,
+      'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
-
-      // Prettier 규칙
-      'prettier/prettier': 'error',
-
-      // 기타 규칙들
-      'no-var': 'error',
-      'prefer-const': 'error',
-      eqeqeq: ['error', 'always'],
-      semi: ['error', 'always'],
-      quotes: ['error', 'single', { avoidEscape: true }],
-      indent: ['error', 2],
     },
   },
-];
+]
