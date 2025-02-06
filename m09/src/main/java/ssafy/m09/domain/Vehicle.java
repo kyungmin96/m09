@@ -26,9 +26,9 @@ public class Vehicle {
     private User manger;
 
     @Column(nullable = false)
-    private boolean is_available;
+    private boolean isAvailable;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
-    private LocalDateTime updated_at;
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 }

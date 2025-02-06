@@ -11,9 +11,7 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-//    private static final String SECRET_KEY = "secret"; // 발급 방법이 있나?
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 365; // 1 year
-
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String generateToken(String username) {
