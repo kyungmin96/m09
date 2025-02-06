@@ -9,7 +9,7 @@ from threading import Thread
 
 # 추적 구조체
 class trace:
-    def __init__(self, motor_control, _headless, yolo_model, cam_width=640, cam_height=480):
+    def __init__(self, motor_control, _headless, yolo_model, target_lable="person", cam_width=640, cam_height=480):
         self.motor_controller = motor_control
         self._headless = _headless
         # 모델 설정
@@ -19,6 +19,7 @@ class trace:
         self.midas = torch.hub.load("intel-isl/MiDaS", "MiDaS_small", pretrained=True)
         self.midas.to(self.device)
         self.midas.eval()
+        self.target_label = target_lable
         self._initiated = True
         # 카메라 0 = 웹캡
         self.cap = cv2.VideoCapture(0)
@@ -106,7 +107,7 @@ class trace:
                     object_center_y = int((y1 + y2) // 2 * depth_height / self.cam_height)
                     object_distance = depth_map[object_center_y, object_center_x]
 
-                    if self.yolo.names[int(class_id)] == "person":
+                    if self.yolo.names[int(class_id)] == self.target_label:
                         print("[OrinCar] Hey! There's a Person!")
                         
                         person_center_x = (x1 + x2) // 2
@@ -140,6 +141,8 @@ class trace:
     def start(self):
         if self._thread and self._thread.is_active():
             self.stop()
+        if self._headless:
+            from m09_stream_uploader import stream_cv_frame
         self._thread = Thread(target=self._run)
         self._thread.start()
 

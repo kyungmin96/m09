@@ -5,6 +5,7 @@ from time import sleep
 import sys
 
 yolo_model = "custom.pt"
+stream_port = 8765
 
 if __name__ == "__main__":
     _headless = ("--headless" in sys.argv) or ("-hl" in sys.argv)
