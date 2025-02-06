@@ -2,6 +2,7 @@ package ssafy.m09.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssafy.m09.domain.en.TaskStatus;
 
 import java.time.LocalDateTime;
 
@@ -27,28 +28,24 @@ public class Task {
     @Column(nullable = false)
     private String location;
 
-    @ManyToOne
-    @JoinColumn(name="assigned_user")
-    private User assignedUser;
+    private int assignedUserId;
+    private int vehicleId;
 
-    @ManyToOne
-    @JoinColumn(name="vehicle_id")
-    private Vehicle vehicle;
-
-    private LocalDateTime scheduled_start_time;
-    private LocalDateTime scheduled_end_time;
-    private LocalDateTime start_time;
-    private LocalDateTime end_time;
+    private LocalDateTime scheduledStartTime;
+    private LocalDateTime scheduledEndTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus is_completed;
+    private TaskStatus taskState;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
-    private LocalDateTime updated_at;
-}
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-enum TaskStatus {
-    START, PENDING, COMPLETED, FAILED
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

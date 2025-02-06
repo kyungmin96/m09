@@ -19,7 +19,7 @@ public class User {
     private int id;
 
     @Column(unique = true, nullable = false)
-    private String username;
+    private String employeeId;
 
     @Column(nullable = false)
     private String password;
@@ -28,15 +28,15 @@ public class User {
     private String name;
 
     // data type 수정 필요
-    private String profile_image;
+    private String profileImage;
 
     @Column(nullable = false)
-    private boolean is_enabled = true;
+    private boolean isEnabled = true;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
     @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(name="user_authorities", joinColumns = @JoinColumn(name="user_id"),

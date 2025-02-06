@@ -21,7 +21,7 @@ public class Authority {
     private String name;
 
     @Column(updatable = false, nullable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "authority", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserAuthority> userAuthorities = new HashSet<>();

@@ -6,19 +6,18 @@ import org.springframework.web.bind.annotation.*;
 import ssafy.m09.domain.User;
 import ssafy.m09.dto.UserLoginRequest;
 import ssafy.m09.dto.UserLoginResponse;
+import ssafy.m09.dto.UserRegisterRequest;
 import ssafy.m09.security.JwtTokenProvider;
 import ssafy.m09.service.AuthService;
-import ssafy.m09.service.UserService;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginRequest request)
@@ -38,6 +37,17 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserRegisterRequest request) {
+        // User로 받으면 보안 취약점 생길 수 있음, DTO로 받은 다음 쓰는게 낫다
+        try{
+            authService.registerUser(request);
+            return ResponseEntity.ok("User registered successfully!!!");
+        }catch (Exception e){
+            return ResponseEntity.status(500).body("ERR during registeration: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/me")
     public ResponseEntity<?> me(@RequestHeader("Authorization") String token){
         String jwtToken = token.replace("Bearer ", "");
@@ -45,8 +55,8 @@ public class AuthController {
             return ResponseEntity.status(401).body("Token is blacklisted");
         }
 
-        String username = jwtTokenProvider.getUsername(jwtToken);
-        Optional<User> userOptional = userService.getUserByUsername(username);
+        String employeeId = jwtTokenProvider.getUsername(jwtToken);
+        Optional<User> userOptional = authService.getUserByEmployeeId(employeeId);
 
         return userOptional
                 .map(ResponseEntity::ok)

@@ -23,7 +23,7 @@ public class Tool {
     private Integer quantity;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime  updated_at;
+    private LocalDateTime updatedAt;
 }
