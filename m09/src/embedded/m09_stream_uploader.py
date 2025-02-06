@@ -3,7 +3,7 @@ import socketio
 import os
 
 port = 8765
-__address = os.environ["STREAM_SERVER_ADDRESS"] + f":{port}"
+__address = "http://" + os.environ["STREAM_SERVER_ADDRESS"] + f":{port}"
 sio_cli = socketio.Client()
 sio_cli.connect(__address)
 
