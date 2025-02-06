@@ -42,7 +42,7 @@ class motor_control:
         steering = min(1, max(-1, steering))
         self._set_steer_raw(self.pan_middle + steering * 45)
 
-    # 좌우 매크로
+    # 매크로
     def left(self):
         self.set_steering(-0.75)
 
@@ -51,7 +51,16 @@ class motor_control:
 
     def middle(self):
         self.set_steering(0)
-        
+    
+    def forward(self):
+        self.set_throttle(0.5)
+
+    def backward(self):
+        self.set_throttle(-0.5)
+    
+    def brake(self):
+        self.set_throttle(0)
+
     # 종료
     def terminate(self):
         self.set_throttle(0)  # 모터 정지
