@@ -1,6 +1,5 @@
 from m09_motor import *
 from m09_trace import *
-from m09_rfid import *
 from matplotlib import use as matploblib_use
 from time import sleep
 import sys
