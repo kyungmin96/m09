@@ -2,12 +2,7 @@ import cv2
 import socketio
 import os
 
-try:
-    stream_port = stream_port
-except:
-    stream_port = 8765
-
-__address = "http://" + os.environ["STREAM_SERVER_ADDRESS"] + f":{stream_port}"
+__address = "http://" + os.environ["STREAM_SERVER_ADDRESS"] 
 sio_cli = socketio.Client()
 sio_cli.connect(__address)
 
