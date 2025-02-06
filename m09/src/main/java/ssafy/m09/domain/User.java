@@ -31,10 +31,11 @@ public class User {
     private String profileImage;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isEnabled = true;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
@@ -42,4 +43,14 @@ public class User {
     @JoinTable(name="user_authorities", joinColumns = @JoinColumn(name="user_id"),
     inverseJoinColumns = @JoinColumn(name="authority_id"))
     private Set<Authority> authorities = new HashSet<>();
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
