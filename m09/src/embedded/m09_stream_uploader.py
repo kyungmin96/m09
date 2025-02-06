@@ -2,7 +2,7 @@ import cv2
 import socketio
 import os
 
-__address = "http://" + os.environ["STREAM_SERVER_ADDRESS"] 
+__address = os.environ["STREAM_SERVER_ADDRESS"] 
 sio_cli = socketio.Client()
 sio_cli.connect(__address)
 
