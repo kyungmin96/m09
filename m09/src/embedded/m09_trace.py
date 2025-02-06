@@ -30,6 +30,9 @@ class trace:
         # GPU에서 CUDA 사용 가능 여부
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
 
+        if self._headless:
+            from m09_stream_uploader import stream_cv_frame
+
         if use_cuda:
             print("[OrinCar] CUDA activated.")
         else:
@@ -92,6 +95,10 @@ class trace:
                 for box in result.boxes:
                     x1, y1, x2, y2 = box.xyxy[0].tolist()
                     confidence = box.conf[0].item()
+
+                    if confidence < 0.5:
+                        continue
+
                     class_id = box.cls[0].item()
                     label = f"{self.yolo.names[int(class_id)]}: {confidence:.2f}"
                     
@@ -117,16 +124,17 @@ class trace:
                             print("[OrinCar] Turn right")
                             self.motor_controller.right()
                         
-                        if not self._headless:
-                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                            cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                    cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             
             self.motor_controller.set_throttle(speed)
             if not self._headless:
                 cv2.imshow("OrinCar MO9", frame)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     break
-
+            else:
+                stream_cv_frame(frame)
+                
     def start(self):
         if self._thread and self._thread.is_active():
             self.stop()
