@@ -49,6 +49,9 @@ class motor_control:
     def right(self):
         self.set_steering(0.75)
 
+    def middle(self):
+        self.set_steering(0)
+        
     # 종료
     def terminate(self):
         self.set_throttle(0)  # 모터 정지
