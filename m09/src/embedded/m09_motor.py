@@ -44,10 +44,10 @@ class motor_control:
 
     # 좌우 매크로
     def left(self):
-        self._set_steer_raw(self, self.pan - 1)
+        self.set_steering(-0.75)
 
     def right(self):
-        self._set_steer_raw(self, self.pan + 1)
+        self.set_steering(0.75)
 
     # 종료
     def terminate(self):
