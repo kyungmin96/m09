@@ -19,16 +19,25 @@ public class Vehicle {
     @Column(nullable = false)
     private String name;
 
+    // 보류
     private String location;
 
+    private int batteryChargeRate;
+
     @ManyToOne
-    @JoinColumn(name="manager_id")
+    @JoinColumn(name="manager_id", nullable = false)
     private User manger;
 
-    @Column(nullable = false)
+    @Builder.Default
     private boolean isAvailable;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.isAvailable = true;
+        this.createdAt = LocalDateTime.now();
+    }
 }

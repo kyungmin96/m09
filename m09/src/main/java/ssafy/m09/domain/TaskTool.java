@@ -6,10 +6,10 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "task_tools")
+@Table(name = "tasks_tools")
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class TaskTools {
+public class TaskTool {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -21,6 +21,4 @@ public class TaskTools {
     @ManyToOne
     @JoinColumn(name= "tool_id")
     private Tool tool;
-
-    private Integer quantity;
 }

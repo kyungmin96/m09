@@ -33,10 +33,10 @@ class RFIDLoginServiceTest {
         // 테스트 유저 생성
         testUser = User.builder()
                 .id(1)
-                .username("testUser")
+                .employeeId("testUser")
                 .name("Test User")
                 .password("password123")
-                .is_enabled(true)
+                .isEnabled(true)
                 .build();
 
         // 테스트 RFID 카드 생성
@@ -57,7 +57,7 @@ class RFIDLoginServiceTest {
 
         // 결과 검증
         assertTrue(result.isPresent());
-        assertEquals(testUser.getUsername(), result.get().getUsername());
+        assertEquals(testUser.getEmployeeId(), result.get().getEmployeeId());
 
         // `findByCardKey()` 메서드가 한 번 호출되었는지 확인
         verify(rfidRepository, times(1)).findByCardKey("123456789ABC");

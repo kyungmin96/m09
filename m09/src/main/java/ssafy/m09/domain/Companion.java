@@ -4,21 +4,20 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
+@Table(name = "companions")
 @Setter
+@Getter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class TaskBuilder {
+public class Companion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable=false)
-    private String title;
+    @Column(columnDefinition = "JSON")
+    private String users;
 
-    @Lob
-    private String content;
-
-    @Column(nullable = false)
-    private String location;
+    @ManyToOne
+    @JoinColumn(name ="task_id")
+    private Task task;
 }

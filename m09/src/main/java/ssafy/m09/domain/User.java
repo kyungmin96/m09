@@ -2,6 +2,7 @@ package ssafy.m09.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssafy.m09.domain.en.AuthorityPosition;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -30,16 +31,24 @@ public class User {
     // data type 수정 필요
     private String profileImage;
 
-    @Column(nullable = false)
+    @Builder.Default
     private boolean isEnabled = true;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @ManyToMany(fetch=FetchType.EAGER)
-    @JoinTable(name="user_authorities", joinColumns = @JoinColumn(name="user_id"),
-    inverseJoinColumns = @JoinColumn(name="authority_id"))
-    private Set<Authority> authorities = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    @Column(unique = true)
+    private AuthorityPosition position;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

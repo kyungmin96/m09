@@ -17,16 +17,24 @@ public class VehicleUsageLog {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name="vehicle_id")
-    private Vehicle vehicle;
-
-    @ManyToOne
     @JoinColumn(name="user_id")
     private User user;
 
-    // data type 수정 필요
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private Task task;
 
+    @ManyToOne
+    @JoinColumn(name="vehicle_id")
+    private Vehicle vehicle;
+
+    // data type 수정 필요
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

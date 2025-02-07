@@ -66,7 +66,7 @@ public class AuthService {
 
         RFID rfid = RFID.builder()
                 .user(user)
-                .cardKey(request.getCardKey())
+                .cardKey(request.getCardKey() != null ? request.getCardKey() : "")
                 .build();
         rfidRepository.save(rfid);
     }
@@ -85,8 +85,8 @@ public class AuthService {
         return user;
     }
 
-    public Optional<User> getUserByEmployeeId(String emplyeeId){
-        return userRepository.findByEmployeeId(emplyeeId);
+    public Optional<User> getUserByEmployeeId(String employeeId){
+        return userRepository.findByEmployeeId(employeeId);
     }
     public void logout(String token) {
         blacklist.add(token);
