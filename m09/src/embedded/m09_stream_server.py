@@ -1,13 +1,15 @@
-import asyncio
 from flask import Flask
 from flask import request
 from flask import Response
 from flask import stream_with_context
 from flask_socketio import SocketIO
+from time import sleep
 
 app = Flask( __name__ )
 socket_io = SocketIO(app)
 __byte_frame = None
+
+fps = 24
 
 @app.route("/stream")
 def stream():
@@ -19,13 +21,15 @@ def stream():
 def stream_gen():   
     global __byte_frame
     try : 
-        while True :
+        while True:
             if not __byte_frame:
                 continue
             yield (b"--frame\r\n"
                    b"Content-Type: image/jpeg\r\n\r\n" + __byte_frame + b"\r\n")
-                    
-    except GeneratorExit :
+
+            sleep(1 / fps)
+                
+    except GeneratorExit:
         pass
 
 @socket_io.on("stream")
