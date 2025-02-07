@@ -2,10 +2,10 @@ from m09_motor import *
 from matplotlib import use as matploblib_use
 from time import sleep
 import sys
+import os
 
-yolo_model = "vest.pt"
-stream_port = 8765
-target_label = "vest"
+yolo_model = os.environ["M09_TRACK_MODEL"] 
+target_label = os.environ["M09_TARGET"]
 
 if __name__ == "__main__":
     _headless = ("--headless" in sys.argv) or ("-hl" in sys.argv)
