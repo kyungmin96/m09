@@ -20,16 +20,21 @@ public class Task {
     private String title;
 
     @Lob
+    @Column(nullable = false)
     private String content;
 
     @Lob
     private String comment;
 
-    @Column(nullable = false)
     private String location;
 
-    private int assignedUserId;
-    private int vehicleId;
+    @ManyToOne
+    @JoinColumn(name = "assigned_user_id")
+    private User assignedUser;
+
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
 
     private LocalDateTime scheduledStartTime;
     private LocalDateTime scheduledEndTime;
@@ -37,10 +42,10 @@ public class Task {
     private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TaskStatus taskState;
+    @Builder.Default
+    private TaskStatus taskState = TaskStatus.START;
 
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

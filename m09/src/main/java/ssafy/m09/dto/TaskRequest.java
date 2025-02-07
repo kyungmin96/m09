@@ -15,8 +15,8 @@ public class TaskRequest {
     private String content;
     private String comment;
     private String location;
-    private int assignedUserId;
-    private int vehicleId;
+    private User assignedUser;
+    private Vehicle vehicle;
     private LocalDateTime scheduledStartTime;
     private LocalDateTime scheduledEndTime;
     private LocalDateTime startTime;

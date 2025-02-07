@@ -25,8 +25,8 @@ public class TaskService {
                 .content(request.getContent())
                 .comment(request.getComment())
                 .location(request.getLocation())
-                .assignedUserId(request.getAssignedUserId())
-                .vehicleId(request.getVehicleId())
+                .assignedUser(request.getAssignedUser())
+                .vehicle(request.getVehicle())
                 .scheduledStartTime(request.getScheduledStartTime())
                 .scheduledEndTime(request.getScheduledEndTime())
                 .startTime(request.getStartTime())
@@ -53,8 +53,8 @@ public class TaskService {
             task.setContent(Optional.ofNullable(request.getContent()).orElse(task.getContent()));
             task.setComment(Optional.ofNullable(request.getComment()).orElse(task.getComment()));
             task.setLocation(Optional.ofNullable(request.getLocation()).orElse(task.getLocation()));
-            task.setAssignedUserId(Optional.ofNullable(request.getAssignedUserId()).orElse(task.getAssignedUserId()));
-            task.setVehicleId(Optional.ofNullable(request.getVehicleId()).orElse(task.getVehicleId()));
+            task.setAssignedUser(Optional.ofNullable(request.getAssignedUser()).orElse(task.getAssignedUser()));
+            task.setVehicle(Optional.ofNullable(request.getVehicle()).orElse(task.getVehicle()));
             task.setScheduledStartTime(Optional.ofNullable(request.getScheduledStartTime()).orElse(task.getScheduledStartTime()));
             task.setScheduledEndTime(Optional.ofNullable(request.getScheduledEndTime()).orElse(task.getScheduledEndTime()));
             task.setStartTime(Optional.ofNullable(request.getStartTime()).orElse(task.getStartTime()));

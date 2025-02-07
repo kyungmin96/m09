@@ -2,6 +2,7 @@ package ssafy.m09.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ssafy.m09.domain.en.ToolCategory;
 
 import java.time.LocalDateTime;
 
@@ -19,11 +20,17 @@ public class Tool {
     @Column(nullable = false)
     private String name;
 
-    private String category;
-    private Integer quantity;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ToolCategory category;
+    private int quantity;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

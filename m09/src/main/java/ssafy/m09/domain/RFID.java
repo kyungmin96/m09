@@ -20,13 +20,11 @@ public class RFID {
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
-    @Column(name="card_key", unique = true)
+    @Column(name="card_key", unique = true, nullable = false)
     private String cardKey;
 
-    @Column(nullable = false, updatable = false)
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @PrePersist

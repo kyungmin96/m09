@@ -66,7 +66,7 @@ public class AuthService {
 
         RFID rfid = RFID.builder()
                 .user(user)
-                .cardKey(request.getCardKey())
+                .cardKey(request.getCardKey() != null ? request.getCardKey() : "")
                 .build();
         rfidRepository.save(rfid);
     }
