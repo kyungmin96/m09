@@ -2,14 +2,14 @@ from m09_motor import *
 import cv2
 import torch
 import torchvision.transforms as tvt
-from PIL import Image
-from numpy import min as npmin
+from numpy import arange
+from scipy.interpolate import RectBivariateSpline
 from ultralytics import YOLO
 from threading import Thread
 
 # 추적 구조체
 class trace:
-    def __init__(self, motor_control, _headless, yolo_model, target_lable="person", cam_width=640, cam_height=480):
+    def __init__(self, motor_control, _headless, yolo_model, target_label="person", cam_width=640, cam_height=480, min_distance_range=100, max_distance_range=500):
         self.motor_controller = motor_control
         self._headless = _headless
         # 모델 설정
@@ -19,13 +19,28 @@ class trace:
         self.midas = torch.hub.load("intel-isl/MiDaS", "MiDaS_small", pretrained=True)
         self.midas.to(self.device)
         self.midas.eval()
-        self.target_label = target_lable
+        self.target_label = target_label
         self._initiated = True
         # 카메라 0 = 웹캡
         self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, cam_width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam_height)
+        print(f"[OrinCar] CAM size: {self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)} x {self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)}")
+
         self.cam_width = cam_width
         self.cam_height = cam_height
+        
+        self.min_distance_range = min_distance_range
+        self.max_distance_range = max_distance_range
         self._thread = None
+
+    def _apply_ema_filter(prev_depth, current_depth, alpha=0.2):
+        filtered_depth = alpha * current_depth + (1 - alpha) * prev_depth
+        prev_depth = filtered_depth  # Update the previous depth value
+        return filtered_depth
+
+    def _depth_to_distance(self, depth_value, depth_scale):
+        return 100 / (depth_value * depth_scale)
 
     def _run(self):
         # GPU에서 CUDA 사용 가능 여부
@@ -39,17 +54,12 @@ class trace:
         else:
             print("[OrinCar] Unable to activate CUDA, Using CPU...")
 
-        depth_radius = self.cam_width // 32
-        known_width = 0.3
-        focal_length = 493
-        depth_width = 384
-        depth_height = 384
-        depth_radius = 15
-        midas_transform = tvt.Compose([
-            tvt.Resize((384, 384)),  # 튜플로 크기 지정
-            tvt.ToTensor(),
-            tvt.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
+        prev_depth = 0.0
+        depth_scale = 1.0
+        direction_trace_range = self.cam_width // 32
+
+        transforms = torch.hub.load('intel-isl/MiDaS','transforms')
+        transform = transforms.small_transform
 
         while self._initiated:
             ret, frame = self.cap.read()
@@ -60,34 +70,45 @@ class trace:
             # 구 프레임 버리기
             for _ in range(2):
                 self.cap.grab()
-            
-            # 프레임 변환
-            frame = cv2.resize(frame, (self.cam_width, self.cam_height))
 
             # GPU를 사용한 이미지 처리
             if use_cuda:
                 gpu_frame = cv2.cuda_GpuMat()
                 gpu_frame.upload(frame)
-
+                gpu_frame = cv2.cuda.resize(gpu_frame, (self.cam_width, self.cam_height))
                 # GPU에서 컬러 변환 (BGR to HSV) -> 다시 BGR로 변환하여 출력
                 gpu_hsv = cv2.cuda.cvtColor(gpu_frame, cv2.COLOR_BGR2HSV)
                 gpu_processed = cv2.cuda.cvtColor(gpu_hsv, cv2.COLOR_HSV2BGR)
                 frame = gpu_processed.download()  # 다시 CPU 메모리로 가져오기
             else:
+                # 프레임 변환
+                frame = cv2.resize(frame, (self.cam_width, self.cam_height))
                 frame = frame
 
-            midas_input = midas_transform(Image.fromarray(frame)).unsqueeze(0)
-            mi_gpu = midas_input.to(self.device)
+            midas_input = transform(frame)
+            mi_device = midas_input.to(self.device)
             with torch.no_grad():
-                depth_map = self.midas(mi_gpu)
-            depth_map = depth_map.squeeze().cpu().numpy()
-            
+                prediction = self.midas(mi_device)
+                prediction = torch.nn.functional.interpolate(
+                    prediction.unsqueeze(1),
+                    size=frame.shape[:2],
+                    mode='bicubic',
+                    align_corners=False
+                )
+
+            output = prediction.squeeze().cpu().numpy()
+            output_norm = cv2.normalize(output, None, 0, 1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+
+            h, w = output_norm.shape
+            x_grid = arange(w)
+            y_grid = arange(h)
+            spline = RectBivariateSpline(y_grid, x_grid, output_norm)
             frame_center_x = self.cam_width // 2
             frame_center_y = self.cam_height // 2
-            frame_center_depth = npmin(depth_map[frame_center_y - depth_radius:frame_center_y + depth_radius, frame_center_x - depth_radius:frame_center_x + depth_radius])
-            
+
             # 중앙 범위의 실제 거리 계산
-            frame_center_distance = (focal_length * known_width) / frame_center_depth if frame_center_depth > 0 else float('inf')
+            frame_center_depth = spline(frame_center_y, frame_center_x)[0][0]
+            frame_center_distance = self._depth_to_distance(frame_center_depth, depth_scale=depth_scale)
             print(F"[OrinCar] Distance Center: {frame_center_distance}")
             # YOLO 모델을 사용하여 객체 감지
             yolo_results = self.yolo(frame)
@@ -103,25 +124,28 @@ class trace:
                     class_id = box.cls[0].item()
                     label = f"{self.yolo.names[int(class_id)]}: {confidence:.2f}"
                     
-                    object_center_x = int((x1 + x2) // 2 * depth_width / self.cam_width)
-                    object_center_y = int((y1 + y2) // 2 * depth_height / self.cam_height)
-                    object_distance = depth_map[object_center_y, object_center_x]
+                    object_center_x = (x1 + x2) // 2
+                    object_center_y = (x1 + y2) // 2
+                    object_depth = spline(object_center_y, object_center_x)[0][0]
+                    object_distance = self._depth_to_distance(object_depth, depth_scale=depth_scale)
 
                     if self.yolo.names[int(class_id)] == self.target_label:
+                        if confidence < 0.8:
+                            continue
                         print("[OrinCar] Hey! There's a Person!")
                         
                         person_center_x = (x1 + x2) // 2
-                        speed = 0.3
+                        speed = 0.6
 
-                        if object_distance < 100:
+                        if object_distance < self.min_distance_range:
                             speed = 0
-                        elif object_distance > 500:
-                            speed = 0.5
+                        elif object_distance > self.max_distance_range:
+                            speed = 0.85
 
-                        if person_center_x < frame_center_x - 30:   
+                        if person_center_x < frame_center_x - direction_trace_range:   
                             print("[OrinCar] Turn left")
                             self.motor_controller.left()
-                        elif person_center_x > frame_center_x + 30: 
+                        elif person_center_x > frame_center_x + direction_trace_range: 
                             print("[OrinCar] Turn right")
                             self.motor_controller.right()
                         else:
@@ -134,6 +158,7 @@ class trace:
             if not self._headless:
                 cv2.imshow("OrinCar MO9", frame)
                 if cv2.waitKey(1) & 0xFF == ord("q"):
+                    cv2.destroyAllWindows()
                     break
             else:
                 stream_cv_frame(frame)

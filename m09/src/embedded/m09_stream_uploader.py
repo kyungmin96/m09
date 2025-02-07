@@ -13,8 +13,6 @@ def stream_cv_frame(frame):
 
 # 바이트 코드로 변환
 def __bytecode_cv_frame(frame):
-    width = 640
-    height = 480
     return cv2.imencode('.jpg', frame)[1].tobytes()
 
 @sio_cli.on("response")

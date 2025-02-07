@@ -3,8 +3,9 @@ from matplotlib import use as matploblib_use
 from time import sleep
 import sys
 
-yolo_model = "custom.pt"
+yolo_model = "vest.pt"
 stream_port = 8765
+target_label = "vest"
 
 if __name__ == "__main__":
     _headless = ("--headless" in sys.argv) or ("-hl" in sys.argv)
@@ -18,7 +19,7 @@ if __name__ == "__main__":
 
     if not _manual:
         from m09_trace import *
-        object_tracer = trace(motor_controller, _headless=_headless, yolo_model=yolo_model)
+        object_tracer = trace(motor_controller, _headless=_headless, yolo_model=yolo_model, target_label=target_label, cam_width=640, cam_height=360)
         object_tracer.start()
         print("[OrinCar] Tracing Enabled!")
     else:
