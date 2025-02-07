@@ -28,7 +28,6 @@ public class Vehicle {
     @JoinColumn(name="manager_id", nullable = false)
     private User manger;
 
-    @Builder.Default
     private boolean isAvailable;
 
     @Column(updatable = false)

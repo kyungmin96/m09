@@ -26,8 +26,8 @@ public class Report {
     private String content;
 
     @Column(nullable = false, updatable = false)
-    @Builder.Default
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 
     @PrePersist
