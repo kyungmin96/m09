@@ -1,7 +1,6 @@
 from m09_motor import *
 import cv2
 import torch
-import torchvision.transforms as tvt
 from numpy import arange
 from scipy.interpolate import RectBivariateSpline
 from ultralytics import YOLO
