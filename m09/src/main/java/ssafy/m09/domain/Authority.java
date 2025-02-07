@@ -22,7 +22,7 @@ public class Authority {
     private String name;
 
     @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
