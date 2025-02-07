@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.domain.Task;
-import ssafy.m09.dto.TaskRequest;
+import ssafy.m09.dto.request.TaskRequest;
 import ssafy.m09.service.TaskService;
 
 import java.util.List;

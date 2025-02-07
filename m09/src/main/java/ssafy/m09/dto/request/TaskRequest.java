@@ -1,4 +1,4 @@
-package ssafy.m09.dto;
+package ssafy.m09.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

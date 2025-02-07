@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.domain.User;
-import ssafy.m09.dto.UserLoginRequest;
-import ssafy.m09.dto.UserLoginResponse;
-import ssafy.m09.dto.UserRegisterRequest;
+import ssafy.m09.dto.request.UserLoginRequest;
+import ssafy.m09.dto.response.UserLoginResponse;
+import ssafy.m09.dto.request.UserRegisterRequest;
 import ssafy.m09.security.JwtTokenProvider;
 import ssafy.m09.service.AuthService;
 

@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.domain.Tool;
-import ssafy.m09.dto.ToolRequest;
+import ssafy.m09.dto.request.ToolRequest;
 import ssafy.m09.service.ToolService;
 
 import java.util.List;

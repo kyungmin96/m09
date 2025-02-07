@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ssafy.m09.domain.Task;
 import ssafy.m09.domain.TaskTool;
 import ssafy.m09.domain.Tool;
-import ssafy.m09.dto.TaskToolRequest;
+import ssafy.m09.dto.request.TaskToolRequest;
 import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.TaskToolRepository;
 import ssafy.m09.repository.ToolRepository;

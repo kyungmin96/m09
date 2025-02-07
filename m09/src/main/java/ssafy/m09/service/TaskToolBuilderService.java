@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ssafy.m09.domain.TaskToolBuilder;
-import ssafy.m09.dto.TaskRequest;
+import ssafy.m09.dto.request.TaskRequest;
 import ssafy.m09.repository.TaskToolBuilderRepository;
 
 import java.util.List;

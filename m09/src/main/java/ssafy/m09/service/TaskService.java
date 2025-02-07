@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ssafy.m09.domain.Task;
 import ssafy.m09.domain.en.TaskStatus;
-import ssafy.m09.dto.TaskRequest;
+import ssafy.m09.dto.request.TaskRequest;
 import ssafy.m09.repository.TaskRepository;
 
 import java.util.List;
