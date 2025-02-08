@@ -33,4 +33,6 @@ public class Report {
     public void prePersist() {
         createdAt = LocalDateTime.now();
     }
+    @PreUpdate
+    protected void onUpdate() {this.updatedAt = LocalDateTime.now();}
 }

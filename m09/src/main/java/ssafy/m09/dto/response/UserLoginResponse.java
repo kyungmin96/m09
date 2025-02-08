@@ -1,4 +1,4 @@
-package ssafy.m09.dto;
+package ssafy.m09.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
