@@ -1,7 +1,7 @@
-import { LoginForm } from '@/features/auth/ui/LoginForm';
+import LoginForm from '@/features/auth/ui/LoginForm'
 import './LoginControlPage.scss';
 
-export const ControlLoginPage = () => {
+export const LoginControlPage = () => {
   const handleLogin = (formData) => {
     // 관제탑 로그인 처리 로직
     console.log('Control tower login:', formData);

@@ -1,12 +1,15 @@
-import LoginForm from './features/auth/ui/LoginForm'
-import "./App.scss"
+import { BrowserRouter } from 'react-router-dom';
+import { AppRouter } from './app/router';
+import "./App.scss";
 
 function App() {
   return (
     <div className="app">
-      <LoginForm />
+      <BrowserRouter>
+        <AppRouter />
+      </BrowserRouter>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
