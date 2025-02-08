@@ -14,22 +14,23 @@ public class JwtTokenProvider {
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 365; // 1 year
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public String generateToken(String username) {
+    public String generateToken(String employeeId) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject("auth_token")
+                .claim("employeeId", employeeId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String getUsername(String token) {
+    public String getEmployeeId(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .getSubject();
+                .get("employeeId", String.class);
     }
 
     public boolean validateToken(String token) {
