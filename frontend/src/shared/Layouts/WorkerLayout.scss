@@ -1,0 +1,17 @@
+.worker-layout {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    
+    &__container {
+      width: 100%;
+      max-width: 400px;
+      min-height: 100vh;
+      background: white;
+      margin: 0 auto;
+      
+      @media (max-width: 400px) {
+        width: 100%;
+      }
+    }
+  }

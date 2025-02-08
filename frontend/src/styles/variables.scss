@@ -1,0 +1,62 @@
+/* Colors */
+// Global Color Token
+$color-green-50: #B7E3C1;
+$color-green-100: #84C993;
+$color-green-500: #4CAF50;
+$color-red-500: #D32F2F;
+$color-yellow-500: #D3B82F;
+
+$color-gray-0: #FFFFFF;
+$color-gray-25: #F6F6F6;
+$color-gray-50: #E0E0E0;
+$color-gray-100: #999999;
+$color-gray-250: #666666;
+$color-gray-10000: #000000;
+
+// Semantic Color Token
+$color-primary: $color-green-50;
+$color-primary-hover: $color-green-100;
+$color-disabled: $color-gray-50;
+$color-error: $color-red-500;
+$color-warning: $color-yellow-500;
+$color-safety: $color-green-500;
+
+$color-white: $color-gray-0;
+$color-white-hover: $color-gray-25;
+$color-lightgray: $color-gray-50;
+$color-gray: $color-gray-100;
+$color-darkgray: $color-gray-250;
+$color-black: $color-gray-10000;
+
+/* Typography : Font size, Font Weight, Line Height */
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-md: 1rem; // 16px
+$font-size-lg: 1.125rem;
+
+$font-weight-bold: 600;
+
+/* Spacing */
+$spacing-xs: 0.25rem;
+$spacing-md: 0.5rem;
+$spacing-lg: 1rem;
+$spacing-xl: 1.25rem;
+
+$input-heigt-lg: 56px;
+$input-padding: 0.5rem;
+$button-padding-y-sm: 8px;
+$button-padding-y-lg: 12px;
+
+/* Layout : BreakPoints */
+$form-field-height: 56px;
+$container-max-width: 400px;
+
+/* Border : Width, Radius, Style */
+$border-radius: 4px;
+
+/* Animation : Duration, Timing */
+$transition-duration: 0.2s;
+$transition-duration-long: 0.3s;
+$transition-timing: ease;
+
+/* Z-index */

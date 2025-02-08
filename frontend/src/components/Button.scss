@@ -1,0 +1,54 @@
+.button {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: $spacing-lg;
+  transition: all $transition-duration ease;
+
+  &:focus {
+    outline: none;
+  }
+
+  // 크기 변형
+  &.full {
+    width: 100%;
+    padding: $button-padding-y-lg 0;
+  }
+
+  &.medium {
+    padding: 12px 20px;
+  }
+
+  &.small {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  // 색상 변형
+  &.main {
+    background-color: $color-primary;
+    color: $color-white;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-lg;
+
+    &:hover:not(.disabled) {
+      background-color: $color-primary-hover;
+    }
+  }
+
+  &.sub {
+    background-color: $color-white;
+    color: $color-primary;
+
+    &:hover:not(.disabled) {
+      background-color: $color-white-hover;
+    }
+  }
+
+  &.disabled {
+    background-color: $color-white-hover;
+    color: $color-darkgray;
+    cursor: not-allowed;
+    pointer-events: auto; // 클릭 이벤트를 받기 위해 필요
+  }
+}

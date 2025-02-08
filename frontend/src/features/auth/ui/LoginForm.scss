@@ -1,0 +1,163 @@
+.login-form-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1.25rem;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .form-field {
+    position: relative;
+    height: $input-heigt-lg;
+    margin-bottom: 1.25rem;
+
+    input {
+      width: 100%;
+      height: 100%;
+      padding: $input-padding;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: $font-size-md;
+
+      &::placeholder {
+        color: transparent;
+        transition: color $transition-duration ease;
+      }
+
+      &:focus::placeholder {
+        color: $color-darkgray;
+      }
+
+      // autocomplete 사용시 배경색 자동 설정 해결 방안 (현재는 autocomplete 해제해둠)
+      // &:-webkit-autofill {
+      //   transition: white 50000s ease-in-out 0s;
+      //   -webkit-box-shadow: 0 0 0 30px white inset !important;
+      // }
+      &:focus {
+        outline: none;
+      }
+    }
+
+    label {
+      position: absolute;
+      left: $input-padding;
+      top: 50%;
+      font-size: $font-size-md;
+      color: $color-darkgray;
+      transition:
+        top $transition-duration ease,
+        font-size $transition-duration ease,
+        color $transition-duration ease;
+      pointer-events: none;
+    }
+
+    .control-button {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      &:focus {
+        outline: none;
+        opacity: 0.8;
+      }
+
+      svg {
+        display: block;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .line {
+      position: absolute;
+      top: $input-heigt-lg;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: $color-lightgray;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: $color-safety;
+        transition: width $transition-duration-long ease;
+        transform: translateX(-50%);
+      }
+    }
+
+    &.focused {
+      label {
+        top: 0.5rem;
+        font-size: 0.75rem;
+        color: $color-safety;
+      }
+
+      .line::after {
+        width: 100%;
+      }
+    }
+
+    .field-error {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: $spacing-md;
+      font-size: $font-size-xs;
+      color: $color-error;
+      animation: fadeIn $transition-duration ease;
+      will-change: transform, opacity;
+    }
+  }
+
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+  }
+
+  .error-message {
+    color: $color-error;
+    font-size: $font-size-sm;
+    margin: 0;
+    text-align: center;
+    animation: fadeIn $transition-duration-long ease;
+    will-change: transform, opacity;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.3125rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 상대 단위, 절대 단위 설정
+  - 상대 단위 (rem)
+    : 텍스트 관련 (font-size), 여백 관련 (margin, padding)
+  - 절대 단위 (px)
+    : border 두께, 입력 필드 높이, 아이콘 크기
+*/
