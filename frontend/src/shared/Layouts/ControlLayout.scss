@@ -1,11 +1,10 @@
 .control-layout {
-    min-height: 100vh;
-    width: 100%;
-    
-    // 반응형 패딩 적용
-    padding: 20px;
-    
-    @media (max-width: 768px) {
-      padding: 10px;
-    }
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  transition: padding $transition-duration-long ease;
+
+  @media (max-width: $breakpoint-tablet) {
+    padding: 10px;
   }
+}
