@@ -1,5 +1,6 @@
 import LoginForm from '@/features/auth/ui/LoginForm'
-import './LoginWorkerPage.scss';
+import { Logo } from '@/shared/ui/Logo/Logo.jsx';
+import './styles.scss';
 
 export const LoginWorkerPage = () => {
   const handleLogin = (formData) => {
@@ -9,6 +10,7 @@ export const LoginWorkerPage = () => {
 
   return (
     <div className="worker-login">
+      <Logo size="large" />
       <LoginForm onSubmit={handleLogin} userType="worker" />
     </div>
   );

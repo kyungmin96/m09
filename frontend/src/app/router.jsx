@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { WorkerLayout } from '@/shared/Layouts/WorkerLayout';
 import { ControlLayout } from '@/shared/Layouts/ControlLayout';
-import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage';
-import { LoginControlPage } from '@/pages/control/LoginControlPage';
+import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage/index';
+import { LoginControlPage } from '@/pages/control/LoginControlPage/index';
 
 export const AppRouter = () => {
   return (

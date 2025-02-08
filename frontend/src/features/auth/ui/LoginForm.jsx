@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Button from '@/components/Button';
+import Button from '@/shared/ui/Button/Button.jsx';
 import './LoginForm.scss';
 
 const LoginForm = () => {

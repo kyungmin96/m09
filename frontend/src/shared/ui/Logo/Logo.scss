@@ -1,0 +1,70 @@
+// src/shared/ui/Logo/Logo.scss
+.logo {
+  &__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  &__image {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__character {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    margin: $spacing-xl;
+    color: $color-black;
+  }
+
+  &__service {
+    font-size: 1.5rem;
+    font-weight: $font-weight-bold;
+    margin: 0.5rem 0 0;
+    color: $color-safety;
+  }
+
+  // Size variants
+  &--small {
+    .logo__image {
+      width: 60px;
+      height: 60px;
+    }
+    .logo__title {
+      font-size: $font-size-md;
+    }
+    .logo__service {
+      font-size: 1.5rem;
+    }
+  }
+
+  &--medium {
+    .logo__image {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  &--large {
+    .logo__image {
+      width: 150px;
+      height: 150px;
+    }
+    .logo__title {
+      font-size: 1.5rem;
+    }
+    .logo__service {
+      font-size: 2.25rem;
+    }
+  }
+}
