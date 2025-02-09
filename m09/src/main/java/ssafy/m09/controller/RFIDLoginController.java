@@ -8,7 +8,7 @@ import ssafy.m09.dto.request.RFIDLoginRequest;
 import ssafy.m09.service.RFIDLoginService;
 
 @RestController
-@RequestMapping("/api/rfid")
+@RequestMapping("/rfid")
 @RequiredArgsConstructor
 public class RFIDLoginController {
 
