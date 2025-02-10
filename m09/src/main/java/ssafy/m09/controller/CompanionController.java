@@ -15,7 +15,7 @@ public class CompanionController {
     // Companion 등록
     @PostMapping
     public ApiResponse<?> addCompanion(@RequestBody CompanionRequest request) {
-        return companionService.registerCompanion(request);
+        return companionService.createCompanion(request);
     }
 
     // 특정 Companion 조회

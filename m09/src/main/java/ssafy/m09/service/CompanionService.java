@@ -24,7 +24,7 @@ public class CompanionService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ApiResponse<Companion> registerCompanion(CompanionRequest request) {
+    public ApiResponse<Companion> createCompanion(CompanionRequest request) {
         Optional<Task> taskOptional = taskRepository.findById(request.getTaskId());
         if (taskOptional.isEmpty()) {
             return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 작업을 찾을 수 없습니다.");
