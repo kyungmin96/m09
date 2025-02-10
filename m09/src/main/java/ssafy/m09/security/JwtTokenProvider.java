@@ -3,6 +3,7 @@ package ssafy.m09.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.stereotype.Component;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 import ssafy.m09.domain.User;
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getUsername(String token) {
+    public String getEmployeeId(String token) {
         return extractAllClaims(token).getSubject();
     }
 
