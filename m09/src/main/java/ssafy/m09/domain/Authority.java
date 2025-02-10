@@ -2,11 +2,8 @@ package ssafy.m09.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssafy.m09.domain.en.AuthorityPosition;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "authorities")

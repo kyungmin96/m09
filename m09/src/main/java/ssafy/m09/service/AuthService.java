@@ -45,15 +45,15 @@ public class AuthService {
         return employeeId;
     }
 
-    public ApiResponse<String> login(UserLoginRequest request)
-    {
+    public ApiResponse<String> login(UserLoginRequest request) {
         Optional<User> userOptional = userRepository.findByEmployeeId(request.getEmployeeId());
         if(userOptional.isEmpty()){
             return ApiResponse.error(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND.getMessage(), ErrorCode.USER_NOT_FOUND.getCode());
         }
 
         User user = userOptional.get();
-        if(!user.getPassword().equals(request.getPassword())){
+        // Changed from direct comparison to using passwordEncoder.matches()
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             return ApiResponse.error(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_PASSWORD.getMessage(), ErrorCode.INVALID_PASSWORD.getCode());
         }
 
