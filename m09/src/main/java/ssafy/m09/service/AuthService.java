@@ -61,9 +61,8 @@ public class AuthService {
         return ApiResponse.success(token, "로그인 성공");
     }
 
-    // 사용자 등록 메서드 - 비밀번호 인코딩 추가
     @Transactional
-    public ApiResponse<String> registerUser(UserRegisterRequest request) {
+    public ApiResponse<User> registerUser(UserRegisterRequest request) {
         // 비밀번호 인코딩
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
@@ -86,7 +85,7 @@ public class AuthService {
                 .build();
         rfidRepository.save(rfid);
 
-        return ApiResponse.success(null, "사용자 등록 성공");
+        return ApiResponse.success(user, "사용자 등록 성공");
     }
 
     // 임시 사용자 등록 (비밀번호 인코딩 포함)
