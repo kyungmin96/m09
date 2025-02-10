@@ -16,19 +16,13 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     // 보류
     private String location;
-
-    private int batteryChargeRate;
-
-    @ManyToOne
-    @JoinColumn(name="manager_id", nullable = false)
-    private User manger;
-
-    private boolean isAvailable;
+    private boolean isUsing;
+    private boolean isCharging;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -36,7 +30,7 @@ public class Vehicle {
 
     @PrePersist
     protected void onCreate() {
-        this.isAvailable = true;
+        this.isUsing = true;
         this.createdAt = LocalDateTime.now();
     }
     @PreUpdate
