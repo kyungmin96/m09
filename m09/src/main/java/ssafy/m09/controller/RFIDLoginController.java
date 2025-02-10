@@ -3,11 +3,8 @@ package ssafy.m09.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ssafy.m09.domain.User;
-import ssafy.m09.dto.RFIDLoginRequest;
+import ssafy.m09.dto.request.RFIDLoginRequest;
 import ssafy.m09.service.RFIDLoginService;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/rfid")

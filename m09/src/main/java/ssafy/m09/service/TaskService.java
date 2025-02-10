@@ -2,14 +2,12 @@ package ssafy.m09.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import ssafy.m09.domain.Task;
-import ssafy.m09.dto.TaskRequest;
+import ssafy.m09.domain.en.TaskStatus;
+import ssafy.m09.dto.request.TaskRequest;
 import ssafy.m09.repository.TaskRepository;
 
-import java.nio.file.OpenOption;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,19 +18,19 @@ public class TaskService {
 
     @Transactional
     public Task createTask(TaskRequest request) {
+        //
         Task task = Task.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
-                .comment(request.getComment())
+//                .comment(request.getComment())
                 .location(request.getLocation())
-                .assignedUser(request.getAssignedUser())
-                .vehicle(request.getVehicle())
+//                .assignedUser(request.getAssignedUser())
+//                .vehicle(request.getVehicle())
                 .scheduledStartTime(request.getScheduledStartTime())
                 .scheduledEndTime(request.getScheduledEndTime())
-                .startTime(request.getStartTime())
-                .endTime(request.getEndTime())
-                .taskState(request.getTaskState())
-                .updatedAt(LocalDateTime.now())
+//                .startTime(request.getStartTime())
+//                .endTime(request.getEndTime())
+                .taskState(TaskStatus.START)
                 .build();
 
         return taskRepository.save(task);
@@ -61,13 +59,12 @@ public class TaskService {
             task.setEndTime(Optional.ofNullable(request.getEndTime()).orElse(task.getEndTime()));
             task.setTaskState(Optional.ofNullable(request.getTaskState()).orElse(task.getTaskState()));
 
-            task.setUpdatedAt(LocalDateTime.now());
             return taskRepository.save(task);
         });
     }
 
     @Transactional
-    public boolean deleteTask(int id) {
+    public boolean deleteTaskById(int id) {
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);
             return true;

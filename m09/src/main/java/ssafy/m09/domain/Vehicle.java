@@ -39,4 +39,6 @@ public class Vehicle {
         this.isAvailable = true;
         this.createdAt = LocalDateTime.now();
     }
+    @PreUpdate
+    protected void onUpdate() {this.updatedAt = LocalDateTime.now();}
 }

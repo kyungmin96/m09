@@ -37,4 +37,6 @@ public class VehicleUsageLog {
     public void prePersist() {
         createdAt = LocalDateTime.now();
     }
+    @PreUpdate
+    protected void onUpdate() {this.updatedAt = LocalDateTime.now();}
 }
