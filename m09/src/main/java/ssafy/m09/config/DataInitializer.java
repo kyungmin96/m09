@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ssafy.m09.domain.RFID;
 import ssafy.m09.domain.User;
 import ssafy.m09.repository.RFIDRepository;
+import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final RFIDRepository rfidRepository;
+    private final TaskRepository taskRepository;
 
     @Override
     public void run(String... args) {
