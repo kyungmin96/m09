@@ -5,6 +5,7 @@ from numpy import arange
 from scipy.interpolate import RectBivariateSpline
 from ultralytics import YOLO
 from threading import Thread
+import os
 
 # 추적 구조체
 class trace:
@@ -60,6 +61,8 @@ class trace:
         transforms = torch.hub.load('intel-isl/MiDaS','transforms')
         transform = transforms.small_transform
 
+        threshold = int(os.environ["M09_DANGER_THRESHOLD"])
+
         while self._initiated:
             ret, frame = self.cap.read()
             if not ret:
@@ -112,46 +115,66 @@ class trace:
             # YOLO 모델을 사용하여 객체 감지
             yolo_results = self.yolo(frame)
             speed = 0
+            is_danger = False
+            ref_dist = 998244353
+            detected = ""
             for result in yolo_results:
                 for box in result.boxes:
                     x1, y1, x2, y2 = box.xyxy[0].tolist()
                     confidence = box.conf[0].item()
-
+                    
                     if confidence < 0.5:
                         continue
 
                     class_id = box.cls[0].item()
                     label = f"{self.yolo.names[int(class_id)]}: {confidence:.2f}"
+                    detected += self.yolo.names[int(class_id)]
                     
                     object_center_x = (x1 + x2) // 2
                     object_center_y = (x1 + y2) // 2
                     object_depth = spline(object_center_y, object_center_x)[0][0]
                     object_distance = self._depth_to_distance(object_depth, depth_scale=depth_scale)
+                    
+                    center_diff = abs(frame_center_x - object_center_x)
+
+                    if ref_dist < object_distance:
+                        continue
 
                     if self.yolo.names[int(class_id)] == self.target_label:
                         if confidence < 0.8:
                             continue
-                        print("[OrinCar] Hey! There's a Person!")
+                        print("[OrinCar] Hey! There's a leader vest!")
                         
-                        person_center_x = (x1 + x2) // 2
+                        ref_dist = object_distance
+
                         speed = 0.6
 
                         if object_distance < self.min_distance_range:
                             speed = 0
-                        elif object_distance > self.max_distance_range:
+                        
+                        if is_danger:
+                            continue
+
+                        if object_distance > self.max_distance_range:
                             speed = 0.85
 
-                        if person_center_x < frame_center_x - direction_trace_range:   
-                            print("[OrinCar] Turn left")
-                            self.motor_controller.left()
-                        elif person_center_x > frame_center_x + direction_trace_range: 
-                            print("[OrinCar] Turn right")
-                            self.motor_controller.right()
-                        else:
-                            self.motor_controller.middle()
-                            
-                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                    cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                        steer_value = (object_center_x - frame_center_x) / 150 * (0.99 ** (object_distance / 100))
+                        print(f"[OrinCar] trace_steer: {steer_value}")
+                        self.motor_controller.set_steering(steer_value)
+
+                        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                        cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    elif center_diff < threshold:
+                        is_danger = True
+                        ref_dist = object_distance
+                        dir = -1 if frame_center_x - object_center_x < 0 else 1
+                        steer_value = (dir * threshold / (abs(frame_center_x - object_center_x) + 1)) * (0.99 ** (object_distance / 100))
+                        print(f"[OrinCar] evade_steer: {steer_value}")
+                        self.motor_controller.set_steering(steer_value)
+
+                        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 0, 0), 2)
+                        cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+            cv2.putText(frame, detected, (0, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
             
             self.motor_controller.set_throttle(speed)
             if not self._headless:
