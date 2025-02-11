@@ -1,4 +1,4 @@
-package ssafy.m09.controller;
+package ssafy.m09.controller.member;
 
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import ssafy.m09.service.VideoStreamService;
 @RestController
 @RequestMapping("/video")
 @RequiredArgsConstructor
-public class VideoController {
+public class MemberVideoController {
     private final VideoStreamService videoStreamService;
 
     @PostMapping("/send")
