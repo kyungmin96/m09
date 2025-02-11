@@ -1,4 +1,4 @@
-package ssafy.m09.security;
+package ssafy.m09.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +10,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ssafy.m09.security.CustomUserDetailsService;
+import ssafy.m09.security.JwtAuthenticationFilter;
+import ssafy.m09.security.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity
@@ -26,11 +29,11 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/api/rfid/login").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/manager/**").hasAuthority("ROLE_MANAGER")
-                        .requestMatchers("/member/**").hasAuthority("ROLE_MEMBER")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/all/**", "/auth/login", "/auth/register", "/api/rfid/login").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/member/**").hasAnyRole("ADMIN", "MANAGER", "MEMBER")
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),
