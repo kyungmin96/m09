@@ -2,11 +2,9 @@ package ssafy.m09.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssafy.m09.domain.en.AuthorityPosition;
+import ssafy.m09.domain.en.UserRole;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -39,8 +37,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true)
-    private AuthorityPosition position;
+    private UserRole position;
 
     @PrePersist
     public void prePersist() {

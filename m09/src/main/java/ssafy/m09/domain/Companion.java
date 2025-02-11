@@ -14,8 +14,9 @@ public class Companion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(columnDefinition = "JSON")
-    private String users;
+    @ManyToOne
+    @JoinColumn(name ="user_id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name ="task_id")

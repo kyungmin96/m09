@@ -1,0 +1,337 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+
+  &.visible {
+    display: flex;
+  }
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  height: 70vh;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+
+  &.visible {
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  position: relative;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .close-button {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #666666;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.modal-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background-color: #f8f8f8;
+}
+
+.search-section {
+  margin-bottom: 16px;
+
+  .search-container {
+    position: relative;
+  }
+
+  .search-button {
+    width: 100%;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #1a1a1a;
+
+    .arrow-down {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #666666;
+      transition: transform 0.2s ease;
+
+      &.open {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+.tool-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .tool-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: #1a1a1a;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+.selected-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .selected-tool-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: visible;
+    position: relative;
+
+    .tool-header {
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      span {
+        font-weight: 500;
+        color: #1a1a1a;
+      }
+
+      .remove-tool {
+        background: none;
+        border: none;
+        color: #666666;
+        cursor: pointer;
+        padding: 4px;
+        font-size: 20px;
+        line-height: 1;
+
+        &:hover {
+          color: #dc3545;
+        }
+      }
+    }
+
+    .tool-content {
+      display: flex;
+      padding: 0 16px 12px;
+      position: relative;
+
+      .work-selection {
+        width: 200px;
+        position: relative;
+
+        .work-button {
+          width: 100%;
+          padding: 8px 12px;
+          background: white;
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+          text-align: left;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          font-size: 14px;
+          color: #666666;
+          white-space: nowrap;
+
+          .arrow-down {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #666666;
+            transition: transform 0.2s ease;
+
+            &.open {
+              transform: rotate(180deg);
+            }
+          }
+
+          &:hover {
+            background: #f8f8f8;
+          }
+        }
+
+        .work-dropdown {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background: white;
+          border: 1px solid #e0e0e0;
+          border-radius: 6px;
+          margin-top: 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          z-index: 10;
+          display: none;
+
+          &.visible {
+            display: block;
+          }
+
+          .work-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #1a1a1a;
+            transition: background-color 0.2s;
+
+            &:hover {
+              background: #f5f5f5;
+            }
+
+            &.selected {
+              background: #e8f5e9;
+              color: #4CAF50;
+            }
+          }
+        }
+      }
+
+      .selected-works {
+        padding-left: 16px;
+        display: flex;
+        gap: 8px;
+
+        .work-badge {
+          background-color: #e8f5e9;
+          color: #4CAF50;
+          padding: 6px 12px;
+          border-radius: 16px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .badge-text {
+            margin-right: 4px;
+          }
+
+          .remove-badge {
+            background: none;
+            border: none;
+            color: #4CAF50;
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+              color: #dc3545;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.modal-footer {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+
+  .submit-button {
+    width: 100%;
+    padding: 14px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+      background: #43A047;
+    }
+  }
+}
+
+// 스크롤바 스타일링
+.modal-body,
+.tool-dropdown,
+.work-dropdown {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+
+    &:hover {
+      background: #a1a1a1;
+    }
+  }
+}

@@ -24,10 +24,6 @@ public class VehicleUsageLog {
     @JoinColumn(name = "task_id")
     private Task task;
 
-    @ManyToOne
-    @JoinColumn(name="vehicle_id")
-    private Vehicle vehicle;
-
     // data type 수정 필요
     @Column(updatable = false)
     private LocalDateTime createdAt;
