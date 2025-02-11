@@ -13,6 +13,7 @@ import ssafy.m09.global.error.ErrorCode;
 import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,6 +72,22 @@ public class TaskService {
     public ApiResponse<List<Task>> getAllTasks() {
         List<Task> tasks = taskRepository.findAll();
         return ApiResponse.success(tasks, "작업 목록 조회 성공");
+    }
+
+    public ApiResponse<List<Task>> getInProcessTasks() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // startTime이 현재 시간 이전이며, 상태가 START 또는 PENDING인 Task 조회
+        List<Task> tasks = taskRepository.findByStartTimeBeforeAndTaskStateIn(
+                now,
+                List.of(TaskStatus.START, TaskStatus.PENDING)
+        );
+
+        if (tasks.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "조회된 작업이 없습니다.");
+        }
+
+        return ApiResponse.success(tasks, "진행 중인 작업 조회 성공");
     }
 
     // 업데이트는 모든 필드 업데이트 가능하게 열어둠
