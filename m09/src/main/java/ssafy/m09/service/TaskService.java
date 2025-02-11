@@ -77,8 +77,8 @@ public class TaskService {
     public ApiResponse<List<Task>> getInProcessTasks() {
         LocalDateTime now = LocalDateTime.now();
 
-        // startTime이 현재 시간 이전이며, 상태가 START 또는 PENDING인 Task 조회
-        List<Task> tasks = taskRepository.findByStartTimeBeforeAndTaskStateIn(
+        // scheduledStartTime이 현재 시간 이전이며, 상태가 START 또는 PENDING인 Task 조회
+        List<Task> tasks = taskRepository.findByScheduledStartTimeBeforeAndTaskStateIn(
                 now,
                 List.of(TaskStatus.START, TaskStatus.PENDING)
         );
@@ -89,6 +89,7 @@ public class TaskService {
 
         return ApiResponse.success(tasks, "진행 중인 작업 조회 성공");
     }
+
 
     // 업데이트는 모든 필드 업데이트 가능하게 열어둠
     @Transactional

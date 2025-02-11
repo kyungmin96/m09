@@ -13,4 +13,6 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     Task getTaskById(int id);
 
     List<Task> findByStartTimeBeforeAndTaskStateIn(LocalDateTime now, List<TaskStatus> start);
+
+    List<Task> findByScheduledStartTimeBeforeAndTaskStateIn(LocalDateTime now, List<TaskStatus> start);
 }
