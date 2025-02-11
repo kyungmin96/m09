@@ -1,4 +1,4 @@
-package ssafy.m09.controller;
+package ssafy.m09.controller._legacy;
 
 import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;

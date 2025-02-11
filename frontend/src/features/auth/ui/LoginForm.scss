@@ -1,6 +1,5 @@
 .login-form-container {
   width: 100%;
-  max-width: 400px;
   margin: 0 auto;
   padding: 1.25rem;
 
@@ -104,8 +103,8 @@
 
     &.focused {
       label {
-        top: 0.5rem;
-        font-size: 0.75rem;
+        top: 0;
+        font-size: $font-size-xs;
         color: $color-safety;
       }
 
