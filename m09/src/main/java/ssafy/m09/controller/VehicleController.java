@@ -1,6 +1,7 @@
 package ssafy.m09.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.VehicleRequest;
@@ -12,26 +13,26 @@ import ssafy.m09.service.VehicleService;
 public class VehicleController {
     private final VehicleService vehicleService;
 
-    // 차량 등록
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     public ApiResponse<?> createVehicle(@RequestBody VehicleRequest request) {
         return vehicleService.createVehicle(request);
     }
 
-    // 전체 차량 조회
+    @PreAuthorize("hasRole('MANAGER')")
     @GetMapping
     public ApiResponse<?> getVehicles() {
         return vehicleService.getVehicles();
     }
 
-    // 차량 이름으로 조회
+    @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/name")
     public ApiResponse<?> getVehicleByName(@RequestBody VehicleRequest request) {
         return vehicleService.getVehicleByName(request);
     }
 
-    // 차량 이름으로 삭제
-    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
+    @DeleteMapping("/name")
     public ApiResponse<?> deleteVehicle(@RequestBody VehicleRequest request) {
         return vehicleService.deleteVehicleByName(request);
     }

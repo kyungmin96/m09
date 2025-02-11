@@ -2,6 +2,7 @@ package ssafy.m09.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.domain.User;
 import ssafy.m09.dto.common.ApiResponse;
@@ -25,6 +26,7 @@ public class AuthController {
         return authService.login(request);
     }
 
+    @PreAuthorize("hasRole('MEMBER')")
     @PostMapping("/logout")
     public ApiResponse<?> logout(@RequestHeader("Authorization") String token) {
         authService.logout(token.replace("Bearer ", ""));
