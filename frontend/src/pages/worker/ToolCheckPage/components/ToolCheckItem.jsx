@@ -8,15 +8,16 @@ const ToolCheckItem = ({
   isCameraDetected,
   isDisabled,
   onCheckChange,
-  onDisable
+  onDisable,
+  isReturnPage = false  // 반납 페이지 여부
 }) => {
   const handleActionClick = (e) => {
-    e.stopPropagation(); // 버튼 클릭이 상위로 전파되지 않도록 방지
+    e.stopPropagation();
     onDisable();
   };
 
   const handleCheckChange = (e) => {
-    e.stopPropagation(); // 체크박스 클릭이 상위로 전파되지 않도록 방지
+    e.stopPropagation();
     if (!isDisabled || isDefault) {
       onCheckChange();
     }
@@ -38,26 +39,30 @@ const ToolCheckItem = ({
           <span className="checkmark"></span>
         </label>
         <span className="tool-name">{tool.name}</span>
-        {!isDefault && <span className="new-badge">NEW</span>}
-        {isCameraDetected && (
+        {!isDefault && !isReturnPage && <span className="new-badge">NEW</span>}
+        {isCameraDetected && !isReturnPage && (
           <span className="camera-badge">
             <i className="camera-icon">📷</i>
           </span>
         )}
-        <button 
-          className={`action-button ${isDefault ? 'toggle-button' : 'delete-button'}`}
-          onClick={handleActionClick}
-        >
-          {isDefault ? (isDisabled ? '활성화' : '비활성화') : '삭제'}
-        </button>
+        {!isReturnPage && (
+          <button 
+            className={`action-button ${isDefault ? 'toggle-button' : 'delete-button'}`}
+            onClick={handleActionClick}
+          >
+            {isDefault ? (isDisabled ? '활성화' : '비활성화') : '삭제'}
+          </button>
+        )}
       </div>
-      <div className="work-badges">
-        {tool.works.map((work) => (
-          <span key={work.id} className="work-badge">
-            {work.name}
-          </span>
-        ))}
-      </div>
+      {!isReturnPage && (
+        <div className="work-badges">
+          {tool.works.map((work) => (
+            <span key={work.id} className="work-badge">
+              {work.name}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

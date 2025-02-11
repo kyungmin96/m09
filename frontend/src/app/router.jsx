@@ -5,6 +5,7 @@ import { ControlLayout } from '@/shared/Layouts/ControlLayout';
 
 import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage/index';
 import ToolCheckPage from '@/pages/worker/ToolCheckPage/index';
+import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
 import { LoginControlPage } from '@/pages/control/LoginControlPage/index';
 import TestMainPage from '@/pages/TestMainPage';
 
@@ -17,6 +18,7 @@ export const AppRouter = () => {
       <Route path="/worker" element={<WorkerLayout />}>
         <Route path="login" element={<LoginWorkerPage />} />
         <Route path="prepare-toolcheck" element={<ToolCheckPage />} />
+        <Route path="return-toolcheck" element={<ToolReturnPage />} />
       </Route>
 
       {/* 관제탑 영역 */}
