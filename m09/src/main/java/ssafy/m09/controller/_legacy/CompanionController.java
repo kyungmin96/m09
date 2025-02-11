@@ -1,4 +1,4 @@
-package ssafy.m09.controller;
+package ssafy.m09.controller._legacy;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

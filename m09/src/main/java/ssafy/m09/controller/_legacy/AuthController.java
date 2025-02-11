@@ -1,18 +1,13 @@
-package ssafy.m09.controller;
+package ssafy.m09.controller._legacy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ssafy.m09.domain.User;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.UserLoginRequest;
-import ssafy.m09.dto.response.UserLoginResponse;
 import ssafy.m09.dto.request.UserRegisterRequest;
 import ssafy.m09.security.JwtTokenProvider;
 import ssafy.m09.service.AuthService;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
