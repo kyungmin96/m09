@@ -30,6 +30,8 @@ public class ReportService {
         Report report = Report.builder()
                 .task(taskOptional.get())
                 .content(request.getContent())
+                .isReport(request.isReport())
+                .isCompleted(false)
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -50,6 +52,8 @@ public class ReportService {
         Report report = Report.builder()
                 .task(taskOptional.get())
                 .content(request.getContent())
+                .isReport(request.isReport())
+                .isCompleted(request.isCompleted())
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -78,6 +82,8 @@ public class ReportService {
         return reportRepository.findById(id)
                 .map(report -> {
                     report.setContent(request.getContent());
+                    report.setCompleted(request.isCompleted());
+                    report.setReport(request.isReport());
                     Report updatedReport = reportRepository.save(report);
                     return ApiResponse.success(updatedReport, "보고서 수정 성공");
                 })

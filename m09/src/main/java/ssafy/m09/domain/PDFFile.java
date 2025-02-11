@@ -2,35 +2,28 @@ package ssafy.m09.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ssafy.m09.domain.en.ToolCategory;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reports")
+@Table(name = "pdf_files")
 @Getter
 @Setter
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class Report {
+public class PDFFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name="task_id")
-    private Task task;
-
-    @Lob
     @Column(nullable = false)
-    private String content;
+    private String fileName;
 
     @Column(nullable = false)
-    private boolean isReport;
+    private String filePath;
 
-    @Column(nullable = false)
-    private boolean isCompleted;
+    private String fileDescription;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
