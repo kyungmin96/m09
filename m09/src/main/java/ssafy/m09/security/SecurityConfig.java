@@ -32,7 +32,6 @@ public class SecurityConfig {
                         .requestMatchers("/member/**").hasAuthority("ROLE_MEMBER")
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),
                         UsernamePasswordAuthenticationFilter.class
