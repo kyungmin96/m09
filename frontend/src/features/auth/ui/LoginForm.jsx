@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Button from '@/components/Button';
+import Button from '@/shared/ui/Button/Button.jsx';
 import './LoginForm.scss';
 
 const LoginForm = () => {
@@ -203,6 +203,7 @@ const LoginForm = () => {
               className="control-button clear-button"
               onClick={handleClearId}
               aria-label="clear input"
+              tabIndex="-1"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 0C4.47 0 0 4.47 0 10C0 15.53 4.47 20 10 20C15.53 20 20 15.53 20 10C20 4.47 15.53 0 10 0ZM15 13.59L13.59 15L10 11.41L6.41 15L5 13.59L8.59 10L5 6.41L6.41 5L10 8.59L13.59 5L15 6.41L11.41 10L15 13.59Z"
@@ -231,6 +232,7 @@ const LoginForm = () => {
               className="control-button visibility-button"
               onClick={togglePasswordVisibility}
               aria-label={showPassword ? "hide password" : "show password"}
+              tabIndex="-1"
             >
               {showPassword ? (
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

@@ -4,7 +4,9 @@ import './WorkerLayout.scss';
 export const WorkerLayout = () => {
   return (
     <div className="worker-layout">
-      <Outlet />
+      <div className="worker-layout__container">
+        <Outlet />
+      </div>
     </div>
   );
 };

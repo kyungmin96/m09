@@ -33,6 +33,7 @@ $font-size-xs: 0.75rem; // 12px
 $font-size-sm: 0.875rem; // 14px
 $font-size-md: 1rem; // 16px
 $font-size-lg: 1.125rem;
+$font-size-xg: 1.5rem;
 
 $font-weight-bold: 600;
 
@@ -49,7 +50,8 @@ $button-padding-y-lg: 12px;
 
 /* Layout : BreakPoints */
 $form-field-height: 56px;
-$container-max-width: 400px;
+$breakpoint-tablet: 768px;
+$container-max-width: 600px;
 
 /* Border : Width, Radius, Style */
 $border-radius: 4px;
