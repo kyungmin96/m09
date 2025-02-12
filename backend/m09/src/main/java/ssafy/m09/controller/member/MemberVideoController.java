@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ssafy.m09.dto.common.ApiResponse;
 
 @RestController
-@RequestMapping("/video")
+@RequestMapping("/member/video")
 @RequiredArgsConstructor
 public class MemberVideoController {
 

@@ -10,7 +10,7 @@ import ssafy.m09.service.PDFService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pdf")
+@RequestMapping("/member/pdf")
 @RequiredArgsConstructor
 public class MemberPDFController {
     private final PDFService pdfService;
