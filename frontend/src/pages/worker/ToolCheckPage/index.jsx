@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import ToolCheckSection from "./components/ToolCheck";
+import ToolCheckSection from "@/shared/ui/ToolCheck/ToolCheck";
 import TodayWorkList from "./components/TodayWorkList";
-import Modal from "./components/Modal";
+import Modal from "./components/AddToolModal";
 import Button from "@/shared/ui/Button/Button";
 import "./styles.scss";
 
@@ -86,10 +86,10 @@ const ToolCheckPage = () => {
     // 공구 삭제 핸들러 (추가)
     const handleDeleteTool = (toolKey) => {
         // 도구 삭제
-        const updatedTools = tools.filter(tool => 
+        const updatedTools = tools.filter(tool =>
             `${tool.id}-${tool.isDefault ? 'default' : 'additional'}` !== toolKey
         );
-        
+
         setTools(updatedTools);
 
         // localStorage 업데이트 (추가된 도구만)
@@ -111,21 +111,27 @@ const ToolCheckPage = () => {
     // 완료 처리
     const handleComplete = () => {
         // 비활성화되지 않은 도구 중 체크되지 않은 도구가 있는지 확인
-        const isAllChecked = activeTools.length > 0 && 
+        const isAllChecked = activeTools.length > 0 &&
             activeTools.length === checkedTools.length;
-    
+
         if (!isAllChecked) return;
-    
-        // 기본 도구 제외한 추가된 도구만 저장
-        const toolsToSave = allTools
-            .filter(tool => !tool.isDefault)
-            .map(({ id, name, works }) => ({ id, name, works }));
-    
+
+        // 활성화된 모든 도구 저장 (기본 도구 + 추가된 도구)
+        const toolsToSave = activeTools.map(({ id, name, works, isDefault }) => ({
+            id,
+            name,
+            works,
+            isDefault
+        }));
+
         // localStorage에 저장된 도구 업데이트
         localStorage.setItem('todayTools', JSON.stringify(toolsToSave));
-        localStorage.setItem('additionalTools', JSON.stringify(toolsToSave));
-    
-        navigate('/return');
+
+        // 추가된 도구만 additionalTools에 저장
+        const additionalTools = toolsToSave.filter(tool => !tool.isDefault);
+        localStorage.setItem('additionalTools', JSON.stringify(additionalTools));
+
+        navigate('/worker/return-toolcheck');
     };
 
     return (

@@ -6,11 +6,9 @@ import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage';
 import { WorkplaceMovePage } from '@/pages/worker/WorkplaceMovePage';
 import { LoginControlPage } from '@/pages/control/LoginControlPage';
 import ToolCheckPage from '@/pages/worker/ToolCheckPage/index';
-<<<<<<< HEAD
-=======
+import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
 import { LoginControlPage } from '@/pages/control/LoginControlPage/index';
 import TestMainPage from '@/pages/TestMainPage';
->>>>>>> 381161e7608834d92826b93c8671c23eb99ef2be
 
 export const AppRouter = () => {
   return (
@@ -22,6 +20,7 @@ export const AppRouter = () => {
         <Route path="login" element={<LoginWorkerPage />} />
         <Route path="workplace_move" element={<WorkplaceMovePage />} />
         <Route path="prepare-toolcheck" element={<ToolCheckPage />} />
+        <Route path="return-toolcheck" element={<ToolReturnPage />} />
       </Route>
 
       {/* 관제탑 영역 */}
