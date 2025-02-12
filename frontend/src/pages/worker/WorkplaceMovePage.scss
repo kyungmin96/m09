@@ -1,0 +1,264 @@
+// WorkplaceMovePage.scss
+$size: 50px; // 버튼 크기
+$circle-size: 200px; // 외부 원 크기
+$button-color: #b5e3c1;
+$hover-color: #9fd4ab;
+$pause-color: #7bc47f;
+
+.workplace-move {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  // 상단 모드 선택 영역
+  .mode-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 400px;
+
+    .mode-button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+
+      &.active {
+        background-color: #a4d4ae; // 활성화된 버튼 배경색
+        color: white; // 활성화된 버튼 텍스트 색상
+        border: none;
+      }
+
+      &:not(.active) {
+        background-color: transparent; // 비활성화된 버튼 배경색
+        color: #ccc; // 비활성화된 버튼 텍스트 색상
+        border: none;
+      }
+    }
+  }
+
+  .content-area {
+    width: 100%;
+    max-width: 600px; // 최대 너비 제한
+    margin-bottom: 20px; // 아래 요소와 간격 추가
+
+    .streaming-video {
+      width: 100%;
+      height: auto;
+      // max-width: 400px;
+      border-radius: 10px;
+      background-color: black; // 비디오 로딩 전 배경색 설정
+    }
+      @media (min-width: 768px) {
+        height: 400px; // 화면 크기에 따라 높이 조정
+      }
+    .direction-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+
+      .circle {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        border: 2px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+
+        button.arrow {
+          background-color: #a4d4ae;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          border: none;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #92c49b;
+          }
+        }
+
+        .horizontal-buttons {
+          display: flex;
+          justify-content: space-between;
+          width: calc(100% - 40px);
+
+          button.pause {
+            background-color: #a4d4ae;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            border: none;
+
+            &:hover {
+              background-color: #92c49b;
+            }
+          }
+        }
+      }
+    }
+  }
+  //   .direction-controls {
+  //     display: flex;
+  //     justify-content: center;
+  //     align-items: center;
+  //     margin-top: 20px;
+    
+  //     .circle {
+  //       width: $circle-size;
+  //       height: $circle-size;
+  //       border: 2px solid #e0e0e0;
+  //       border-radius: 50%;
+  //       position: relative;
+    
+  //       .horizontal-buttons {
+  //         display: flex;
+  //         gap: 10px;
+  //         position: absolute;
+  //         top: calc(50% - (#{$size} / 2));
+  //       }
+    
+  //       button {
+  //         width: $size;
+  //         height: $size;
+  //         background-color: $button-color;
+  //         border-radius: 50%;
+  //         border: none;
+  //         display: flex;
+  //         justify-content: center;
+  //         align-items: center;
+  //         cursor: pointer;
+    
+  //         &:hover {
+  //           background-color: $hover-color;
+  //         }
+    
+  //         &.pause {
+  //           position: absolute;
+  //           top: calc(50% - (#{$size} / 2));
+  //           left: calc(50% - (#{$size} / 2));
+  //           background-color: $pause-color;
+    
+  //           &::before {
+  //             content: "||"; // 정지 버튼 표시
+  //             font-size: 20px;
+  //             color: white;
+  //             font-weight: bold;
+  //           }
+  //         }
+    
+  //         &.arrow {
+  //           position: absolute;
+    
+  //           &.up {
+  //             top: calc(10%);
+  //             left: calc(50% - (#{$size} / 2));
+  //           }
+    
+  //           &.down {
+  //             bottom: calc(10%);
+  //             left: calc(50% - (#{$size} / 2));
+  //           }
+    
+  //           &.left {
+  //             left: calc(10%);
+  //             top: calc(50% - (#{$size} / 2));
+  //           }
+    
+  //           &.right {
+  //             right: calc(10%);
+  //             top: calc(50% - (#{$size} / 2));
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  .control-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+
+    .toggle-button {
+      width: 120px;
+      height: 50px;
+      border-radius: 25px;
+      background-color: #e0e0e0; // 기본 배경색
+      display: flex;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+
+      &.stopped {
+        background-color: #f03d3d; // '멈춤' 상태 배경색
+
+        .toggle-circle {
+          left: calc(100% - 44px); // 오른쪽 끝으로 이동
+          background-color: #fff !important; // 활성화 시 원 색상 변경
+        }
+
+        .toggle-label {
+          color: #fff; // '멈춤' 상태 텍스트 색상
+        }
+      }
+
+      &.started {
+        background-color: #a4d4ae; // '재시동' 상태 배경색
+
+        .toggle-circle {
+          left: 4px; // 기본 위치
+        }
+
+        .toggle-label {
+          color: #000; // '재시동' 상태 텍스트 색상
+          left: calc(100% - 70px);
+        }
+      }
+
+      .toggle-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #fff; // 기본 원 색상
+        position: absolute;
+        top: calc(50% - 20px); // 수직 가운데 정렬
+        left: 4px; // 기본 위치
+        transition: all 0.3s ease-in-out; // 부드러운 이동 애니메이션
+      }
+
+      .toggle-label {
+        position: absolute;
+        width: calc(100% - 50px); // 텍스트 영역 크기
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        color: #000; // 기본 텍스트 색상
+      }
+    }
+
+    .start-button {
+      position:absolute ;
+      bottom: 4%;
+      width: 120px;
+      height: 40px;
+      border-radius: 20px;
+      background-color: #a4d4ae; // 기본 색상
+      color: white;
+      font-size: 16px;
+
+      &:hover {
+        background-color: #92c49b; // 호버 색상
+      }
+    }
+  }
+}
