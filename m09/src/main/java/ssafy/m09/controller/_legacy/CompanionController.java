@@ -1,6 +1,7 @@
-package ssafy.m09.controller;
+package ssafy.m09.controller._legacy;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.CompanionRequest;
@@ -12,31 +13,31 @@ import ssafy.m09.service.CompanionService;
 public class CompanionController {
     private final CompanionService companionService;
 
-    // Companion 등록
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     public ApiResponse<?> addCompanion(@RequestBody CompanionRequest request) {
         return companionService.createCompanion(request);
     }
 
-    // 특정 Companion 조회
+    @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/{id}")
     public ApiResponse<?> getCompanionById(@PathVariable int id) {
         return companionService.getCompanionById(id);
     }
 
-    // taskId로 Companion 조회
+    @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/task/{taskId}")
     public ApiResponse<?> getCompanionsByTaskId(@PathVariable int taskId) {
         return companionService.getCompanionsByTaskId(taskId);
     }
 
-    // userId로 Companion 조회
+    @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/user/{userId}")
     public ApiResponse<?> getCompanionsByUserId(@PathVariable int userId) {
         return companionService.getCompanionsByUserId(userId);
     }
 
-    // Companion 삭제
+    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{id}")
     public ApiResponse<?> deleteCompanion(@PathVariable int id) {
         return companionService.deleteCompanion(id);

@@ -1,35 +1,20 @@
-package ssafy.m09.controller;
+package ssafy.m09.controller.manager;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ssafy.m09.domain.Task;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.TaskRequest;
 import ssafy.m09.service.TaskService;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/manager/tasks")
 @RequiredArgsConstructor
-public class TaskController {
+public class ManagerTaskController {
     private final TaskService taskService;
 
     @PostMapping("/posts")
-    public ApiResponse<?> createTask(@RequestHeader("Authorization") String token, @RequestBody TaskRequest taskRequest) {
-        return taskService.createTask(taskRequest);
-    }
-
-    @GetMapping("/posts")
-    public ApiResponse<?> getAllTasks(@RequestHeader("Authorization") String token) {
-        return taskService.getAllTasks();
-    }
-
-    @GetMapping("/posts/{id}")
-    public ApiResponse<?> getSingleTaskById(@RequestHeader("Authorization") String token, @PathVariable int id) {
-        return taskService.getTaskById(id);
+    public ApiResponse<?> createTask(@RequestHeader("Authorization") String token, @RequestBody TaskRequest request) {
+        return taskService.createTask(request);
     }
 
     @PutMapping("/posts/{id}")
