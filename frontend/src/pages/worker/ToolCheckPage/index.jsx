@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import ToolCheckSection from "./components/ToolCheck";
+import ToolCheckSection from "@/shared/ui/ToolCheck/ToolCheck";
 import TodayWorkList from "./components/TodayWorkList";
-import Modal from "./components/Modal";
+import Modal from "./components/AddToolModal";
 import Button from "@/shared/ui/Button/Button";
 import "./styles.scss";
 

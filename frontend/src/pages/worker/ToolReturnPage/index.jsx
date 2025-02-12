@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import ToolCheckSection from "../ToolCheckPage/components/ToolCheck";
+import ToolCheckSection from "@/shared/ui/ToolCheck/ToolCheck";
 import Button from "@/shared/ui/Button/Button";
 import "./styles.scss";
 

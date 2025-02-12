@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Camera from './Camera';
+import Camera from '@/shared/ui/Camera/Camera';
 import ToolCheckItem from './ToolCheckItem';
 import './ToolCheck.scss';
 
