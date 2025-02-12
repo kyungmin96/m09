@@ -13,19 +13,16 @@ import ssafy.m09.service.VehicleUsageLogService;
 public class ManagerVehicleUsageLogController {
     private final VehicleUsageLogService vehicleUsageLogService;
 
-    @PreAuthorize("hasRole('MANAGER')")
     @GetMapping
     public ApiResponse<?> getAllLogs() {
         return vehicleUsageLogService.getAllLogs();
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/{id}")
     public ApiResponse<?> getLogById(@PathVariable int id) {
         return vehicleUsageLogService.getLogById(id);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{id}")
     public ApiResponse<?> deleteLog(@PathVariable int id) {
         return vehicleUsageLogService.deleteLog(id);

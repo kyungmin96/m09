@@ -15,13 +15,11 @@ import ssafy.m09.service.TaskToolBuilderService;
 public class MemberTaskToolBuilderController {
     private final TaskToolBuilderService taskToolBuilderService;
 
-    @PreAuthorize("hasRole('MEMBER')")
     @GetMapping
     public ApiResponse<?> getAllTaskToolBuilders() {
         return taskToolBuilderService.getAllTaskToolBuilder();
     }
 
-    @PreAuthorize("hasRole('MEMBER')")
     @GetMapping("/{id}")
     public ApiResponse<?> getSingleTaskToolBuilder(@PathVariable("id") int id) {
         return taskToolBuilderService.getTaskToolBuilderById(id);

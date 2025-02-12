@@ -13,7 +13,6 @@ import ssafy.m09.service.VehicleUsageLogService;
 public class AdminVehicleUsageLogController {
     private final VehicleUsageLogService vehicleUsageLogService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ApiResponse<?> createLog(@RequestBody VehicleUsageLogRequest request) {
         return vehicleUsageLogService.createVehicleUsageLog(request);

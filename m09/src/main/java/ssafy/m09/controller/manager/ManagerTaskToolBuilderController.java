@@ -13,19 +13,16 @@ import ssafy.m09.service.TaskToolBuilderService;
 public class ManagerTaskToolBuilderController {
     private final TaskToolBuilderService taskToolBuilderService;
 
-    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     public ApiResponse<?> createTaskToolBuilder(@RequestBody TaskRequest taskRequest) {
         return taskToolBuilderService.createTaskToolBuilder(taskRequest);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/{id}")
     public ApiResponse<?> updateTaskToolBuilder(@PathVariable("id") int id, @RequestBody TaskRequest taskRequest) {
         return taskToolBuilderService.updateTaskToolBuilder(id, taskRequest);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{id}")
     public ApiResponse<?> deleteTaskToolBuilder(@PathVariable("id") int id) {
         return taskToolBuilderService.deleteTaskToolBuilder(id);
