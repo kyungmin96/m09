@@ -31,6 +31,12 @@ public class TaskController {
         return taskService.getTaskById(id);
     }
 
+    @PreAuthorize("hasRole('MEMBER')")
+    @GetMapping("/posts/in-process")
+    public ApiResponse<?> getInProcessTasks(@RequestHeader("Authorization") String token) {
+        return taskService.getInProcessTasks();
+    }
+
     @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/posts/{id}")
     public ApiResponse<?> updateTask(@RequestHeader("Authorization") String token, @PathVariable int id, @RequestBody TaskRequest request) {

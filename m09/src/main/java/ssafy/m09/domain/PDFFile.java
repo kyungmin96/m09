@@ -25,6 +25,10 @@ public class PDFFile {
 
     private String fileDescription;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_tool_builder_id")
+    private TaskToolBuilder taskToolBuilder;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
