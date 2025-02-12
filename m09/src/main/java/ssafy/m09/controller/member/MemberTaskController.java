@@ -20,4 +20,9 @@ public class MemberTaskController {
     public ApiResponse<?> getTaskById(@RequestHeader("Authorization") String token, @PathVariable int id) {
         return taskService.getTaskById(id);
     }
+
+    @GetMapping("/posts/in-process")
+    public ApiResponse<?> getInProcessTasks(@RequestHeader("Authorization") String token) {
+        return taskService.getInProcessTasks();
+    }
 }
