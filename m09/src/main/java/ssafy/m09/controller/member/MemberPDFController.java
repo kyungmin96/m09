@@ -2,11 +2,7 @@ package ssafy.m09.controller.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.response.PDFFileResponse;
 import ssafy.m09.service.PDFService;
