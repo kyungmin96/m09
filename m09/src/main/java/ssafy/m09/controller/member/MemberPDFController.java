@@ -19,13 +19,6 @@ import java.util.List;
 public class MemberPDFController {
     private final PDFService pdfService;
 
-    @PostMapping("/upload")
-    public ApiResponse<PDFFileResponse> uploadPDF(@RequestParam("file") MultipartFile file,
-                                                  @RequestParam("description") String fileDescription) {
-        // file: file, description: 설명
-        return pdfService.uploadPDF(file, fileDescription);
-    }
-
     @GetMapping
     public ApiResponse<List<PDFFileResponse>> getAllPDFs() {
         return pdfService.getAllPDFs();
