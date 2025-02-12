@@ -17,6 +17,11 @@ public class ManagerCompanionController {
         return companionService.createCompanion(request);
     }
 
+    @GetMapping("/task/{taskId}")
+    public ApiResponse<?> getCompanionsByTaskId(@PathVariable int taskId) {
+        return companionService.getCompanionsByTaskId(taskId);
+    }
+
     @DeleteMapping("/{id}")
     public ApiResponse<?> deleteCompanion(@PathVariable int id) {
         return companionService.deleteCompanion(id);

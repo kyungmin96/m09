@@ -23,6 +23,13 @@ public class ManagerTaskToolBuilderController {
         return taskToolBuilderService.updateTaskToolBuilder(id, taskRequest);
     }
 
+    @PutMapping("/{taskToolBuilderId}/pdf/{pdfId}")
+    public ApiResponse<?> updatePDFForTaskToolBuilder(
+            @PathVariable int taskToolBuilderId,
+            @PathVariable int pdfId) {
+        return taskToolBuilderService.updatePDFForTaskToolBuilder(taskToolBuilderId, pdfId);
+    }
+
     @DeleteMapping("/{id}")
     public ApiResponse<?> deleteTaskToolBuilder(@PathVariable("id") int id) {
         return taskToolBuilderService.deleteTaskToolBuilder(id);
