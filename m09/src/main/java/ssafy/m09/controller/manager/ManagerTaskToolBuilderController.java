@@ -1,0 +1,33 @@
+package ssafy.m09.controller.manager;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import ssafy.m09.dto.common.ApiResponse;
+import ssafy.m09.dto.request.TaskRequest;
+import ssafy.m09.service.TaskToolBuilderService;
+
+@RestController
+@RequestMapping("/manager/taskbuilders")
+@RequiredArgsConstructor
+public class ManagerTaskToolBuilderController {
+    private final TaskToolBuilderService taskToolBuilderService;
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @PostMapping
+    public ApiResponse<?> createTaskToolBuilder(@RequestBody TaskRequest taskRequest) {
+        return taskToolBuilderService.createTaskToolBuilder(taskRequest);
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @PutMapping("/{id}")
+    public ApiResponse<?> updateTaskToolBuilder(@PathVariable("id") int id, @RequestBody TaskRequest taskRequest) {
+        return taskToolBuilderService.updateTaskToolBuilder(id, taskRequest);
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> deleteTaskToolBuilder(@PathVariable("id") int id) {
+        return taskToolBuilderService.deleteTaskToolBuilder(id);
+    }
+}

@@ -11,7 +11,7 @@ import ssafy.m09.dto.response.PDFFileResponse;
 import ssafy.m09.service.PDFService;
 
 @RestController
-@RequestMapping("/pdf")
+@RequestMapping("/manager/pdf")
 @RequiredArgsConstructor
 public class ManagerPDFController {
     private final PDFService pdfService;
