@@ -1,0 +1,100 @@
+.cart-log {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px; /* 로그 영역의 최대 너비 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+  
+    h2 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+  
+    .selected-cart {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #555;
+  
+      .status {
+        font-size: 14px;
+        color: #4caf50; /* 초록색 (이용중 상태) */
+        font-weight: bold;
+  
+        &.waiting {
+          color: #999; /* 대기중 상태 */
+        }
+      }
+    }
+  
+    .log-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 10px;
+  
+      .log-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+  
+        &:last-child {
+          margin-bottom: 0; /* 마지막 항목 간격 제거 */
+        }
+  
+        .log-date {
+          font-size: 14px;
+          font-weight: bold;
+          color: #333;
+          margin-right: auto; /* 왼쪽 정렬 */
+        }
+  
+        .log-time {
+          font-size: 12px;
+          color: #666;
+          margin-right: auto; /* 왼쪽 정렬 */
+        }
+  
+        .log-manager {
+          font-size: 14px;
+          color: #333;
+          text-align: right; /* 오른쪽 정렬 */
+        }
+  
+        /* 타임라인 점과 선 */
+        position: relative;
+  
+        &::before {
+          content: "";
+          position: absolute;
+          left: -10px; /* 타임라인 점 위치 */
+          top: calc(50% - 5px);
+          width: 10px;
+          height: 10px;
+          background-color: #4caf50; /* 타임라인 점 색상 */
+          border-radius: 50%; /* 원형 점 */
+        }
+  
+        &::after {
+          content: "";
+          position: absolute;
+          left: -5px; /* 타임라인 선 위치 */
+          top: calc(50% + 5px);
+          width: 2px; /* 선 두께 */
+          height: calc(100% - 15px); /* 선 길이 */
+          background-color: #ddd; /* 타임라인 선 색상 */
+  
+          /* 마지막 항목의 선 제거 */
+          display: block;
+  
+          &:last-child::after {
+            display: none; /* 마지막 항목에서 선 숨김 */
+          }
+        }
+      }
+    }
+  }
+  

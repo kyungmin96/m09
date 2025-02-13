@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./WorkplaceMovePage.scss";
+import "./styles.scss";
 
 export const WorkplaceMovePage = () => {
   const [activeMode, setActiveMode] = useState("follow"); // '작업자 따라가기' 또는 '수동 조작'
