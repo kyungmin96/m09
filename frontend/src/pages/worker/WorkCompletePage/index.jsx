@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ToolCheckSection from '@/shared/ui/ToolCheck/ToolCheck';
-import Button from '@/shared/ui/Button/Button';
-import WorkStatusReport from './components/WorkStatusReport';
-import ConsumablesReport from './components/ConsumablesReport';
+import { ToolCheckSection } from '@/shared/ui/ToolCheck/ToolCheck';
+import { Button } from '@/shared/ui/Button/Button';
+import { WorkStatusReport } from './components/WorkStatusReport';
+import { ConsumablesReport } from './components/ConsumablesReport';
 import './styles.scss';
 
 export const WorkCompletePage = () => {
@@ -11,25 +11,34 @@ export const WorkCompletePage = () => {
   const [tools, setTools] = useState([]);
 
   useEffect(() => {
-    // todayTools에서 도구 목록 로드
     const savedTools = localStorage.getItem('todayTools');
     if (savedTools) {
       const parsedTools = JSON.parse(savedTools);
-      setTools(parsedTools);
+      const toolsWithStatus = parsedTools.map(tool => ({
+        ...tool,
+        taskState: tool.taskState || 'COMPLETE',
+        endTime: tool.endTime || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+      setTools(toolsWithStatus);
     }
   }, []);
 
   const handleComplete = () => {
-    // 작업 완료 처리
-    localStorage.removeItem('dailyTasks');
-    localStorage.removeItem('specialNotes');
-    localStorage.removeItem('todayTools');
-    localStorage.removeItem('checkedTools');
-    localStorage.removeItem('cameraDetectedTools');
-    localStorage.removeItem('disabledTools');
-    localStorage.removeItem('additionalTools');
-    localStorage.removeItem('dailyWorkStatus');
-    localStorage.removeItem('selectedTasks');
+    // 작업 완료 시 모든 localStorage 데이터 삭제
+    const keysToRemove = [
+      'dailyTasks',
+      'specialNotes',
+      'todayTools',
+      'checkedTools',
+      'cameraDetectedTools',
+      'disabledTools',
+      'additionalTools',
+      'dailyWorkStatus',
+      'selectedTasks'
+    ];
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
     navigate('/worker/today-task');
   };
 
@@ -47,6 +56,7 @@ export const WorkCompletePage = () => {
           hideDeleteButton={true}
           hideDisableButton={true}
           hideNewBadge={true}
+          readOnly={true}
         />
         
         <WorkStatusReport />

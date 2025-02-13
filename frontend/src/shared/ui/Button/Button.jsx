@@ -1,6 +1,6 @@
 import "./Button.scss"
 
-const Button = ({
+export const Button = ({
   variant = "main",
   size = "medium",
   type = "button",
@@ -29,5 +29,3 @@ const Button = ({
     </button>
   )
 }
-
-export default Button

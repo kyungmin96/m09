@@ -3,6 +3,7 @@ import { WorkerLayout } from '@/shared/Layouts/WorkerLayout';
 // import { ControlLayout } from '@/shared/Layouts/ControlLayout';
 
 import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage';
+import { MainPage } from '@/pages/worker/MainPage';
 import { TaskAssignment } from '@/pages/worker/TaskAssignmentPage/TaskAssignment';
 import { ToolCheckPage } from '@/pages/worker/ToolCheckPage';
 import { CheckSafetyPage } from '@/pages/worker/CheckSafetyPage';
@@ -22,6 +23,7 @@ export const AppRouter = () => {
       {/* 작업자 영역 */}
       <Route path="/worker" element={<WorkerLayout />}>
         <Route path="login" element={<LoginWorkerPage />} />
+        <Route path="main" element={<MainPage/>}/>
         <Route path="today-task" element={< TaskAssignment />}/>
         <Route path="prepare-toolcheck" element={<ToolCheckPage />} />
         <Route path="safety-check" element={<CheckSafetyPage />} />

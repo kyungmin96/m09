@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './Camera.scss';
 
-const Camera = ({ isEnabled = true }) => {
+export const Camera = ({ isEnabled = true }) => {
   const videoRef = useRef(null);
   const [error, setError] = useState(null);
   const [isStreamActive, setIsStreamActive] = useState(false);
@@ -66,5 +66,3 @@ const Camera = ({ isEnabled = true }) => {
     </div>
   );
 };
-
-export default Camera;

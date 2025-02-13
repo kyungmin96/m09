@@ -1,60 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/shared/ui/Button/Button';
-import ModalFrame from '@/shared/ui/ModalWorker/ModalFrame';
+import { Button } from '@/shared/ui/Button/Button';
+import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import './TaskAssignment.scss';
 
-// 더미 데이터
+// 더미 데이터를 API 응답 형식에 맞게 수정
 const DUMMY_TASKS = [
   {
     id: 1,
-    name: 'F100-FW-229 엔진 저압 압축기 블레이드 균열 검사',
-    details: [
-      '엔진 오일 레벨 점검 및 필요 시 보충',
-      'FADEC 시스템 진단 수행'
-    ],
-    deadline: '2025.01.24',
+    title: 'F100-FW-229 엔진 저압 압축기 블레이드 균열 검사',
+    content: '엔진 점검 및 진단 수행',
+    comment: '최근 작품 시 경고등 점등 이력 있음',
     location: 'T.O. 1F-16CJ-2-70JG-00-1',
-    tools: ['내시경 검사 장비', '토크 렌치 세트', '3mm 육각 렌치'],
-    manual: 'manual-link-1',
-    notes: '최근 작품 시 경고등 점등 이력 있음'
+    vehicle: null,
+    scheduledStartTime: '2025-01-24T09:00:00',
+    scheduledEndTime: '2025-01-24T17:00:00',
+    startTime: null,
+    endTime: null,
+    taskState: 'START',
+    createdAt: '2025-01-23T16:15:00.037435',
+    updatedAt: null,
+    assignedUser: null
   },
   {
     id: 2,
-    name: 'APU 배기 덕트 부식 검사',
-    details: [
-      'APU 배기 덕트 외부 육안 검사',
-      '부식 정도 측정 및 기록',
-      '클램프 체결 상태 확인'
-    ],
-    deadline: '2025.01.25',
+    title: 'APU 배기 덕트 부식 검사',
+    content: 'APU 배기 덕트 검사 및 상태 확인',
+    comment: '지난 점검 시 경미한 부식 발견됨',
     location: 'T.O. 1F-16CJ-2-49JG-00-1',
-    tools: ['부식 측정 게이지', '토크 렌치', '디지털 카메라'],
-    manual: 'manual-link-2',
-    notes: '지난 점검 시 경미한 부식 발견됨'
-  },
-  {
-    id: 3,
-    name: '착륙장치 유압 시스템 점검',
-    details: [
-      '유압 레벨 및 누유 여부 확인',
-      '작동 압력 테스트 수행',
-      '비상 확장 시스템 점검'
-    ],
-    deadline: '2025.01.26',
-    location: 'T.O. 1F-16CJ-2-32JG-00-1',
-    tools: ['유압 게이지', '손전등', '다용도 렌치 세트', '유압유'],
-    manual: 'manual-link-3',
-    notes: '동절기 특별 점검 항목 포함'
+    vehicle: null,
+    scheduledStartTime: '2025-01-25T09:00:00',
+    scheduledEndTime: '2025-01-25T17:00:00',
+    startTime: null,
+    endTime: null,
+    taskState: 'START',
+    createdAt: '2025-01-23T16:15:00.037435',
+    updatedAt: null,
+    assignedUser: null
   }
 ];
 
 const DUMMY_WORKERS = [
-  { id: 1, name: '김민호' },
-  { id: 2, name: '이상욱' },
-  { id: 3, name: '박준영' },
-  { id: 4, name: '최지훈' },
-  { id: 5, name: '정다은' }
+  {
+    id: 1,
+    employeeId: '7859885',
+    name: 'kbj1',
+    position: 'ROLE_MEMBER',
+    enabled: true,
+    createdAt: '2025-02-11T16:01:20.862905',
+    updatedAt: null
+  },
+  {
+    id: 2,
+    employeeId: '7859886',
+    name: 'kbj2',
+    position: 'ROLE_MEMBER',
+    enabled: true,
+    createdAt: '2025-02-11T16:01:20.862905',
+    updatedAt: null
+  }
 ];
 
 export const TaskAssignment = () => {
@@ -66,12 +70,10 @@ export const TaskAssignment = () => {
   const [selectedWorkers, setSelectedWorkers] = useState([]);
 
   useEffect(() => {
-    // 로컬 스토리지에서 선택된 작업 불러오기
     const savedTasks = localStorage.getItem('selectedTasks');
     if (savedTasks) {
       const parsedTasks = JSON.parse(savedTasks);
       setSelectedTasks(parsedTasks);
-      // 저장된 작업들을 available 리스트에서 제외
       setAvailableTasks(prev => 
         prev.filter(task => !parsedTasks.some(selected => selected.id === task.id))
       );
@@ -95,22 +97,21 @@ export const TaskAssignment = () => {
 
   const handleModalConfirm = () => {
     if (currentTask && selectedWorkers.length > 0) {
+      const assignedUser = DUMMY_WORKERS.find(worker => worker.id === selectedWorkers[0]);
+      
       const newTask = {
         ...currentTask,
-        workers: selectedWorkers.map(id => 
-          DUMMY_WORKERS.find(worker => worker.id === id)
-        )
+        assignedUser,
+        taskState: 'START',
+        updatedAt: new Date().toISOString()
       };
 
       const updatedTasks = [...selectedTasks, newTask];
       setSelectedTasks(updatedTasks);
-      
-      // 선택된 작업을 가용 작업 목록에서 제거
       setAvailableTasks(prev => 
         prev.filter(task => task.id !== currentTask.id)
       );
       
-      // 로컬 스토리지에 저장
       localStorage.setItem('selectedTasks', JSON.stringify(updatedTasks));
       
       setIsModalOpen(false);
@@ -132,14 +133,13 @@ export const TaskAssignment = () => {
         <div className="task-list">
           {selectedTasks.map(task => (
             <div key={task.id} className="task-item">
-              <h3>{task.name}</h3>
-              <div className="workers">
-                {task.workers.map(worker => (
-                  <span key={worker.id} className="worker-tag">
-                    {worker.name}
-                  </span>
-                ))}
-              </div>
+              <h3>{task.title}</h3>
+              <p>{task.content}</p>
+              {task.assignedUser && (
+                <div className="worker-tag">
+                  {task.assignedUser.name}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -150,12 +150,9 @@ export const TaskAssignment = () => {
         <div className="task-list">
           {availableTasks.map(task => (
             <div key={task.id} className="task-item">
-              <h3>{task.name}</h3>
-              <div className="task-details">
-                {task.details.map((detail, index) => (
-                  <p key={index}>{detail}</p>
-                ))}
-              </div>
+              <h3>{task.title}</h3>
+              <p>{task.content}</p>
+              {task.comment && <p className="comment">{task.comment}</p>}
               <Button 
                 variant="main"
                 onClick={() => handleTaskSelect(task)}
@@ -181,7 +178,7 @@ export const TaskAssignment = () => {
       <ModalFrame
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="공동 작업자 선택"
+        title="작업자 선택"
         footerContent={
           <Button
             variant="main"

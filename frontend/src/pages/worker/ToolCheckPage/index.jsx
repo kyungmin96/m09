@@ -1,10 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import ToolCheckSection from "@/shared/ui/ToolCheck/ToolCheck";
-import TodayWorkList from "./components/TodayWorkList";
-import Modal from "./components/AddToolModal";
-import Button from "@/shared/ui/Button/Button";
+import { ToolCheckSection } from "@/shared/ui/ToolCheck/ToolCheck";
+import { TodayWorkList } from "./components/TodayWorkList";
+import { Modal } from "./components/AddToolModal";
+import { Button } from "@/shared/ui/Button/Button";
 import "./styles.scss";
+
+// 기본 도구 데이터 구조
+const createToolObject = (name, works = [], isDefault = true) => ({
+    id: `tool-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    title: name,  // name 대신 title 사용
+    content: '',  // 설명이 필요한 경우를 위해 추가
+    comment: null,
+    location: null,
+    assignedUser: null,
+    scheduledStartTime: null,
+    scheduledEndTime: null,
+    startTime: null,
+    endTime: null,
+    taskState: 'READY',
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+    isDefault,
+    works
+});
 
 export const ToolCheckPage = () => {
     const navigate = useNavigate();
@@ -14,77 +33,63 @@ export const ToolCheckPage = () => {
     const [disabledTools, setDisabledTools] = useState(new Set());
     const [allTools, setAllTools] = useState([]);
 
-    // 초기 도구 목록 설정
     useEffect(() => {
         const initializeTools = () => {
-            // 선택된 작업에서 도구 목록 가져오기
             const savedTasks = localStorage.getItem('selectedTasks');
             if (!savedTasks) return;
 
             const parsedTasks = JSON.parse(savedTasks);
             
-            // 모든 작업의 도구 목록 추출 및 중복 제거
+            // 작업별 필요 도구 추출 (tools 필드가 있다고 가정)
             const toolSet = new Set();
             parsedTasks.forEach(task => {
-                task.tools.forEach(tool => toolSet.add(tool));
+                // tools 필드가 없는 경우를 대비한 안전한 접근
+                const taskTools = task.content?.split(',') || [];
+                taskTools.forEach(tool => toolSet.add(tool.trim()));
             });
 
             // 기본 도구 목록 생성
-            const defaultTools = Array.from(toolSet).map((toolName, index) => ({
-                id: `default-${index + 1}`,
-                name: toolName,
-                works: parsedTasks
-                    .filter(task => task.tools.includes(toolName))
+            const defaultTools = Array.from(toolSet).map(toolName => 
+                createToolObject(toolName, parsedTasks
+                    .filter(task => task.content?.includes(toolName))
                     .map(task => ({
-                        id: `work-${task.id}`,
-                        name: task.name
-                    })),
-                isDefault: true,
-                isActive: true,
-                isChecked: false
-            }));
+                        id: task.id,
+                        title: task.title,  // name 대신 title 사용
+                        content: task.content
+                    }))
+                )
+            );
 
             // localStorage에서 추가된 도구 로드
             const storedAdditionalTools = JSON.parse(localStorage.getItem('additionalTools') || '[]');
             
-            // 전체 도구 목록 설정
             setTools([...defaultTools, ...storedAdditionalTools]);
         };
 
         initializeTools();
     }, []);
 
-    // 활성화된 도구 계산
     const activeTools = useMemo(() => {
         return allTools.filter(tool =>
             !disabledTools.has(`${tool.id}-${tool.isDefault ? 'default' : 'additional'}`)
         );
     }, [allTools, disabledTools]);
 
-    // 공구 추가 핸들러
     const handleAddTool = (newTools) => {
         const toolsToAdd = newTools.map(newTool => ({
-            ...newTool,
-            id: `additional-${Date.now()}-${newTool.id}`,
-            isDefault: false,
-            isActive: true,
-            works: newTool.works.map((work, index) => ({
-                ...work,
-                id: `${newTool.id}-${index + 1}`
-            }))
+            ...createToolObject(newTool.title, newTool.works, false),
+            content: newTool.content || ''
         }));
 
         const updatedTools = [...tools, ...toolsToAdd];
         setTools(updatedTools);
 
-        // localStorage에 추가된 도구 저장
         const additionalTools = updatedTools.filter(tool => !tool.isDefault);
         localStorage.setItem('additionalTools', JSON.stringify(additionalTools));
 
         setIsModalOpen(false);
     };
 
-    // 공구 삭제 핸들러
     const handleDeleteTool = (toolKey) => {
         const updatedTools = tools.filter(tool =>
             `${tool.id}-${tool.isDefault ? 'default' : 'additional'}` !== toolKey
@@ -92,44 +97,42 @@ export const ToolCheckPage = () => {
 
         setTools(updatedTools);
 
-        // localStorage 업데이트 (추가된 도구만)
         const additionalTools = updatedTools.filter(tool => !tool.isDefault);
         localStorage.setItem('additionalTools', JSON.stringify(additionalTools));
     };
 
-    // ToolCheckSection에서 업데이트된 상태 처리
     const handleToolsUpdate = (updatedCheckedTools, updatedDisabledTools, updatedAllTools) => {
         setCheckedTools(updatedCheckedTools);
         setDisabledTools(updatedDisabledTools);
         setAllTools(updatedAllTools);
 
-        // 체크된 도구 목록 localStorage에 저장
+        // 업데이트된 도구들의 상태 저장
+        const toolsWithUpdates = updatedAllTools.map(tool => ({
+            ...tool,
+            taskState: updatedCheckedTools.includes(tool.id) ? 'COMPLETE' : 'READY',
+            updatedAt: new Date().toISOString()
+        }));
+
         localStorage.setItem('checkedTools', JSON.stringify(updatedCheckedTools));
         
-        // 추가된 도구 목록 localStorage에 저장
-        const additionalTools = updatedAllTools.filter(tool => !tool.isDefault);
+        const additionalTools = toolsWithUpdates.filter(tool => !tool.isDefault);
         localStorage.setItem('additionalTools', JSON.stringify(additionalTools));
     };
 
-    // 완료 처리
     const handleComplete = () => {
-        // 비활성화되지 않은 도구 중 체크되지 않은 도구가 있는지 확인
         const isAllChecked = activeTools.length > 0 &&
             activeTools.length === checkedTools.length;
 
         if (!isAllChecked) return;
 
-        // 활성화된 모든 도구 저장
-        const toolsToSave = activeTools.map(({ id, name, works, isDefault }) => ({
-            id,
-            name,
-            works,
-            isDefault
+        const toolsToSave = activeTools.map(tool => ({
+            ...tool,
+            taskState: 'COMPLETE',
+            endTime: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         }));
 
-        // localStorage에 저장
         localStorage.setItem('todayTools', JSON.stringify(toolsToSave));
-
         navigate('/worker/safety-check');
     };
 

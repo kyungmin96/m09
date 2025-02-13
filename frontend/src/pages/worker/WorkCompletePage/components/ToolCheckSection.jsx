@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
-import ToolCheckSection from "@/shared/ui/ToolCheck/ToolCheck";
-import Button from "@/shared/ui/Button/Button";
-import "./ToolReturnSection.scss";  // 파일명 변경
+import { ToolCheckSection } from "@/shared/ui/ToolCheck/ToolCheck";
+import { Button } from "@/shared/ui/Button/Button";
+import "./ToolReturnSection.scss";
 
-const ToolReturnSection = () => {    // 컴포넌트명 변경
+export const ToolReturnSection = () => {
     const navigate = useNavigate();
     const [tools, setTools] = useState([]);
     const [checkedTools, setCheckedTools] = useState([]);
@@ -18,15 +18,14 @@ const ToolReturnSection = () => {    // 컴포넌트명 변경
     }, [allTools, disabledTools]);
 
     useEffect(() => {
-        // todayTools에서 도구 목록 로드
         const savedTools = localStorage.getItem('todayTools');
         if (savedTools) {
             const parsedTools = JSON.parse(savedTools);
-            // 각 도구의 상태 초기화
             const initialTools = parsedTools.map(tool => ({
                 ...tool,
                 isActive: true,
-                isChecked: false
+                isChecked: false,
+                taskState: tool.taskState || 'START'
             }));
             
             setTools(initialTools);
@@ -40,16 +39,20 @@ const ToolReturnSection = () => {    // 컴포넌트명 변경
     };
 
     const handleComplete = () => {
-        const isAllChecked = activeTools.length > 0 && 
-            activeTools.length === checkedTools.length;
-    
-        if (!isAllChecked) return;
-    
-        // 모든 도구가 반납되었으므로 localStorage 초기화
+        if (activeTools.length === 0 || activeTools.length !== checkedTools.length) return;
+        
+        // 반납 완료 처리
+        const updatedTools = tools.map(tool => ({
+            ...tool,
+            taskState: 'COMPLETE',
+            endTime: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        }));
+        
+        localStorage.setItem('todayTools', JSON.stringify(updatedTools));
         localStorage.removeItem('checkedTools');
         localStorage.removeItem('additionalTools');
-        localStorage.removeItem('dailyWorkStatus');  // 작업 상태도 초기화
-    
+        
         navigate('/worker/complete');
     };
 
@@ -64,9 +67,6 @@ const ToolReturnSection = () => {    // 컴포넌트명 변경
                     onToolsUpdate={handleToolsUpdate}
                     isReturnPage={true}
                     hideAddButton={true}
-                    hideDeleteButton={true}
-                    hideDisableButton={true}
-                    hideNewBadge={true}
                 />
             </div>
             <div className="button-wrapper">
@@ -85,5 +85,3 @@ const ToolReturnSection = () => {    // 컴포넌트명 변경
         </div>
     );
 };
-
-export default ToolReturnSection;

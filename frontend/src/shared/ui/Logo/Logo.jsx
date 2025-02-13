@@ -18,5 +18,3 @@ export const Logo = ({ size = 'medium' }) => {
     </div>
   );
 };
-
-export default Logo;

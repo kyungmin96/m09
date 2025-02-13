@@ -27,12 +27,18 @@ export const CheckSafetyPage = () => {
 
       // 선택된 작업들의 모든 작업자 추가
       parsedTasks.forEach(task => {
-        task.workers.forEach(worker => {
-          allWorkers.add(worker.name);
-        });
+        // assignedUser가 있는 경우에만 추가
+        if (task.assignedUser && task.assignedUser.name) {
+          allWorkers.add(task.assignedUser.name);
+        }
       });
 
       const uniqueWorkerList = Array.from(allWorkers);
+
+      // 작업자 목록이 비어있는 경우 현재 사용자라도 추가
+      if (uniqueWorkerList.length === 0 && currentUser) {
+        uniqueWorkerList.push(currentUser);
+      }
 
       // 작업자 목록 설정
       setWorkerList(uniqueWorkerList);
@@ -60,6 +66,8 @@ export const CheckSafetyPage = () => {
   );
 
   const handleCompleteCheck = () => {
+    if (!currentWorker) return;
+
     setWorkerStatus((prevStatus) => ({
       ...prevStatus,
       [currentWorker]: detectionData[currentWorker],
@@ -73,6 +81,15 @@ export const CheckSafetyPage = () => {
   const handleReadyComplete = () => {
     navigate("/worker/workplace-move");
   };
+
+  if (workerList.length === 0) {
+    return (
+      <div className="check-safety-page">
+        <h1>복장 체크</h1>
+        <p>확인할 작업자가 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="check-safety-page">

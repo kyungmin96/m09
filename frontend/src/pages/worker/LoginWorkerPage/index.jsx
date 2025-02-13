@@ -1,4 +1,4 @@
-import LoginForm from '@/features/auth/ui/LoginForm'
+import { LoginForm } from '@/features/auth/ui/LoginForm'
 import { Logo } from '@/shared/ui/Logo/Logo.jsx';
 import './styles.scss';
 
