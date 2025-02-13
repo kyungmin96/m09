@@ -1,0 +1,226 @@
+// styles.scss
+.main-page {
+    padding: 20px;
+    
+    .main-header {
+      margin-bottom: 24px;
+      
+      h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
+      }
+    }
+  
+    .cart-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      
+      .cart-registration {
+        .cart-empty {
+          border: 2px dashed #ccc;
+          border-radius: 8px;
+          padding: 40px;
+          text-align: center;
+          margin-bottom: 16px;
+          
+          .cart-icon {
+            width: 48px;
+            height: 48px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #666;
+          }
+        }
+        
+        .register-button {
+          width: 100%;
+          padding: 12px;
+          background: #a5d6a7;
+          border: none;
+          border-radius: 8px;
+          color: #fff;
+          font-weight: bold;
+          cursor: pointer;
+          
+          &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+          }
+        }
+      }
+  
+      .cart-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .battery-status {
+          width: 120px;
+          height: 20px;
+          background: #eee;
+          border-radius: 10px;
+          overflow: hidden;
+          position: relative;
+          
+          .battery-bar {
+            height: 100%;
+            background: #a5d6a7;
+            transition: width 0.3s;
+          }
+          
+          span {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  
+    .work-schedule {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      
+      h2 {
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+  
+      .calendar-section {
+        margin-bottom: 24px;
+        
+        .calendar-nav {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+          
+          .nav-button {
+            padding: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            
+            &:hover {
+              background: #f5f5f5;
+              border-radius: 50%;
+            }
+          }
+        }
+        
+        .weekdays {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          text-align: center;
+          margin-bottom: 8px;
+        }
+        
+        .dates-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 8px;
+          
+          .date-cell {
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            
+            &:hover {
+              background-color: #f0f0f0;
+            }
+            
+            .date {
+              font-size: 16px;
+            }
+            
+            .work-count {
+              font-size: 12px;
+              background: #eee;
+              padding: 2px 6px;
+              border-radius: 10px;
+            }
+            
+            &.selected {
+              background: #a5d6a7;
+              color: #fff;
+              
+              &:hover {
+                background-color: darken(#a5d6a7, 5%);
+              }
+              
+              .work-count {
+                background: rgba(255, 255, 255, 0.3);
+              }
+            }
+          }
+        }
+      }
+  
+      .work-list {
+        .work-item {
+          display: flex;
+          align-items: center;
+          padding: 16px;
+          border-bottom: 1px solid #eee;
+          
+          &:last-child {
+            border-bottom: none;
+          }
+          
+          .count {
+            width: 24px;
+            height: 24px;
+            background: #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+          }
+          
+          .work-info {
+            h3 {
+              font-size: 16px;
+              margin-bottom: 4px;
+            }
+            
+            .workers {
+              font-size: 14px;
+              color: #666;
+            }
+          }
+        }
+      }
+    }
+  
+    .work-setting-button {
+      width: 100%;
+      padding: 16px;
+      background: #a5d6a7;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      
+      &:hover {
+        background: darken(#a5d6a7, 5%);
+      }
+    }
+  }

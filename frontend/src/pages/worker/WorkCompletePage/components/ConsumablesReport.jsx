@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './ConsumablesReport.scss';
 
-const ConsumablesReport = () => {
+export const ConsumablesReport = () => {
   const [report, setReport] = useState('');
 
   return (
@@ -15,5 +15,3 @@ const ConsumablesReport = () => {
     </div>
   );
 };
-
-export default ConsumablesReport;

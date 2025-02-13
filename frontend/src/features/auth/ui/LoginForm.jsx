@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Button from '@/shared/ui/Button/Button.jsx';
+import { Button } from '@/shared/ui/Button/Button.jsx';
 import './LoginForm.scss';
 
-const LoginForm = () => {
+export const LoginForm = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState(null);
@@ -273,5 +273,3 @@ const LoginForm = () => {
     </div>
   );
 };
-
-export default LoginForm;
