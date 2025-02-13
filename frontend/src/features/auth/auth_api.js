@@ -37,3 +37,20 @@ export const login = async (payload) => {
     throw new Error("로그인 오류 발생");
   }
 };
+
+/**
+ * 로그아웃 API 함수
+ * @returns {Promise<any>} 로그아웃 응답 데이터
+ */
+export const logout = async () => {
+  try {
+    const response = await axios_api.post("/member/auth/logout");
+    localStorage.removeItem('auth-token');
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response?.data;
+    }
+    throw new Error("로그아웃 오류 발생");
+  }
+};

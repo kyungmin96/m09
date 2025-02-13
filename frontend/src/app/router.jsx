@@ -15,6 +15,7 @@ import CheckSafetyPage from '@/pages/worker/CheckSafetyPage';
 import CartManagePage from '@/pages/control/CartManagePage';
 import TestMainPage from '@/pages/TestMainPage';
 import RegisterTestPage from '@/pages/test/RegisterTestPage';
+import LoginTestPage from '@/pages/test/LoginTestPage';
 
 export const AppRouter = () => {
   return (
@@ -22,6 +23,7 @@ export const AppRouter = () => {
       {/* 테스트 메인 페이지 */}
       <Route path="/" element={<TestMainPage />} />
       <Route path="/test/register" element={<RegisterTestPage />} />
+      <Route path="/test/login" element={<LoginTestPage />} />
       {/* 작업자 영역 */}
       <Route path="/worker" element={<WorkerLayout />}>
         <Route path="login" element={<LoginWorkerPage />} />
