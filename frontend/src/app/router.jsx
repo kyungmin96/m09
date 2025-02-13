@@ -10,16 +10,18 @@ import ToolCheckPage from '@/pages/worker/ToolCheckPage/index';
 import WorkProgressPage from '@/pages/worker/WhileWorkPage';
 import WorkCompletePage from '@/pages/worker/WorkCompletePage/index';
 // import { LoginControlPage } from '@/pages/control/LoginControlPage/index';
-import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
+// import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
 import CheckSafetyPage from '@/pages/worker/CheckSafetyPage';
 import CartManagePage from '@/pages/control/CartManagePage';
 import TestMainPage from '@/pages/TestMainPage';
+import RegisterTestPage from '@/pages/test/RegisterTestPage';
 
 export const AppRouter = () => {
   return (
     <Routes>
       {/* 테스트 메인 페이지 */}
       <Route path="/" element={<TestMainPage />} />
+      <Route path="/test/register" element={<RegisterTestPage />} />
       {/* 작업자 영역 */}
       <Route path="/worker" element={<WorkerLayout />}>
         <Route path="login" element={<LoginWorkerPage />} />
@@ -30,7 +32,7 @@ export const AppRouter = () => {
         <Route path="complete-work" element={<WorkCompletePage />} />
         <Route path="workplace-move" element={<WorkplaceMovePage />} />
         <Route path="prepare-toolcheck" element={<ToolCheckPage />} />
-        <Route path="return-toolcheck" element={<ToolReturnPage />} />
+        {/* <Route path="return-toolcheck" element={<ToolReturnPage />} /> */}
         <Route path="safety-check" element={<CheckSafetyPage />} />
       </Route>
 
