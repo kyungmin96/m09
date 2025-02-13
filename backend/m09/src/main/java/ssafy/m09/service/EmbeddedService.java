@@ -13,7 +13,7 @@ import ssafy.m09.dto.response.DetectionStartResponse;
 @Service
 @RequiredArgsConstructor
 public class EmbeddedService {
-    private final String EMBEDDED_API_URL = "http://localhost:8765/api/v1/embedded";
+    private final String EMBEDDED_API_URL = "http://localhost:8765/barebone";
     private final RestTemplate restTemplate;
 
     public ResponseEntity<String> manualDriveStop() {
