@@ -1,15 +1,16 @@
 package ssafy.m09.controller.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.VehicleUsageLogRequest;
 import ssafy.m09.service.VehicleUsageLogService;
 
 @RestController
-@RequestMapping("/admin/vehicle-logs")
+@RequestMapping("/admin/vehicle-usage-logs")
 @RequiredArgsConstructor
-public class AdminVehicleLogController {
+public class AdminVehicleUsageLogController {
     private final VehicleUsageLogService vehicleUsageLogService;
 
     @PostMapping
