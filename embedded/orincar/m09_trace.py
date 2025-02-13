@@ -231,7 +231,7 @@ class trace:
                 stream_cv_frame(frame)
                 
     def start(self):
-        if self._thread and self._thread.is_active():
+        if self._thread and self._thread.is_alive():
             self.stop()
         if self._headless:
             from m09_socketio import stream_cv_frame
