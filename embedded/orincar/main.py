@@ -1,12 +1,9 @@
 from m09_motor import *
 from m09_camera import *
+from m09_socketio import *
 from matplotlib import use as matploblib_use
 from time import sleep
 import sys
-import os
-
-yolo_model = os.environ["M09_TRACK_MODEL"] 
-target_label = os.environ["M09_TARGET"]
 
 if __name__ == "__main__":
     _headless = ("--headless" in sys.argv) or ("-hl" in sys.argv)
@@ -21,9 +18,13 @@ if __name__ == "__main__":
 
     if not _manual:
         from m09_trace import *
-        object_tracer = trace(motor_controller, camera=cap, _headless=_headless, yolo_model=yolo_model, target_label=target_label)
-        object_tracer.start()
+        from m09_detect import *
+        object_tracer = trace(motor_controller, camera=cap, _headless=_headless)
+        # object_tracer.start()
         print("[OrinCar] Tracing Enabled!")
+        object_detect = detect(camera=cap)
+        # object_detect.start(tool_list=["hammer"])
+        print("[OrinCar] Detection Enabled!")
     else:
         from m09_ssh_control import *
         ssh_controller = ssh_control(motor_controller)
@@ -35,9 +36,10 @@ if __name__ == "__main__":
             sleep(0.1)
     except KeyboardInterrupt:
         pass
-    
+
     if not _manual:
         object_tracer.stop()
+        object_detect.stop()
     else:
         ssh_controller.stop()
 
