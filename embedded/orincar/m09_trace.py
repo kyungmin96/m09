@@ -9,23 +9,26 @@ import os
 
 # 추적 구조체
 class trace:
-    def __init__(self, motor_control, camera, _headless, yolo_model, target_label="person", min_distance_range=100, max_distance_range=500):
+    def __init__(self, motor_control, camera, _headless, min_distance_range=100, max_distance_range=500):
         self.motor_controller = motor_control
         self._headless = _headless
         # 모델 설정
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        yolo_model = os.environ["M09_TRACK_MODEL"] 
         self.yolo = YOLO(yolo_model)
         self.yolo.to(self.device)
+        
         self.midas = torch.hub.load("intel-isl/MiDaS", "MiDaS_small", pretrained=True)
         self.midas.to(self.device)
         self.midas.eval()
 
+        target_label = os.environ["M09_TARGET"]
         self.target_label = 0
         for key, val in self.yolo.names.items():
             if val == target_label:
                 self.target_label = int(key)
             
-        self._initiated = True
+        self._initiated = False
         # 카메라
         self.camera = camera
         
@@ -42,11 +45,13 @@ class trace:
         return 100 / (depth_value * depth_scale)
 
     def _run(self):
+        # 주행 루프
+        self._initiated = True
         # GPU에서 CUDA 사용 가능 여부
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
 
         if self._headless:
-            from m09_stream_uploader import stream_cv_frame
+            from m09_socketio import stream_cv_frame
 
         if use_cuda:
             print("[OrinCar] CUDA activated.")
@@ -56,6 +61,7 @@ class trace:
         prev_depth = 0.0
         depth_scale = 1.0
         direction_trace_range = self.camera.cam_width // 32
+        tick_count = 0
 
         transforms = torch.hub.load('intel-isl/MiDaS','transforms')
         transform = transforms.small_transform
@@ -112,11 +118,14 @@ class trace:
             frame_center_depth = spline(frame_center_y, frame_center_x)[0][0]
             frame_center_distance = self._depth_to_distance(frame_center_depth, depth_scale=depth_scale)
             print(F"[OrinCar] Distance Center: {frame_center_distance}")
+
             # YOLO 모델을 사용하여 객체 감지
             yolo_results = self.yolo(frame)
             speed = 0
             is_danger = False
             ref_dist = 998244353
+            found_target = False
+            steer_value = 0
 
             for result in yolo_results:
                 detect_boxes = []
@@ -128,13 +137,13 @@ class trace:
                 for box in detect_boxes:
                     x1, y1, x2, y2 = box.xyxy[0].tolist()
                     confidence = box.conf[0].item()
-                    
+
                     if confidence < 0.5:
                         continue
 
                     class_id = box.cls[0].item()
                     label = f"{self.yolo.names[int(class_id)]}: {confidence:.2f}"
-                    
+
                     object_center_x = (x1 + x2) // 2
                     object_center_y = (x1 + y2) // 2
                     object_depth = spline(object_center_y, object_center_x)[0][0]
@@ -142,14 +151,15 @@ class trace:
 
                     if int(class_id) == self.target_label:
                         print("[OrinCar] Hey! There's a leader vest!")
-                        
+
+                        found_target = True
                         ref_dist = object_distance
 
                         speed = 0.6
 
                         if object_distance < self.min_distance_range:
                             speed = 0
-                        
+
                         if is_danger:
                             continue
 
@@ -166,6 +176,9 @@ class trace:
                         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
                         cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
+                        # tmp
+                        continue
+
                         if ref_dist < object_distance + 100:
                             continue
 
@@ -174,16 +187,43 @@ class trace:
                         dir = -1 if frame_center_x - object_center_x < 0 else 1
                         steer_value = (dir * threshold / (abs(frame_center_x - object_center_x) + 1)) * (0.99 ** (object_distance / 100))
                         print(f"[OrinCar] evade_steer: {steer_value}")
-                        self.motor_controller.set_steering(steer_value)                        
+                        self.motor_controller.set_steering(steer_value)
                     else:
                         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 255, 0), 2)
                         cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
-            
+
+            # new logic
+            frame_focus_y = self.camera.cam_height * 2 // 3
+            dander_ref_x = frame_center_x
+            danger_ref_dist = 998244353
+
+            for i in range(frame_center_x - threshold, frame_center_x + threshold):
+                cur_depth = spline(frame_focus_y, i)[0][0]
+                cur_distance = self._depth_to_distance(cur_depth, depth_scale=depth_scale)
+
+                if cur_distance > self.max_distance_range * 0.75 and ref_dist < cur_distance + 100:
+                    continue
+
+                danger_ref_dist = min(cur_distance, danger_ref_dist)
+                is_danger = True
+
+            if is_danger:
+                left_avg = sum([self._depth_to_distance(spline(frame_focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x - threshold)])
+                right_avg = sum([self._depth_to_distance(spline(frame_focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x + threshold, self.camera.cam_width)])
+                dir = 1 if left_avg < right_avg else -1
+                print("[OrinCar] Danger!")
+                danger_steer_value = dir * (0.75 ** (danger_ref_dist / 100))
+                self.motor_controller.set_steering((danger_steer_value * 4 + steer_value * 6) / 10)
+
+
             self.motor_controller.set_throttle((speed + prev_speed) / 2)
             prev_speed = speed
 
+            tick_count += 1
             if not self._headless:
-                cv2.imshow("OrinCar MO9", frame)
+                if tick_count & 1:
+                    cv2.imshow("OrinCar MO9", frame)
+
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     cv2.destroyAllWindows()
                     break
@@ -194,7 +234,7 @@ class trace:
         if self._thread and self._thread.is_active():
             self.stop()
         if self._headless:
-            from m09_stream_uploader import stream_cv_frame
+            from m09_socketio import stream_cv_frame
         self._thread = Thread(target=self._run)
         self._thread.start()
 
