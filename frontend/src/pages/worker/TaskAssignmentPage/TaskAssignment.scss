@@ -1,0 +1,71 @@
+.task-assignment {
+    padding: 16px;
+    
+    section {
+      margin-bottom: 24px;
+      
+      h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+    }
+  
+    .task-list {
+      .task-item {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  
+        h3 {
+          font-size: 16px;
+          margin-bottom: 8px;
+        }
+  
+        .task-details {
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 16px;
+  
+          p {
+            margin: 4px 0;
+          }
+        }
+      }
+    }
+  
+    .workers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+  
+      .worker-tag {
+        background: #f0f0f0;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 14px;
+      }
+    }
+  
+    .worker-selection {
+      .worker-item {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: white;
+        cursor: pointer;
+        transition: background-color 0.2s;
+  
+        &.selected {
+          background: #e6f7ff;
+          color: #1890ff;
+        }
+  
+        &:hover {
+          background: #f5f5f5;
+        }
+      }
+    }
+  }
