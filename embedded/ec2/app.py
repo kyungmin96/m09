@@ -10,7 +10,7 @@ app = FastAPI()
 sio = AsyncServer(async_mode="asgi")
 socket_app = ASGIApp(sio, app)
 __byte_frame = None
-internal_server_address = "http://localhost:port"
+internal_server_address = "http://localhost:8080"
 
 # A dictionary to keep track of connected clients and their SIDs
 connected_clients = {}
@@ -92,7 +92,7 @@ async def manual_drive(drive: str):
 async def tool_detect_start(tool_list: dict):
     try:
         global sio
-        await sio.emit("tool_detectstart", tool_list)
+        await sio.emit("tool_detect_start", tool_list)
     except:
         return Response(status_code=502)
     

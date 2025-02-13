@@ -36,7 +36,6 @@ def camera_stop():
 # 주행
 @sio_cli.event
 def drive(operation):
-    print("fdfds")
     if operation == "start":
         __main__.object_tracer.start()
     elif operation == "stop":
