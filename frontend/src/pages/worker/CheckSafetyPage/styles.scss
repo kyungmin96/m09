@@ -1,0 +1,94 @@
+.check-safety-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+  
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      overflow: hidden;
+  
+      .video-stream {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 300px; // 영상 높이 설정
+        background-color: #ddd; // 임시 배경색
+        font-size: 16px;
+        color: #555;
+      }
+  
+    }
+  
+    .worker-list {
+        display: flex;
+        justify-content: center;
+        gap: 10px; /* 버튼 간의 간격 */
+        margin-bottom: 20px;
+      
+        .worker-button {
+          flex: 1; /* 버튼이 동일한 너비를 가지도록 설정 */
+          max-width: 80px; /* 버튼 최대 너비 제한 */
+          padding: 10px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: bold;
+          text-align: center;
+          cursor: pointer;
+          border: none;
+      
+          &.active {
+            background-color: #a4d4ae; /* 활성화된 버튼 배경색 */
+            color: white; /* 활성화된 버튼 텍스트 색상 */
+          }
+      
+          &:not(.active) {
+            background-color: #e0e0e0; /* 비활성화된 버튼 배경색 */
+            color: black; /* 비활성화된 버튼 텍스트 색상 */
+          }
+        }
+    }
+  
+    .equipment-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      img {
+          width: 40px; /* 아이콘 크기 */
+          height: auto;
+          margin-bottom: 5px; /* 텍스트와 간격 */
+      }
+    }
+  
+    .next-worker-button {
+      margin-top: 30px; /* 위 요소와의 간격 추가 */
+      padding: 15px 30px; /* 버튼 크기 조정 */
+      font-size: 16px;
+      border-radius: 25px;
+      border: none;
+      background-color: #a4d4ae; /* 기본 배경색 */
+      color: white;
+  
+      &:disabled {
+        background-color: #e0e0e0; /* 비활성화 상태 배경색 */
+        color: #a0a0a0; /* 비활성화 상태 텍스트 색상 */
+        cursor: not-allowed; /* 비활성화 상태 커서 */
+      }
+  
+      &:hover:not(:disabled) {
+        background-color: #92c49b; /* 활성화 상태에서 호버 시 배경색 */
+      }
+    }
+  }
+  

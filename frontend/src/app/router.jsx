@@ -7,7 +7,8 @@ import { WorkplaceMovePage } from '@/pages/worker/WorkplaceMovePage';
 import { LoginControlPage } from '@/pages/control/LoginControlPage';
 import ToolCheckPage from '@/pages/worker/ToolCheckPage/index';
 import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
-import { LoginControlPage } from '@/pages/control/LoginControlPage/index';
+import CheckSafetyPage from '@/pages/worker/CheckSafetyPage';
+import CartManagePage from '@/pages/control/CartManagePage';
 import TestMainPage from '@/pages/TestMainPage';
 
 export const AppRouter = () => {
@@ -18,14 +19,16 @@ export const AppRouter = () => {
       {/* 작업자 영역 */}
       <Route path="/worker" element={<WorkerLayout />}>
         <Route path="login" element={<LoginWorkerPage />} />
-        <Route path="workplace_move" element={<WorkplaceMovePage />} />
+        <Route path="workplace-move" element={<WorkplaceMovePage />} />
         <Route path="prepare-toolcheck" element={<ToolCheckPage />} />
         <Route path="return-toolcheck" element={<ToolReturnPage />} />
+        <Route path="safety-check" element={<CheckSafetyPage />} />
       </Route>
 
       {/* 관제탑 영역 */}
       <Route path="/control" element={<ControlLayout />}>
         <Route path="login" element={<LoginControlPage />} />
+        <Route path="cart-manage" element={<CartManagePage />} />
       </Route>
     </Routes>
   );
