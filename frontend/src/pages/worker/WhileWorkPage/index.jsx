@@ -16,7 +16,7 @@ const getStatusEmoji = (status) => {
   }
 };
 
-const WorkInProgressPage = () => {
+export const WorkProgressPage = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -116,7 +116,7 @@ const WorkInProgressPage = () => {
   };
 
   const handleReturn = () => {
-    navigate('/worker/complete-work');
+    navigate('/worker/return-move');
   };
 
   return (
@@ -209,5 +209,3 @@ const WorkInProgressPage = () => {
     </div>
   );
 };
-
-export default WorkInProgressPage;

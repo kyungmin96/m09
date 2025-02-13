@@ -6,7 +6,7 @@ import WorkStatusReport from './components/WorkStatusReport';
 import ConsumablesReport from './components/ConsumablesReport';
 import './styles.scss';
 
-const WorkCompletePage = () => {
+export const WorkCompletePage = () => {
   const navigate = useNavigate();
   const [tools, setTools] = useState([]);
 
@@ -30,7 +30,7 @@ const WorkCompletePage = () => {
     localStorage.removeItem('additionalTools');
     localStorage.removeItem('dailyWorkStatus');
     localStorage.removeItem('selectedTasks');
-    navigate('/worker/main');
+    navigate('/worker/today-task');
   };
 
   return (
@@ -64,5 +64,3 @@ const WorkCompletePage = () => {
     </div>
   );
 };
-
-export default WorkCompletePage;

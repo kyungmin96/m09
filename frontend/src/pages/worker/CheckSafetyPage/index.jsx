@@ -1,57 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Helmet from "@/shared/assets/images/helmet.png";
 import "./styles.scss";
 
-const CheckSafetyPage = () => {
-  const [currentWorkerIndex, setCurrentWorkerIndex] = useState(0); // 현재 검사 중인 작업자의 인덱스
-  const [workerStatus, setWorkerStatus] = useState({
-    김동우: false,
-    정도영: false,
-    염정우: false,
-    김병지: false,
-  }); // 각 작업자의 검사 상태
-  const workerList = ["김동우", "정도영", "염정우", "김병지"]; // 작업자 리스트
+export const CheckSafetyPage = () => {
+  const navigate = useNavigate();
+  const [currentWorkerIndex, setCurrentWorkerIndex] = useState(0);
+  const [workerStatus, setWorkerStatus] = useState({});
+  const [workerList, setWorkerList] = useState([]);
+  const [detectionData, setDetectionData] = useState({});
 
-  // 더미 데이터: 헬멧 착용 여부
-  const detectionData = {
-    김동우: false,
-    정도영: false,
-    염정우: false,
-    김병지: false,
-  };
+  useEffect(() => {
+    // 로컬 스토리지에서 선택된 작업 정보 가져오기
+    const savedTasks = localStorage.getItem('selectedTasks');
+    const currentUser = localStorage.getItem('currentUser'); // 현재 로그인한 사용자 정보
 
-  // 현재 작업자 이름
+    if (savedTasks) {
+      const parsedTasks = JSON.parse(savedTasks);
+      // 모든 작업자 목록 추출 (중복 제거)
+      const allWorkers = new Set();
+      
+      // 현재 로그인한 사용자를 첫 번째로 추가
+      if (currentUser) {
+        allWorkers.add(currentUser);
+      }
+
+      // 선택된 작업들의 모든 작업자 추가
+      parsedTasks.forEach(task => {
+        task.workers.forEach(worker => {
+          allWorkers.add(worker.name);
+        });
+      });
+
+      const uniqueWorkerList = Array.from(allWorkers);
+
+      // 작업자 목록 설정
+      setWorkerList(uniqueWorkerList);
+
+      // 작업자 상태 초기화
+      const initialWorkerStatus = {};
+      uniqueWorkerList.forEach(worker => {
+        initialWorkerStatus[worker] = false;
+      });
+      setWorkerStatus(initialWorkerStatus);
+
+      // 감지 데이터 초기화
+      const initialDetectionData = {};
+      uniqueWorkerList.forEach(worker => {
+        initialDetectionData[worker] = true;
+      });
+      setDetectionData(initialDetectionData);
+    }
+  }, []);
+
   const currentWorker = workerList[currentWorkerIndex];
 
-  // 모든 작업자가 검사에 통과했는지 확인
   const isAllWorkersChecked = Object.values(workerStatus).every(
     (status) => status === true
   );
 
-  // 현재 작업자 검사 완료 처리
   const handleCompleteCheck = () => {
     setWorkerStatus((prevStatus) => ({
       ...prevStatus,
-      [currentWorker]: detectionData[currentWorker], // 현재 작업자의 상태를 업데이트
+      [currentWorker]: detectionData[currentWorker],
     }));
 
-    // 마지막 작업자가 아니라면 다음 작업자로 이동
     if (currentWorkerIndex < workerList.length - 1) {
       setCurrentWorkerIndex((prevIndex) => prevIndex + 1);
     }
+  };
+
+  const handleReadyComplete = () => {
+    navigate("/worker/workplace-move");
   };
 
   return (
     <div className="check-safety-page">
       <h1>복장 체크</h1>
 
-      {/* 실시간 영상 */}
       <div className="video-container">
         <div className="video-stream">
           <p>실시간 영상 스트리밍</p>
         </div>
         <div className="status-indicator">
-          {detectionData[currentWorker] ? (
+          {currentWorker && detectionData[currentWorker] ? (
             <div className="status success">확인됨</div>
           ) : (
             <div className="status waiting">확인 중</div>
@@ -59,7 +91,6 @@ const CheckSafetyPage = () => {
         </div>
       </div>
 
-      {/* 작업자 리스트 */}
       <div className="worker-list">
         {workerList.map((worker, index) => (
           <button
@@ -67,7 +98,7 @@ const CheckSafetyPage = () => {
             className={`worker-button ${
               worker === currentWorker ? "active" : ""
             } ${workerStatus[worker] ? "checked" : ""}`}
-            disabled={index !== currentWorkerIndex} // 현재 작업자가 아니면 비활성화
+            disabled={index !== currentWorkerIndex}
           >
             {worker}
           </button>
@@ -79,28 +110,24 @@ const CheckSafetyPage = () => {
         <span>안전모</span>
       </div>
 
-      {/* 검사 완료 및 준비 완료 버튼 */}
       {!isAllWorkersChecked && currentWorkerIndex !== workerList.length - 1 && (
         <button
           className="next-worker-button"
           onClick={handleCompleteCheck}
-          disabled={!detectionData[currentWorker]} // 헬멧 착용이 확인되지 않으면 비활성화
+          disabled={!detectionData[currentWorker]}
         >
           다음 사람
         </button>
       )}
 
-      {/* 준비 완료 버튼 */}
-      {isAllWorkersChecked || currentWorkerIndex === workerList.length - 1 ? (
+      {(isAllWorkersChecked || currentWorkerIndex === workerList.length - 1) && (
         <button
           className="next-worker-button"
-          onClick={() => console.log("준비 완료 클릭됨")}
+          onClick={handleReadyComplete}
         >
           준비 완료
         </button>
-      ) : null}
+      )}
     </div>
   );
 };
-
-export default CheckSafetyPage;

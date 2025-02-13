@@ -56,7 +56,8 @@ const DUMMY_WORKERS = [
   { id: 4, name: '최지훈' },
   { id: 5, name: '정다은' }
 ];
-const TaskAssignment = () => {
+
+export const TaskAssignment = () => {
   const navigate = useNavigate();
   const [availableTasks, setAvailableTasks] = useState(DUMMY_TASKS);
   const [selectedTasks, setSelectedTasks] = useState([]);
@@ -209,5 +210,3 @@ const TaskAssignment = () => {
     </div>
   );
 };
-
-export default TaskAssignment;

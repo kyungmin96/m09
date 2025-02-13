@@ -6,7 +6,7 @@ import Modal from "./components/AddToolModal";
 import Button from "@/shared/ui/Button/Button";
 import "./styles.scss";
 
-const ToolCheckPage = () => {
+export const ToolCheckPage = () => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tools, setTools] = useState([]);
@@ -130,7 +130,7 @@ const ToolCheckPage = () => {
         // localStorage에 저장
         localStorage.setItem('todayTools', JSON.stringify(toolsToSave));
 
-        navigate('/worker/while-work');
+        navigate('/worker/safety-check');
     };
 
     return (
@@ -168,5 +168,3 @@ const ToolCheckPage = () => {
         </div>
     );
 };
-
-export default ToolCheckPage;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/shared/ui/Button/Button';
 
-const TestMainPage = () => {
+export const TestMainPage = () => {
   const navigate = useNavigate();
   const [supportsPWA, setSupportsPWA] = useState(true);
   const [promptInstall, setPromptInstall] = useState(null);
@@ -97,5 +97,3 @@ const TestMainPage = () => {
     </div>
   );
 };
-
-export default TestMainPage;
