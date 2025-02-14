@@ -4,6 +4,7 @@ from m09_socketio import *
 from matplotlib import use as matploblib_use
 from time import sleep
 import sys
+import os
 
 if __name__ == "__main__":
     _headless = ("--headless" in sys.argv) or ("-hl" in sys.argv)
@@ -22,7 +23,8 @@ if __name__ == "__main__":
         object_tracer = trace(motor_controller, camera=cap, _headless=_headless)
         # object_tracer.start()
         print("[OrinCar] Tracing Enabled!")
-        object_detect = detect(camera=cap)
+        helmet_detect = detect(camera=cap, yolo_model=os.environ["M09_HELMET_MODEL"], prefix="detect-helmet")
+        object_detect = detect(camera=cap, yolo_model=os.environ["M09_TOOL_MODEL"], prefix="detect-09")
         # object_detect.start(tool_list=["hammer"])
         print("[OrinCar] Detection Enabled!")
     else:
