@@ -240,6 +240,6 @@ class trace:
 
     def stop(self):
         self._initiated = False
-        self.motor_controller.stop()
+        self.motor_controller.brake()
         if self._thread and self._thread.is_alive():
             self._thread.join()
