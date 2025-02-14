@@ -14,6 +14,7 @@ import ssafy.m09.global.error.ErrorCode;
 import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.TaskToolBuilderRepository;
 import ssafy.m09.repository.UserRepository;
+import ssafy.m09.security.JwtTokenProvider;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TaskToolBuilderRepository taskToolBuilderRepository;
+    private final JwtTokenProvider jwtTokenProvider;
     // 초기 필수: 제목, 내용, 위치, 담당자, 예정 시작/끝 시간, 기본 START enum
     // 서비스 로직에서 이후 user page에서 추가 코멘트, 사용 차량, 작업 시작/끝 시간 추가됨
 
@@ -82,13 +84,28 @@ public class TaskService {
         return ApiResponse.success(tasks, "작업 목록 조회 성공");
     }
 
-    public ApiResponse<List<Task>> getInProcessTasks() {
+    public ApiResponse<List<Task>> getInProcessTasks(String token) {
         LocalDateTime now = LocalDateTime.now();
 
-        // scheduledStartTime이 현재 시간 이전이며, 상태가 START 또는 PENDING인 Task 조회
-        List<Task> tasks = taskRepository.findByScheduledStartTimeBeforeAndTaskStateIn(
+        // JWT에서 employeeId 추출
+        String employeeId = jwtTokenProvider.getEmployeeId(token);
+        if (employeeId == null) {
+            return ApiResponse.error(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+        }
+
+        // 데이터베이스에서 사용자 확인
+        Optional<User> userOptional = userRepository.findByEmployeeId(employeeId);
+        if (userOptional.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 사용자(User)를 찾을 수 없습니다.");
+        }
+
+        User user = userOptional.get();
+
+        // 현재 시간 이전이며, 상태가 START 또는 PENDING이고, 해당 유저가 할당된 Task 조회
+        List<Task> tasks = taskRepository.findByScheduledStartTimeBeforeAndTaskStateInAndAssignedUser(
                 now,
-                List.of(TaskStatus.START, TaskStatus.PENDING)
+                List.of(TaskStatus.START, TaskStatus.PENDING),
+                user
         );
 
         if (tasks.isEmpty()) {
