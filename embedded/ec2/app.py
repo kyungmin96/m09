@@ -88,11 +88,30 @@ async def manual_drive(drive: str):
     
     return Response(status_code=200)
 
+@app.post("/barebone/detect-helmet/start")
+async def helmet_detect_start():
+    try:
+        global sio
+        await sio.emit("helmet_detect_start", ["helmet"])
+    except:
+        return Response(status_code=502)
+    
+    return Response(status_code=200)
+
+@app.post("/barebone/detect-helmet/stop")
+async def helmet_detect_stop():
+    try:
+        global sio
+        await sio.emit("helmet_detect_stop")
+    except:
+        return Response(status_code=502)
+    return Response(status_code=200)
+
 @app.post("/barebone/detect-09/start")
 async def tool_detect_start(tool_list: dict):
     try:
         global sio
-        await sio.emit("tool_detect_start", tool_list)
+        await sio.emit("tool_detect_start", tool_list["name"])
     except:
         return Response(status_code=502)
     
@@ -107,6 +126,24 @@ async def tool_detect_stop():
         return Response(status_code=502)
     return Response(status_code=200)
 
+@app.post("/barebone/nfc/start")
+async def nfc_start():
+    try:
+        global sio
+        await sio.emit("nfc_start")
+    except:
+        return Response(status_code=502)
+    
+    return Response(status_code=200)
+
+@app.post("/barebone/nfc/stop")
+async def nfc_stop():
+    try:
+        global sio
+        await sio.emit("nfc_stop")
+    except:
+        return Response(status_code=502)
+    return Response(status_code=200)
 
 # 프레임 생성
 async def _stream_gen():   
@@ -133,14 +170,21 @@ async def echo_frame(sid, message):
     global __byte_frame
     __byte_frame = message  # 수신한 메시지를 전역 변수에 저장
 
+@sio.on("detect-helmet")
+async def helmet_check_ack(sid, helmet_check):
+    print(f"Helmet check: {str(helmet_check)}")
+    url = internal_server_address + "/api/v1/embedded/detect-helmet/check"
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, data = json.dumps(helmet_check), headers=headers)
+    print(f"Transmitted internal helmet check: {response}")
+
 # 공구 체크 데이터 전송
-@sio.on("tool_check")
+@sio.on("detect-09")
 async def tool_check_ack(sid, tool_check):
     print(f"Tool check: {str(tool_check)}")
     url = internal_server_address + "/api/v1/embedded/detect-09/check"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, data = json.dumps(tool_check), headers=headers)
-
     print(f"Transmitted internal tool check: {response}")
 
 if __name__ == "__main__":
