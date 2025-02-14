@@ -3,29 +3,30 @@ import os
 import torch
 from ultralytics import YOLO
 from threading import Thread
-from m09_socketio import stream_cv_frame, transmit_tool_check
+from m09_socketio import stream_cv_frame, transmit_detect_check
 
 class detect:
-    def __init__(self, camera):
+    def __init__(self, camera, yolo_model, prefix="detect-09"):
         self.camera = camera
         self._thread = None
         self._initiated = False
+        self.prefix = prefix
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        yolo_model = os.environ["M09_TOOL_MODEL"]
+        yolo_model = yolo_model
         self.yolo = YOLO(yolo_model)
         self.yolo.to(self.device)
     
-    def _run(self, tool_list):
+    def _run(self, detect_list):
         # 메인 루프
         self._initiated = True
 
-        tool_state = {}
-        for tool in tool_list:
-            tool_state[tool] = 0
-        tool_check = {}
-        for tool in tool_list:
-            tool_check[tool] = False
+        detect_state = {}
+        for item in detect_list:
+            detect_state[item] = 0
+        detect_check = {}
+        for item in detect_list:
+            detect_check[item] = False
 
         # cuda 사용
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
@@ -70,26 +71,26 @@ class detect:
                         continue
 
                     class_id = box.cls[0].item()
-                    tool_name = self.yolo.names[int(class_id)]
-                    label = f"{tool_name}: {confidence:.2f}"
+                    detect_name = self.yolo.names[int(class_id)]
+                    label = f"{detect_name}: {confidence:.2f}"
                     
                     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
                     cv2.putText(frame, label, (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                    if tool_name not in tool_list:
+                    if detect_name not in detect_list:
                         continue
 
-                    tool_state[tool_name] += 1
-                    if not tool_check[tool_name] and tool_state[tool_name] >= 60:
-                        tool_check[tool_name] = True
-                        transmit_tool_check(tool_check)
+                    detect_state[detect_name] += 1
+                    if not detect_check[detect_name] and detect_state[detect_name] >= 60:
+                        detect_check[detect_name] = True
+                        transmit_detect_check(detect_check, self.prefix)
                     
             stream_cv_frame(frame)
 
-    def start(self, tool_list=[]):
+    def start(self, detect_list=[]):
         if self._thread and self._thread.is_alive():
             self.stop()
-        self._thread = Thread(target=self._run, args=(tool_list,))
+        self._thread = Thread(target=self._run, args=(detect_list,))
         self._thread.start()
 
     def stop(self):
