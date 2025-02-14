@@ -5,7 +5,8 @@ import { WorkerLayout } from '@/shared/Layouts/WorkerLayout';
 import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage';
 import { MainPage } from '@/pages/worker/MainPage';
 import { TaskAssignment } from '@/pages/worker/TaskAssignmentPage/TaskAssignment';
-import { ToolCheckPage } from '@/pages/worker/ToolCheckPage';
+import { PrepareToolPage } from '@/pages/worker/PrepareToolPage';
+// import { ToolCheckPage } from '@/pages/worker/ToolCheckPage';
 import { CheckSafetyPage } from '@/pages/worker/CheckSafetyPage';
 import { WorkplaceMovePage } from '@/pages/worker/WorkplaceMovePage';
 import { WorkProgressPage } from '@/pages/worker/WhileWorkPage';
@@ -25,7 +26,8 @@ export const AppRouter = () => {
         <Route path="login" element={<LoginWorkerPage />} />
         <Route path="main" element={<MainPage/>}/>
         <Route path="today-task" element={< TaskAssignment />}/>
-        <Route path="prepare-toolcheck" element={<ToolCheckPage />} />
+        <Route path="prepare-tool" element={< PrepareToolPage />}/>
+        {/* <Route path="prepare-toolcheck" element={<ToolCheckPage />} /> */}
         <Route path="safety-check" element={<CheckSafetyPage />} />
         <Route path="workplace-move" element={<WorkplaceMovePage mode="to-workplace" />} />
         <Route path="while-work" element={<WorkProgressPage />}/>
