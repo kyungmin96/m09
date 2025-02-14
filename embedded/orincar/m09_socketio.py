@@ -18,8 +18,8 @@ def __bytecode_cv_frame(frame):
     return cv2.imencode('.jpg', frame)[1].tobytes()
 
 # 공구 감지 보내기
-def transmit_tool_check(tool_check):
-    sio_cli.emit("tool_check", tool_check)
+def transmit_detect_check(tool_check, prefix):
+    sio_cli.emit(prefix, tool_check)
 
 
 # 서버 응답 처리
@@ -55,10 +55,19 @@ def manual_drive(operation):
     elif operation == "right":
         __main__.motor_controller.btn_right()
 
+# 헬멧멧 인식
+@sio_cli.event
+def helmet_detect_start(helmet_list):
+    __main__.helmet_detect.start(detect_list=helmet_list)
+
+@sio_cli.event
+def helmet_detect_stop():
+    __main__.helmet_detect.stop()
+
 # 공구 인식
 @sio_cli.event
 def tool_detect_start(tool_list):
-    __main__.object_detect.start(tool_list=tool_list)
+    __main__.object_detect.start(detect_list=tool_list)
 
 @sio_cli.event
 def tool_detect_stop():
