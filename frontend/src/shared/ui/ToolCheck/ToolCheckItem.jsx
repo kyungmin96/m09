@@ -1,7 +1,7 @@
 import React from 'react';
 import './ToolCheckItem.scss';
 
-const ToolCheckItem = ({ 
+export const ToolCheckItem = ({ 
   tool, 
   isDefault,
   isChecked, 
@@ -66,5 +66,3 @@ const ToolCheckItem = ({
     </div>
   );
 };
-
-export default ToolCheckItem;

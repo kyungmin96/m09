@@ -1,7 +1,7 @@
 import React from 'react';
 import './ModalFrame.scss';
 
-const ModalFrame = ({ 
+export const ModalFrame = ({ 
   isOpen, 
   onClose, 
   title, 
@@ -27,5 +27,3 @@ const ModalFrame = ({
     </div>
   );
 };
-
-export default ModalFrame
