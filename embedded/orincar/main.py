@@ -7,7 +7,7 @@ import sys
 import os
 
 if __name__ == "__main__":
-    _headless = ("--headless" in sys.argv) or ("-hl" in sys.argv)
+    _headless = ("--vnc" not in sys.argv) and ("-v" not in sys.argv)
     _manual = ("--manual" in sys.argv) or ("-m" in sys.argv)
 
     if _headless:
