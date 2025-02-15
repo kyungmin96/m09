@@ -1,6 +1,30 @@
-// styles.scss
+@use "sass:color";
+
 .main-page {
     padding: 20px;
+
+    .rfid-registration-modal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    
+      .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+      }
+    
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    }
     
     .main-header {
       margin-bottom: 24px;
@@ -91,136 +115,106 @@
       padding: 20px;
       margin-bottom: 24px;
       
-      h2 {
-        font-size: 18px;
+      .schedule-header {
         margin-bottom: 16px;
-      }
-  
-      .calendar-section {
-        margin-bottom: 24px;
-        
-        .calendar-nav {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-          
-          .nav-button {
-            padding: 8px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            
-            &:hover {
-              background: #f5f5f5;
-              border-radius: 50%;
-            }
-          }
-        }
-        
-        .weekdays {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          text-align: center;
+
+        h2 {
+          font-size: 18px;
           margin-bottom: 8px;
         }
-        
-        .dates-grid {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 8px;
-          
-          .date-cell {
-            padding: 12px;
-            text-align: center;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            
-            &:hover {
-              background-color: #f0f0f0;
-            }
-            
-            .date {
-              font-size: 16px;
-            }
-            
-            .work-count {
-              font-size: 12px;
-              background: #eee;
-              padding: 2px 6px;
-              border-radius: 10px;
-            }
-            
-            &.selected {
-              background: #a5d6a7;
-              color: #fff;
-              
-              &:hover {
-                background-color: darken(#a5d6a7, 5%);
-              }
-              
-              .work-count {
-                background: rgba(255, 255, 255, 0.3);
-              }
-            }
-          }
+
+        .today-date {
+          display: block;
+          color: #666;
+          font-size: 14px;
         }
       }
-  
+
       .work-list {
         .work-item {
           display: flex;
+          justify-content: space-between;
           align-items: center;
+          background: #f8f8f8;
+          border-radius: 8px;
           padding: 16px;
-          border-bottom: 1px solid #eee;
+          margin-bottom: 12px;
+          border: 1px solid #eee;
+          transition: border-color 0.2s;
           
           &:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
           }
-          
-          .count {
-            width: 24px;
-            height: 24px;
-            background: #eee;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 16px;
+
+          &.configured {
+            border-color: #a5d6a7;
           }
-          
+
           .work-info {
             h3 {
               font-size: 16px;
               margin-bottom: 4px;
             }
-            
+
             .workers {
               font-size: 14px;
               color: #666;
+            }
+          }
+
+          .work-status {
+            .status-badge {
+              display: inline-block;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 12px;
+              background: #eee;
+              color: #666;
+
+              &.configured {
+                background: #a5d6a7;
+                color: #fff;
+              }
             }
           }
         }
       }
     }
   
-    .work-setting-button {
-      width: 100%;
-      padding: 16px;
-      background: #a5d6a7;
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      
-      &:hover {
-        background: darken(#a5d6a7, 5%);
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      button {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+      }
+
+      .work-setting-button {
+        background: #a5d6a7;
+        
+        &:hover {
+          background: color.scale(#a5d6a7, $lightness: -5%);
+        }
+      }
+
+      .start-work-button {
+        background: #4CAF50;
+        
+        &:hover:not(:disabled) {
+          background: color.scale(#4CAF50, $lightness: -5%);
+        }
       }
     }
   }
