@@ -1,17 +1,33 @@
 import { useState, useEffect } from 'react';
 import './WorkStatusReport.scss';
 
-const WorkStatusReport = () => {
+const getStatusText = (taskState) => {
+  switch(taskState) {
+    case 'COMPLETE':
+      return '작업완료';
+    case 'IN_PROGRESS':
+      return '작업중';
+    case 'START':
+      return '작업전';
+    default:
+      return '작업전';
+  }
+};
+
+export const WorkStatusReport = () => {
   const [workNotes, setWorkNotes] = useState([]);
   const [taskStatuses, setTaskStatuses] = useState([]);
 
   useEffect(() => {
-    // 로컬 스토리지에서 작업 노트와 작업 상태 로드
     const storedNotes = JSON.parse(localStorage.getItem('specialNotes') || '[]');
-    const storedTasks = JSON.parse(localStorage.getItem('dailyTasks') || '[]');
+    const storedTasks = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
     
     setWorkNotes(storedNotes);
-    setTaskStatuses(storedTasks);
+    setTaskStatuses(storedTasks.map(task => ({
+      id: task.id,
+      title: task.title,
+      taskState: task.taskState || 'START'
+    })));
   }, []);
 
   return (
@@ -20,9 +36,9 @@ const WorkStatusReport = () => {
       <div className="status-summary">
         {taskStatuses.map(task => (
           <div key={task.id} className="status-item">
-            <span className="task-name">{task.name}</span>
-            <span className={`status-badge ${task.status}`}>
-              {task.status}
+            <span className="task-name">{task.title}</span>
+            <span className={`status-badge ${task.taskState.toLowerCase()}`}>
+              {getStatusText(task.taskState)}
             </span>
           </div>
         ))}
@@ -35,9 +51,11 @@ const WorkStatusReport = () => {
             <div key={note.id} className="note-item">
               <div className="note-header">
                 <span className="task-name">
-                  {taskStatuses.find(t => t.id === note.taskId)?.name}
+                  {taskStatuses.find(t => t.id === note.taskId)?.title}
                 </span>
-                <span className="timestamp">{note.timestamp}</span>
+                <span className="timestamp">
+                  {new Date(note.timestamp).toLocaleString()}
+                </span>
               </div>
               <p className="note-content">{note.content}</p>
             </div>
@@ -47,5 +65,3 @@ const WorkStatusReport = () => {
     </div>
   );
 };
-
-export default WorkStatusReport;

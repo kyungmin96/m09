@@ -1,26 +1,38 @@
-// WorkInProgressPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles.scss';
 
-const getStatusEmoji = (status) => {
-  switch(status) {
-    case '작업완료':
+const getStatusEmoji = (taskState) => {
+  switch(taskState) {
+    case 'COMPLETE':
       return '⭕';
-    case '작업중':
+    case 'IN_PROGRESS':
       return '⏳';
-    case '작업전':
+    case 'START':
       return '';
     default:
       return '';
   }
 };
 
-const WorkInProgressPage = () => {
+const getTaskState = (koreanStatus) => {
+  switch(koreanStatus) {
+    case '작업완료':
+      return 'COMPLETE';
+    case '작업중':
+      return 'IN_PROGRESS';
+    case '작업전':
+      return 'START';
+    default:
+      return 'START';
+  }
+};
+
+export const WorkProgressPage = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [workStatus, setWorkStatus] = useState('작업전');
+  const [workStatus, setWorkStatus] = useState('START');
   const [specialNote, setSpecialNote] = useState('');
   const [specialNotes, setSpecialNotes] = useState([]);
 
@@ -32,14 +44,17 @@ const WorkInProgressPage = () => {
     
     if (savedTasks) {
       const parsedTasks = JSON.parse(savedTasks);
-      // 작업 상태 정보 추가
+      // 기존 taskState 유지하면서 추가 정보 병합
       const tasksWithStatus = parsedTasks.map(task => ({
         id: task.id,
-        name: task.name,
-        status: '작업전',
-        manualUrl: task.manual,
-        tools: task.tools,
-        notes: task.notes
+        title: task.title,
+        content: task.content,
+        comment: task.comment,
+        location: task.location,
+        taskState: task.taskState || 'START',
+        assignedUser: task.assignedUser,
+        scheduledStartTime: task.scheduledStartTime,
+        scheduledEndTime: task.scheduledEndTime
       }));
 
       // 이전에 저장된 작업 상태가 있다면 복원
@@ -48,14 +63,14 @@ const WorkInProgressPage = () => {
         tasksWithStatus.forEach(task => {
           const savedTaskStatus = savedStatus.find(s => s.id === task.id);
           if (savedTaskStatus) {
-            task.status = savedTaskStatus.status;
+            task.taskState = savedTaskStatus.taskState;
           }
         });
       }
 
       setTasks(tasksWithStatus);
       setSelectedTask(tasksWithStatus[0]);
-      setWorkStatus(tasksWithStatus[0]?.status || '작업전');
+      setWorkStatus(tasksWithStatus[0]?.taskState || 'START');
     }
 
     if (storedNotes) {
@@ -65,26 +80,32 @@ const WorkInProgressPage = () => {
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
-    setWorkStatus(task.status);
+    setWorkStatus(task.taskState);
   };
 
-  const handleStatusChange = (status) => {
+  const handleStatusChange = (koreanStatus) => {
     if (!selectedTask) return;
     
+    const newTaskState = getTaskState(koreanStatus);
     const updatedTasks = tasks.map(task => {
       if (task.id === selectedTask.id) {
-        return { ...task, status };
+        return { 
+          ...task, 
+          taskState: newTaskState,
+          updatedAt: new Date().toISOString()
+        };
       }
       return task;
     });
 
     setTasks(updatedTasks);
-    setWorkStatus(status);
-    setSelectedTask({ ...selectedTask, status });
+    setWorkStatus(newTaskState);
+    setSelectedTask({ ...selectedTask, taskState: newTaskState });
 
     // 작업 상태 저장
-    const statusToSave = updatedTasks.map(({ id, status }) => ({ id, status }));
+    const statusToSave = updatedTasks.map(({ id, taskState }) => ({ id, taskState }));
     localStorage.setItem('dailyWorkStatus', JSON.stringify(statusToSave));
+    localStorage.setItem('selectedTasks', JSON.stringify(updatedTasks));
   };
 
   const handleSpecialNoteSubmit = () => {
@@ -94,7 +115,7 @@ const WorkInProgressPage = () => {
       id: Date.now(),
       taskId: selectedTask.id,
       content: specialNote,
-      timestamp: new Date().toLocaleString()
+      timestamp: new Date().toISOString()
     };
 
     const updatedNotes = [...specialNotes, newNote];
@@ -110,13 +131,13 @@ const WorkInProgressPage = () => {
   };
 
   const handleManualView = () => {
-    if (selectedTask?.manualUrl) {
-      window.open(selectedTask.manualUrl, '_blank');
+    if (selectedTask?.location) {
+      window.open(`/technical-orders/${selectedTask.location}.pdf`, '_blank');
     }
   };
 
   const handleReturn = () => {
-    navigate('/worker/complete-work');
+    navigate('/worker/return-move');
   };
 
   return (
@@ -132,36 +153,36 @@ const WorkInProgressPage = () => {
           <button
             key={task.id}
             className={`task-button ${selectedTask?.id === task.id ? 'active' : ''} ${
-              task.status
+              task.taskState
             }`}
             onClick={() => handleTaskClick(task)}
           >
             <div className="status-circle">
-              {getStatusEmoji(task.status)}
+              {getStatusEmoji(task.taskState)}
             </div>
-            <span className="task-name">{task.name}</span>
+            <span className="task-name">{task.title}</span>
           </button>
         ))}
       </div>
 
       {selectedTask && (
         <div className="task-detail">
-          <h2>{selectedTask.name}</h2>
+          <h2>{selectedTask.title}</h2>
           <div className="status-buttons">
             <button
-              className={`status-button ${workStatus === '작업전' ? 'active' : ''}`}
+              className={`status-button ${workStatus === 'START' ? 'active' : ''}`}
               onClick={() => handleStatusChange('작업전')}
             >
               작업 전
             </button>
             <button
-              className={`status-button ${workStatus === '작업중' ? 'active' : ''}`}
+              className={`status-button ${workStatus === 'IN_PROGRESS' ? 'active' : ''}`}
               onClick={() => handleStatusChange('작업중')}
             >
               작업중
             </button>
             <button
-              className={`status-button ${workStatus === '작업완료' ? 'active' : ''}`}
+              className={`status-button ${workStatus === 'COMPLETE' ? 'active' : ''}`}
               onClick={() => handleStatusChange('작업완료')}
             >
               작업완료
@@ -188,7 +209,7 @@ const WorkInProgressPage = () => {
                 <div key={note.id} className="note-item">
                   <div className="note-content">
                     <p>{note.content}</p>
-                    <span>{note.timestamp}</span>
+                    <span>{new Date(note.timestamp).toLocaleString()}</span>
                   </div>
                   <button 
                     className="delete-button"
@@ -209,5 +230,3 @@ const WorkInProgressPage = () => {
     </div>
   );
 };
-
-export default WorkInProgressPage;

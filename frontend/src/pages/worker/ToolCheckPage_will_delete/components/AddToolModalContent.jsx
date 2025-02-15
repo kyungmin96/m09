@@ -2,23 +2,38 @@ import React, { useState, useRef, useEffect } from 'react';
 import './AddToolModalContent.scss';
 
 const DUMMY_TOOLS = [
-  { id: 1, name: "전동 드릴" },
-  { id: 2, name: "토크 렌치" },
-  { id: 3, name: "햄머" },
-  { id: 4, name: "유압 게이지" }
+  { 
+    id: 1, 
+    title: "전동 드릴",
+    content: "전동 드릴 - 18V, 충전식",
+    comment: "정기 점검 필요",
+    location: "공구실 A-1"
+  },
+  { 
+    id: 2, 
+    title: "토크 렌치",
+    content: "토크 렌치 세트 - 1/2인치",
+    comment: "보정 일자 확인 필요",
+    location: "공구실 B-2"
+  }
 ];
 
-const DUMMY_WORKS = [
-  { id: 1, name: "엔진 점검 및 정비" },
-  { id: 2, name: "작동 상태 정비" }
-];
-
-const ToolSelectionContent = ({ onSubmit, onClose }) => {
+export const ToolSelectionContent = ({ onSubmit, onClose }) => {
   const [selectedTools, setSelectedTools] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeToolId, setActiveToolId] = useState(null);
+  const [availableWorks, setAvailableWorks] = useState([]);
   const dropdownRef = useRef(null);
   const searchButtonRef = useRef(null);
+
+  // localStorage에서 작업 목록 가져오기
+  useEffect(() => {
+    const savedTasks = localStorage.getItem('selectedTasks');
+    if (savedTasks) {
+      const parsedTasks = JSON.parse(savedTasks);
+      setAvailableWorks(parsedTasks);
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -37,7 +52,15 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
   const handleToolSelect = (tool) => {
     const existingTool = selectedTools.find(t => t.id === tool.id);
     if (!existingTool) {
-      setSelectedTools([...selectedTools, { ...tool, works: [] }]);
+      setSelectedTools([...selectedTools, { 
+        ...tool, 
+        works: [],
+        taskState: 'READY',
+        startTime: null,
+        endTime: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: null
+      }]);
     }
     setIsDropdownOpen(false);
   };
@@ -50,12 +73,14 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
           if (workExists) {
             return {
               ...tool,
-              works: tool.works.filter(w => w.id !== work.id)
+              works: tool.works.filter(w => w.id !== work.id),
+              updatedAt: new Date().toISOString()
             };
           } else {
             return {
               ...tool,
-              works: [...tool.works, work]
+              works: [...tool.works, work],
+              updatedAt: new Date().toISOString()
             };
           }
         }
@@ -76,19 +101,27 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
   };
 
   const handleSubmit = () => {
-    const existingTools = JSON.parse(localStorage.getItem('todayTools')) || [];
-    
     const newToolsToAdd = selectedTools.map(tool => ({
       id: `tool-${Date.now()}-${tool.id}`,
-      name: tool.name,
-      works: tool.works.map((work, index) => ({
-        id: `${tool.id}-${index + 1}`,
-        name: work.name
+      title: tool.title,
+      content: tool.content,
+      comment: tool.comment,
+      location: tool.location,
+      taskState: 'READY',
+      startTime: null,
+      endTime: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+      works: tool.works.map(work => ({
+        id: `${tool.id}-${work.id}`,
+        title: work.title,
+        content: work.content,
+        taskState: work.taskState,
+        scheduledStartTime: work.scheduledStartTime,
+        scheduledEndTime: work.scheduledEndTime
       }))
     }));
 
-    const updatedTools = [...existingTools, ...newToolsToAdd];
-    localStorage.setItem('todayTools', JSON.stringify(updatedTools));
     onSubmit(newToolsToAdd);
     setSelectedTools([]);
     setActiveToolId(null);
@@ -117,7 +150,7 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
                     className="tool-item"
                     onClick={() => handleToolSelect(tool)}
                   >
-                    {tool.name}
+                    {tool.title}
                   </div>
                 ))}
             </div>
@@ -129,7 +162,7 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
         {selectedTools.map((tool) => (
           <div key={tool.id} className="selected-tool-item">
             <div className="tool-header">
-              <span>{tool.name}</span>
+              <span>{tool.title}</span>
               <button 
                 className="remove-tool"
                 onClick={() => handleRemoveTool(tool.id)}
@@ -149,13 +182,13 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
                 </button>
 
                 <div className={`work-dropdown ${activeToolId === tool.id ? 'visible' : ''}`}>
-                  {DUMMY_WORKS.map(work => (
+                  {availableWorks.map(work => (
                     <div
                       key={work.id}
                       className={`work-item ${tool.works.some(w => w.id === work.id) ? 'selected' : ''}`}
                       onClick={() => handleWorkToggle(tool.id, work)}
                     >
-                      {work.name}
+                      {work.title}
                     </div>
                   ))}
                 </div>
@@ -164,7 +197,7 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
               <div className="selected-works">
                 {tool.works.map(work => (
                   <div key={work.id} className="work-badge">
-                    <span className="badge-text">{work.name}</span>
+                    <span className="badge-text">{work.title}</span>
                     <button
                       className="remove-badge"
                       onClick={() => handleWorkToggle(tool.id, work)}
@@ -189,5 +222,3 @@ const ToolSelectionContent = ({ onSubmit, onClose }) => {
     </>
   );
 };
-
-export default ToolSelectionContent;

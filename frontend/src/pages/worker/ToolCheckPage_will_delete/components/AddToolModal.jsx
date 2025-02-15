@@ -1,8 +1,8 @@
 import React from 'react';
-import ModalFrame from '@/shared/ui/ModalWorker/ModalFrame';
-import ToolSelectionContent from './AddToolModalContent';
+import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
+import { ToolSelectionContent } from './AddToolModalContent';
 
-const Modal = ({ isOpen, onClose, onSubmit }) => {
+export const Modal = ({ isOpen, onClose, onSubmit }) => {
   return (
     <ModalFrame
       isOpen={isOpen}
@@ -16,5 +16,3 @@ const Modal = ({ isOpen, onClose, onSubmit }) => {
     </ModalFrame>
   );
 };
-
-export default Modal;

@@ -1,84 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/shared/ui/Button/Button';
-import ModalFrame from '@/shared/ui/ModalWorker/ModalFrame';
+import { useAuth } from '@/contexts/AuthContext';
+import { useWorks } from '@/contexts/WorksContext';
+import { Button } from '@/shared/ui/Button/Button';
+import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import './TaskAssignment.scss';
 
-// 더미 데이터
-const DUMMY_TASKS = [
+// 임시 전체 작업자 데이터
+const DUMMY_ALL_WORKERS = [
   {
     id: 1,
-    name: 'F100-FW-229 엔진 저압 압축기 블레이드 균열 검사',
-    details: [
-      '엔진 오일 레벨 점검 및 필요 시 보충',
-      'FADEC 시스템 진단 수행'
-    ],
-    deadline: '2025.01.24',
-    location: 'T.O. 1F-16CJ-2-70JG-00-1',
-    tools: ['내시경 검사 장비', '토크 렌치 세트', '3mm 육각 렌치'],
-    manual: 'manual-link-1',
-    notes: '최근 작품 시 경고등 점등 이력 있음'
+    employeeId: '7859885',
+    name: '김철수',
+    position: 'ROLE_MEMBER',
   },
   {
     id: 2,
-    name: 'APU 배기 덕트 부식 검사',
-    details: [
-      'APU 배기 덕트 외부 육안 검사',
-      '부식 정도 측정 및 기록',
-      '클램프 체결 상태 확인'
-    ],
-    deadline: '2025.01.25',
-    location: 'T.O. 1F-16CJ-2-49JG-00-1',
-    tools: ['부식 측정 게이지', '토크 렌치', '디지털 카메라'],
-    manual: 'manual-link-2',
-    notes: '지난 점검 시 경미한 부식 발견됨'
+    employeeId: '7859886',
+    name: '이영희',
+    position: 'ROLE_MEMBER',
   },
   {
     id: 3,
-    name: '착륙장치 유압 시스템 점검',
-    details: [
-      '유압 레벨 및 누유 여부 확인',
-      '작동 압력 테스트 수행',
-      '비상 확장 시스템 점검'
-    ],
-    deadline: '2025.01.26',
-    location: 'T.O. 1F-16CJ-2-32JG-00-1',
-    tools: ['유압 게이지', '손전등', '다용도 렌치 세트', '유압유'],
-    manual: 'manual-link-3',
-    notes: '동절기 특별 점검 항목 포함'
+    employeeId: '7859887',
+    name: '박지민',
+    position: 'ROLE_MEMBER',
+  },
+  {
+    id: 4,
+    employeeId: '7859888',
+    name: '최민수',
+    position: 'ROLE_MEMBER',
   }
 ];
 
-const DUMMY_WORKERS = [
-  { id: 1, name: '김민호' },
-  { id: 2, name: '이상욱' },
-  { id: 3, name: '박준영' },
-  { id: 4, name: '최지훈' },
-  { id: 5, name: '정다은' }
-];
-const TaskAssignment = () => {
+export const TaskAssignment = () => {
   const navigate = useNavigate();
-  const [availableTasks, setAvailableTasks] = useState(DUMMY_TASKS);
-  const [selectedTasks, setSelectedTasks] = useState([]);
+  const { user } = useAuth();
+  const { todayWorks, selectedWorks, updateSelectedWorks } = useWorks();
+  
+  const [availableTasks, setAvailableTasks] = useState([]);
+  const [workers, setWorkers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [selectedWorkers, setSelectedWorkers] = useState([]);
 
   useEffect(() => {
-    // 로컬 스토리지에서 선택된 작업 불러오기
-    const savedTasks = localStorage.getItem('selectedTasks');
-    if (savedTasks) {
-      const parsedTasks = JSON.parse(savedTasks);
-      setSelectedTasks(parsedTasks);
-      // 저장된 작업들을 available 리스트에서 제외
-      setAvailableTasks(prev => 
-        prev.filter(task => !parsedTasks.some(selected => selected.id === task.id))
-      );
-    }
-  }, []);
+    // 작업자 목록 가져오기 (실제로는 API 호출)
+    setWorkers(DUMMY_ALL_WORKERS);
+
+    // todayWorks에서 아직 선택되지 않은 작업만 필터링
+    const unselectedTasks = todayWorks.filter(
+      task => !selectedWorks.some(selected => selected.id === task.id)
+    );
+    setAvailableTasks(unselectedTasks);
+  }, [todayWorks, selectedWorks]);
 
   const handleTaskSelect = (task) => {
     setCurrentTask(task);
+    // 현재 사용자를 기본으로 선택
+    setSelectedWorkers([user.id]);
     setIsModalOpen(true);
   };
 
@@ -86,31 +67,41 @@ const TaskAssignment = () => {
     setSelectedWorkers(prev => {
       const isSelected = prev.includes(workerId);
       if (isSelected) {
+        // 이미 선택된 작업자라면 제거
         return prev.filter(id => id !== workerId);
       }
+      // 새 작업자 추가
       return [...prev, workerId];
     });
   };
 
   const handleModalConfirm = () => {
-    if (currentTask && selectedWorkers.length > 0) {
+    if (currentTask) {
+      // 선택된 작업자들의 정보 가져오기
+      const selectedWorkerDetails = workers
+        .filter(worker => selectedWorkers.includes(worker.id))
+        .map(worker => ({
+          id: worker.id,
+          name: worker.name,
+          employeeId: worker.employeeId
+        }));
+
       const newTask = {
         ...currentTask,
-        workers: selectedWorkers.map(id => 
-          DUMMY_WORKERS.find(worker => worker.id === id)
-        )
+        workers: selectedWorkerDetails,
+        isConfigured: true,
+        updatedAt: new Date().toISOString(),
+        workersSelectedAt: new Date().toISOString()
       };
 
-      const updatedTasks = [...selectedTasks, newTask];
-      setSelectedTasks(updatedTasks);
-      
-      // 선택된 작업을 가용 작업 목록에서 제거
+      // 선택된 작업 목록 업데이트
+      const updatedSelectedWorks = [...selectedWorks, newTask];
+      updateSelectedWorks(updatedSelectedWorks);
+
+      // 사용 가능한 작업 목록에서 제거
       setAvailableTasks(prev => 
         prev.filter(task => task.id !== currentTask.id)
       );
-      
-      // 로컬 스토리지에 저장
-      localStorage.setItem('selectedTasks', JSON.stringify(updatedTasks));
       
       setIsModalOpen(false);
       setSelectedWorkers([]);
@@ -118,62 +109,97 @@ const TaskAssignment = () => {
     }
   };
 
-  const handleNextPage = () => {
-    if (selectedTasks.length > 0) {
-      navigate('/worker/prepare-toolcheck');
+  // 선택된 작업 해제 핸들러
+  const handleTaskRemove = (taskToRemove) => {
+    // 선택된 작업 목록에서 제거
+    const updatedSelectedWorks = selectedWorks.filter(
+      task => task.id !== taskToRemove.id
+    );
+    updateSelectedWorks(updatedSelectedWorks);
+
+    // 사용 가능한 작업 목록에 다시 추가
+    setAvailableTasks(prev => [...prev, taskToRemove]);
+  };
+
+  const handleConfirmSelection = () => {
+    if (selectedWorks.length > 0) {
+      navigate('/worker/main');
     }
   };
 
   return (
     <div className="task-assignment">
       <section className="today-tasks">
-        <h2>오늘의 작업</h2>
+        <h2>선택된 작업</h2>
         <div className="task-list">
-          {selectedTasks.map(task => (
-            <div key={task.id} className="task-item">
-              <h3>{task.name}</h3>
-              <div className="workers">
-                {task.workers.map(worker => (
-                  <span key={worker.id} className="worker-tag">
-                    {worker.name}
-                  </span>
-                ))}
+          {selectedWorks.length > 0 ? (
+            selectedWorks.map(task => (
+              <div key={task.id} className="task-item configured">
+                <h3>{task.title}</h3>
+                {task.workers && task.workers.length > 0 && (
+                  <div className="worker-tags">
+                    {task.workers.map((worker, index) => (
+                      <span key={index} className="worker-tag">{worker.name}</span>
+                    ))}
+                  </div>
+                )}
+                <div className="task-details">
+                  <p><strong>위치:</strong> {task.location}</p>
+                  <p><strong>내용:</strong> {task.content}</p>
+                  <p><strong>예정 종료 시간:</strong> {task.scheduledEndTime}</p>
+                  {task.comment && <p><strong>비고:</strong> {task.comment}</p>}
+                </div>
+                <Button 
+                  variant="secondary"
+                  onClick={() => handleTaskRemove(task)}
+                >
+                  작업 해제
+                </Button>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="no-tasks">오늘 작업이 없습니다</div>
+          )}
         </div>
       </section>
 
       <section className="available-tasks">
         <h2>작업 리스트</h2>
-        <div className="task-list">
-          {availableTasks.map(task => (
-            <div key={task.id} className="task-item">
-              <h3>{task.name}</h3>
-              <div className="task-details">
-                {task.details.map((detail, index) => (
-                  <p key={index}>{detail}</p>
-                ))}
+        {availableTasks.length > 0 ? (
+          <div className="task-list">
+            {availableTasks.map(task => (
+              <div key={task.id} className="task-item">
+                <h3>{task.title}</h3>
+                <div className="task-details">
+                  <p><strong>위치:</strong> {task.location}</p>
+                  <p><strong>내용:</strong> {task.content}</p>
+                  <p><strong>예정 종료 시간:</strong> {task.scheduledEndTime}</p>
+                  {task.comment && <p><strong>비고:</strong> {task.comment}</p>}
+                </div>
+                <Button 
+                  variant="main"
+                  onClick={() => handleTaskSelect(task)}
+                >
+                  작업 선택하기
+                </Button>
               </div>
-              <Button 
-                variant="main"
-                onClick={() => handleTaskSelect(task)}
-              >
-                작업 선택하기
-              </Button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="all-tasks-selected">
+            오늘 할당된 작업을 모두 선택하셨습니다
+          </div>
+        )}
       </section>
 
       <div className="navigation-buttons">
         <Button
           variant="main"
           size="full"
-          onClick={handleNextPage}
-          disabled={selectedTasks.length === 0}
+          onClick={handleConfirmSelection}
+          disabled={selectedWorks.length === 0}
         >
-          공구 체크리스트로 이동
+          {selectedWorks.length === 0 ? '한 개 이상의 작업을 선택해주세요' : '설정 완료'}
         </Button>
       </div>
 
@@ -186,28 +212,27 @@ const TaskAssignment = () => {
             variant="main"
             size="full"
             onClick={handleModalConfirm}
-            disabled={selectedWorkers.length === 0}
           >
             설정 완료
           </Button>
         }
       >
         <div className="worker-selection">
-          {DUMMY_WORKERS.map(worker => (
-            <div
-              key={worker.id}
-              className={`worker-item ${
-                selectedWorkers.includes(worker.id) ? 'selected' : ''
-              }`}
-              onClick={() => handleWorkerSelect(worker.id)}
-            >
-              {worker.name}
-            </div>
-          ))}
+          {workers
+            .filter(worker => worker.id !== user.id) // 현재 사용자 제외
+            .map(worker => (
+              <div
+                key={worker.id}
+                className={`worker-item ${
+                  selectedWorkers.includes(worker.id) ? 'selected' : ''
+                }`}
+                onClick={() => handleWorkerSelect(worker.id)}
+              >
+                <span className="worker-name">{worker.name}</span>
+              </div>
+            ))}
         </div>
       </ModalFrame>
     </div>
   );
 };
-
-export default TaskAssignment;

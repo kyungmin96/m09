@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import Camera from '@/shared/ui/Camera/Camera';
-import ToolCheckItem from './ToolCheckItem';
+import { Camera } from '@/shared/ui/Camera/Camera';
+import { ToolCheckItem } from './ToolCheckItem';
 import './ToolCheck.scss';
 
 const createToolKey = (toolId, isDefault) => `${toolId}-${isDefault ? 'default' : 'additional'}`;
 
-const ToolCheckSection = ({
+export const ToolCheckSection = ({
   tools = [],
   onAddToolClick,
   onToolsUpdate,
   onDeleteTool,
   isCameraEnabled = true,
-  isReturnPage = false,  // 반납 페이지 여부
-  hideAddButton = false, // 추가 버튼 숨김 여부
+  isReturnPage = false,
+  hideAddButton = false,
 }) => {
   const [defaultTools, setDefaultTools] = useState([]);
   const [additionalTools, setAdditionalTools] = useState([]);
@@ -20,8 +20,44 @@ const ToolCheckSection = ({
   const [cameraDetectedTools, setCameraDetectedTools] = useState(new Set());
   const [disabledTools, setDisabledTools] = useState(new Set());
 
+  // 초기 도구 목록 설정
   useEffect(() => {
-    const normalizedTools = tools.map(tool => ({
+    // localStorage에서 작업 정보 가져오기
+    const savedTasks = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
+    
+    // 작업별 필요 도구 추출 및 가공
+    const toolsFromTasks = savedTasks.reduce((acc, task) => {
+      // task.content에서 도구 목록 추출
+      const toolMatches = task.content?.match(/필요한\s*도구[:\s]*([\s\S]+?)(?=\n|$)/i);
+      const toolsList = toolMatches ? toolMatches[1].split(',').map(t => t.trim()) : [];
+      
+      toolsList.forEach(toolName => {
+        const existingTool = acc.find(t => t.title === toolName);
+        if (existingTool) {
+          existingTool.works.push({
+            id: task.id,
+            title: task.title
+          });
+        } else {
+          acc.push({
+            id: `default-${Date.now()}-${Math.random()}`,
+            title: toolName,
+            works: [{
+              id: task.id,
+              title: task.title
+            }],
+            isDefault: true
+          });
+        }
+      });
+      return acc;
+    }, []);
+
+    // 기존 추가된 도구들 가져오기
+    const savedAdditionalTools = JSON.parse(localStorage.getItem('additionalTools') || '[]');
+
+    // 도구 목록 설정
+    const normalizedTools = [...toolsFromTasks, ...savedAdditionalTools].map(tool => ({
       ...tool,
       works: Array.isArray(tool.works) ? tool.works : []
     }));
@@ -32,9 +68,10 @@ const ToolCheckSection = ({
     setDefaultTools(loadedDefaultTools);
     setAdditionalTools(loadedAdditionalTools);
 
-    const loadedCheckedTools = JSON.parse(localStorage.getItem('checkedTools')) || [];
-    const loadedCameraDetected = JSON.parse(localStorage.getItem('cameraDetectedTools')) || [];
-    const loadedDisabledTools = JSON.parse(localStorage.getItem('disabledTools')) || [];
+    // 체크 상태 복원
+    const loadedCheckedTools = JSON.parse(localStorage.getItem('checkedTools') || '[]');
+    const loadedCameraDetected = JSON.parse(localStorage.getItem('cameraDetectedTools') || '[]');
+    const loadedDisabledTools = JSON.parse(localStorage.getItem('disabledTools') || '[]');
 
     setCheckedTools(new Set(loadedCheckedTools));
     setCameraDetectedTools(new Set(loadedCameraDetected));
@@ -55,7 +92,7 @@ const ToolCheckSection = ({
       .filter(tool => checkedTools.has(createToolKey(tool.id, tool.isDefault)))
       .map(tool => ({
         id: tool.id,
-        name: tool.name,
+        title: tool.title,
         isDefault: tool.isDefault,
         works: tool.works
       }));
@@ -76,6 +113,7 @@ const ToolCheckSection = ({
     setCheckedTools(newCheckedTools);
   };
 
+  // 카메라 감지 처리 함수 추가
   const handleCameraDetection = (toolId, isDefault) => {
     const toolKey = createToolKey(toolId, isDefault);
     if (disabledTools.has(toolKey)) return;
@@ -174,5 +212,3 @@ const ToolCheckSection = ({
     </div>
   );
 };
-
-export default ToolCheckSection;
