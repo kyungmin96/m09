@@ -8,13 +8,13 @@ import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.service.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/member/users")
 @RequiredArgsConstructor
 public class MemberUserController {
     private final UserService userService;
 
     @GetMapping("/members")
     public ApiResponse<?> getAllMembers() {
-        return userService.getAllMembers();
+        return userService.getAllMemberEmployeeIdsAndNames();
     }
 }

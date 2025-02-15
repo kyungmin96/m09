@@ -9,20 +9,14 @@ import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
 import ssafy.m09.service.EmbeddedService;
-import ssafy.m09.service.HelmetCheckService;
 
 @RestController
 @RequestMapping("/embedded")
 @RequiredArgsConstructor
 public class MemberEmbeddedController {
     private final EmbeddedService embeddedService;
-    private final HelmetCheckService helmetCheckService;
 
-    // 헬멧 인식 시작
-    @PostMapping("/detect/helmet-check/start")
-    public ApiResponse<?> detectHelmet() {
-        return helmetCheckService.startHelmetCheck();
-    }
+
 
     // NFC 시작
     @PostMapping("/nfc/start")
@@ -34,12 +28,6 @@ public class MemberEmbeddedController {
     @PostMapping("/nfc/stop")
     public ResponseEntity<String> stopNfc() {
         return embeddedService.nfcStop();
-    }
-
-    // NFC 상태 확인 (Polling)
-    @GetMapping("/nfc/status")
-    public ResponseEntity<?> pollNfcStatus() {
-        return embeddedService.pollRFIDKey();
     }
 
     // 수동 조작 정지
