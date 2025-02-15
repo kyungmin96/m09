@@ -17,6 +17,10 @@ public class TaskToolBuilder {
     @Column(nullable = false)
     private String title;
 
+    @ManyToOne
+    @JoinColumn(name = "pdf_file_id")  // TaskToolBuilder가 PDFFile과 연결
+    private PDFFile pdfFile;
+
     @Lob
     @Column(nullable = false)
     private String content;

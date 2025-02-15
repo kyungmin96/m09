@@ -3,6 +3,7 @@ package ssafy.m09.controller.member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.DetectionStartRequest;
 import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
@@ -14,6 +15,20 @@ import ssafy.m09.service.EmbeddedService;
 @RequiredArgsConstructor
 public class MemberEmbeddedController {
     private final EmbeddedService embeddedService;
+
+
+
+    // NFC 시작
+    @PostMapping("/nfc/start")
+    public ResponseEntity<String> startNfc() {
+        return embeddedService.nfcStart();
+    }
+
+    // NFC 중지
+    @PostMapping("/nfc/stop")
+    public ResponseEntity<String> stopNfc() {
+        return embeddedService.nfcStop();
+    }
 
     // 수동 조작 정지
     @PostMapping("/manual-drive/stop")

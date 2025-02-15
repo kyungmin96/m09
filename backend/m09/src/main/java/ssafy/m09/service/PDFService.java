@@ -8,9 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ssafy.m09.domain.PDFFile;
+import ssafy.m09.domain.Task;
+import ssafy.m09.domain.TaskToolBuilder;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.response.PDFFileResponse;
 import ssafy.m09.repository.PDFRepository;
+import ssafy.m09.repository.TaskRepository;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PDFService {
     private final PDFRepository pdfRepository;
+    private final TaskRepository taskRepository;
     private static final String UPLOAD_DIR = "/uploads/pdf_files/";
     // C://uploads/pdf_files/
     @Transactional
@@ -85,6 +89,23 @@ public class PDFService {
                         .build(),
                 "PDF 조회 성공"
         )).orElse(ApiResponse.error(HttpStatus.NOT_FOUND, "PDF 파일을 찾을 수 없습니다."));
+    }
+
+    public ApiResponse<PDFFile> getPDFByTaskId(int taskId) {
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        if (taskOptional.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 작업(Task)을 찾을 수 없습니다.");
+        }
+
+        Task task = taskOptional.get();
+        TaskToolBuilder taskToolBuilder = task.getTaskToolBuilder();
+
+        if (taskToolBuilder == null || taskToolBuilder.getPdfFile() == null) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 작업에 연결된 PDF가 없습니다.");
+        }
+
+        PDFFile pdfFile = taskToolBuilder.getPdfFile();
+        return ApiResponse.success(pdfFile, "작업에 연결된 PDF 조회 성공");
     }
 
     public ApiResponse<Resource> getPDFPreview(int id) {

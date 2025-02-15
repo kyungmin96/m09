@@ -6,15 +6,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ssafy.m09.domain.Companion;
 import ssafy.m09.domain.Task;
+import ssafy.m09.domain.TaskTool;
 import ssafy.m09.domain.User;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.CompanionRequest;
+import ssafy.m09.dto.request.TaskAllocateRequest;
 import ssafy.m09.repository.CompanionRepository;
 import ssafy.m09.repository.TaskRepository;
+import ssafy.m09.repository.TaskToolRepository;
 import ssafy.m09.repository.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class CompanionService {
     private final CompanionRepository companionRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final TaskToolRepository taskToolRepository;
 
     @Transactional
     public ApiResponse<Companion> createCompanion(CompanionRequest request) {
@@ -43,6 +47,53 @@ public class CompanionService {
         Companion savedCompanion = companionRepository.save(companion);
         return ApiResponse.success(savedCompanion, "Companion 등록 성공");
     }
+
+    @Transactional
+    public ApiResponse<Map<String, Object>> addCompanionWithStart(List<TaskAllocateRequest> requests) {
+        Set<String> uniqueToolNames = new HashSet<>();  // 중복 제거된 Tool 이름을 저장할 Set
+
+        for (TaskAllocateRequest request : requests) {
+            Optional<Task> taskOptional = taskRepository.findById(request.getTaskId());
+            if (taskOptional.isEmpty()) {
+                return ApiResponse.error(HttpStatus.NOT_FOUND, "Task ID " + request.getTaskId() + "에 해당하는 작업을 찾을 수 없습니다.");
+            }
+
+            Task task = taskOptional.get();
+
+            for (String employeeId : request.getEmployeeIds()) {
+                Optional<User> userOptional = userRepository.findByEmployeeId(employeeId);
+                if (userOptional.isEmpty()) {
+                    return ApiResponse.error(HttpStatus.NOT_FOUND, "Employee ID " + employeeId + "에 해당하는 사용자를 찾을 수 없습니다.");
+                }
+
+                User user = userOptional.get();
+
+                // isEnabled 값을 false로 변경
+                user.setEnabled(false);
+                userRepository.save(user);  // 변경된 User 저장
+
+                // Companion 생성 및 저장
+                Companion companion = Companion.builder()
+                        .task(task)
+                        .user(user)
+                        .build();
+                companionRepository.save(companion);
+            }
+
+            // Task에 연결된 Tool 목록 조회 및 중복 제거
+            List<TaskTool> taskTools = taskToolRepository.findByTaskId(task.getId());
+            uniqueToolNames.addAll(taskTools.stream()
+                    .map(taskTool -> taskTool.getTool().getName())  // Tool 이름 추출
+                    .collect(Collectors.toSet()));  // 중복 제거를 위해 Set 사용
+        }
+
+        // 결과 반환
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("uniqueTools", uniqueToolNames);
+        return ApiResponse.success(responseData, "Companions 생성 및 중복 제거된 Tool 목록 조회 성공");
+    }
+
+
 
     public ApiResponse<Companion> getCompanionById(int id) {
         return companionRepository.findById(id)

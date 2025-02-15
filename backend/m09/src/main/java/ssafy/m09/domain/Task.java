@@ -45,6 +45,10 @@ public class Task {
     @Builder.Default
     private TaskStatus taskState = TaskStatus.START;
 
+    @ManyToOne
+    @JoinColumn(name = "task_tool_builder_id")  // Task가 TaskToolBuilder와 연결
+    private TaskToolBuilder taskToolBuilder;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -25,6 +25,11 @@ public class MemberPDFController {
         return pdfService.getPDFById(id);
     }
 
+    @GetMapping("/tasks/{taskId}")
+    public ApiResponse<?> getPDFForTask(@PathVariable int taskId) {
+        return pdfService.getPDFByTaskId(taskId);
+    }
+
     @GetMapping("/preview/{id}")
     public ApiResponse<Resource> previewPDF(@PathVariable int id) {
         return pdfService.getPDFPreview(id);
