@@ -10,15 +10,13 @@ import ssafy.m09.domain.User;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.UserLoginRequest;
 import ssafy.m09.dto.request.UserRegisterRequest;
+import ssafy.m09.dto.response.UserLoginResponse;
 import ssafy.m09.global.error.ErrorCode;
 import ssafy.m09.repository.RFIDRepository;
 import ssafy.m09.repository.UserRepository;
 import ssafy.m09.security.JwtTokenProvider;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +43,7 @@ public class AuthService {
         return employeeId;
     }
 
-    public ApiResponse<String> login(UserLoginRequest request) {
+    public ApiResponse<UserLoginResponse> login(UserLoginRequest request) {
         Optional<User> userOptional = userRepository.findByEmployeeId(request.getEmployeeId());
         if(userOptional.isEmpty()){
             return ApiResponse.error(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND.getMessage(), ErrorCode.USER_NOT_FOUND.getCode());
@@ -58,7 +56,9 @@ public class AuthService {
         }
 
         String token = jwtTokenProvider.generateToken(user);
-        return ApiResponse.success(token, "로그인 성공");
+
+        UserLoginResponse userLoginResponse = new UserLoginResponse(token, user);
+        return ApiResponse.success(userLoginResponse, "로그인 성공");
     }
 
     @Transactional

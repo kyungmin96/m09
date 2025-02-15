@@ -22,6 +22,11 @@ public class ManagerTaskController {
         return taskService.updateTask(id, request);
     }
 
+    @PutMapping("/posts/{id}/status-change")
+    public ApiResponse<?> changeTaskStatus(@RequestHeader("Authorization") String token, @PathVariable int id, @RequestBody TaskRequest request) {
+        return taskService.updateTaskStatusById(id, request);
+    }
+
     @DeleteMapping("/posts/{id}")
     public ApiResponse<?> deleteTask(@RequestHeader("Authorization") String token, @PathVariable int id) {
         return taskService.deleteTaskById(id);

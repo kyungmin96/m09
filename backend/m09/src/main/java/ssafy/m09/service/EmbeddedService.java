@@ -5,16 +5,32 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ssafy.m09.domain.User;
+import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.DetectionStartRequest;
+import ssafy.m09.dto.request.RFIDLoginRequest;
+import ssafy.m09.dto.request.UserLoginRequest;
 import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
+import ssafy.m09.dto.response.RFIDLoginResponse;
 
 @Service
 @RequiredArgsConstructor
 public class EmbeddedService {
     private final String EMBEDDED_API_URL = "http://localhost:8765/barebone";
     private final RestTemplate restTemplate;
+    private final RFIDLoginService rfidLoginService;
+
+    public ResponseEntity<String> nfcStart(){
+        String url = EMBEDDED_API_URL + "/nfc/start";
+        return restTemplate.postForEntity(url, null, String.class);
+    }
+
+    public ResponseEntity<String> nfcStop(){
+        String url = EMBEDDED_API_URL + "/nfc/stop";
+        return restTemplate.postForEntity(url, null, String.class);
+    }
 
     public ResponseEntity<String> manualDriveStop() {
         String url = EMBEDDED_API_URL + "/manual-drive/stop";
@@ -114,4 +130,46 @@ public class EmbeddedService {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+
+    public ResponseEntity<ApiResponse<User>> pollRFIDKey() {
+        String url = EMBEDDED_API_URL + "/nfc/check";
+        RFIDLoginResponse previousResponse = null;
+
+        while (true) {
+            // 임베디드에서 RFID 상태 조회 요청
+            ResponseEntity<RFIDLoginResponse> response =
+                    restTemplate.getForEntity(url, RFIDLoginResponse.class);
+            RFIDLoginResponse currentResponse = response.getBody();
+
+            if (currentResponse == null || !currentResponse.isDetected()) continue;  // 감지되지 않으면 건너뛰기
+
+            // 새로운 UID가 감지되었는지 확인
+            if (previousResponse == null || currentResponse.isNewDetection(previousResponse)) {
+                // 새로운 UID 값이 있으면 RFID 로그인 검증
+                RFIDLoginRequest request = new RFIDLoginRequest(currentResponse.getUid());
+                ApiResponse<User> loginResponse = rfidLoginService.loginWithRFID(request);
+
+                if (loginResponse.isSuccess()) {
+                    // 로그인 성공 시 사용자 정보 반환
+                    return ResponseEntity.ok(loginResponse);
+                } else {
+                    // 로그인 실패 시 에러 메시지 반환
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(loginResponse);
+                }
+            }
+
+            previousResponse = currentResponse;
+
+            try {
+                // 1초 대기 후 다시 체크
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
 }

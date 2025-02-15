@@ -23,6 +23,6 @@ public class MemberTaskController {
 
     @GetMapping("/posts/in-process")
     public ApiResponse<?> getInProcessTasks(@RequestHeader("Authorization") String token) {
-        return taskService.getInProcessTasks();
+        return taskService.getInProcessTasks(token);
     }
 }

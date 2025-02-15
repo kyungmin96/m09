@@ -31,6 +31,15 @@ public class MemberReportController {
     public ApiResponse<?> getReportsByTaskId(@PathVariable int taskId) {
         return reportService.getReportsByTaskId(taskId);
     }
+    @GetMapping("/completed")
+    public ApiResponse<?> getReportsForCompletedTasks() {
+        return reportService.getReportsForAllCompletedOrDelayedTasks();
+    }
+
+    @PutMapping("{id}/is-completed")
+    public ApiResponse<?> updateIsCompleted(@PathVariable int id) {
+        return reportService.updateIsCompleted(id);
+    }
 
     @PutMapping("/{id}")
     public ApiResponse<?> updateReport(@PathVariable int id, @RequestBody ReportRequest request) {

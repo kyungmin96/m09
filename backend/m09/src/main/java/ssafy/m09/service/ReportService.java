@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ssafy.m09.domain.Report;
 import ssafy.m09.domain.Task;
+import ssafy.m09.domain.en.TaskStatus;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.ReportRequest;
 import ssafy.m09.repository.ReportRepository;
@@ -53,7 +54,7 @@ public class ReportService {
                 .task(taskOptional.get())
                 .content(request.getContent())
                 .isReport(request.isReport())
-                .isCompleted(request.isCompleted())
+                .isCompleted(false)
                 .build();
 
         Report savedReport = reportRepository.save(report);
@@ -74,6 +75,34 @@ public class ReportService {
             return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 작업에 대한 보고서가 없습니다.");
         }
         return ApiResponse.success(reports, "작업에 대한 보고서 목록 조회 성공");
+    }
+
+    @Transactional
+    public ApiResponse<List<Report>> getReportsForAllCompletedOrDelayedTasks() {
+        // COMPLETED 또는 DELAYED 상태의 모든 Task에 해당하는 보고서 조회
+        List<Report> reports = reportRepository.findByTaskTaskStateInAndIsCompletedFalseAndIsReportTrue(
+                List.of(TaskStatus.COMPLETED, TaskStatus.DELAYED)
+        );
+
+        if (reports.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "조건에 맞는 보고서가 없습니다.");
+        }
+
+        return ApiResponse.success(reports, "조건에 맞는 보고서 전체 조회 성공");
+    }
+
+    @Transactional
+    public ApiResponse<Report> updateIsCompleted(int reportId) {
+        Optional<Report> reportOptional = reportRepository.findById(reportId);
+        if (reportOptional.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 보고서를 찾을 수 없습니다.");
+        }
+
+        Report report = reportOptional.get();
+        report.setCompleted(true);  // isCompleted 상태만 업데이트
+        Report updatedReport = reportRepository.save(report);
+
+        return ApiResponse.success(updatedReport, "isCompleted 상태가 성공적으로 업데이트되었습니다.");
     }
 
     // 보고서 수정

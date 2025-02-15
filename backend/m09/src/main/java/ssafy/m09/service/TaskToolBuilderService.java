@@ -4,9 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ssafy.m09.domain.PDFFile;
 import ssafy.m09.domain.TaskToolBuilder;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.TaskRequest;
+import ssafy.m09.repository.PDFRepository;
 import ssafy.m09.repository.TaskToolBuilderRepository;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TaskToolBuilderService {
     private final TaskToolBuilderRepository taskToolBuilderRepository;
+    private final PDFRepository pdfRepository;
 
     @Transactional
     public ApiResponse<TaskToolBuilder> createTaskToolBuilder(TaskRequest request) {
@@ -58,6 +61,27 @@ public class TaskToolBuilderService {
                 })
                 .orElse(ApiResponse.error(HttpStatus.NOT_FOUND, "TaskToolBuilder를 찾을 수 없습니다."));
     }
+
+    // DTO 안썼음
+    @Transactional
+    public ApiResponse<TaskToolBuilder> updatePDFForTaskToolBuilder(int taskToolBuilderId, int pdfId) {
+        Optional<TaskToolBuilder> ttbOptional = taskToolBuilderRepository.findById(taskToolBuilderId);
+        if (ttbOptional.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 TaskToolBuilder를 찾을 수 없습니다.");
+        }
+
+        Optional<PDFFile> pdfOptional = pdfRepository.findById(pdfId);
+        if (pdfOptional.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당 PDF 파일을 찾을 수 없습니다.");
+        }
+
+        TaskToolBuilder taskToolBuilder = ttbOptional.get();
+        taskToolBuilder.setPdfFile(pdfOptional.get());  // PDF 연결
+        TaskToolBuilder updatedTTB = taskToolBuilderRepository.save(taskToolBuilder);
+
+        return ApiResponse.success(updatedTTB, "TaskToolBuilder에 PDF 연결 성공");
+    }
+
 
     @Transactional
     public ApiResponse<String> deleteTaskToolBuilder(int id) {
