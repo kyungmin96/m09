@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import ssafy.m09.domain.User;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.DetectionStartRequest;
-import ssafy.m09.dto.request.RFIDLoginRequest;
-import ssafy.m09.dto.request.UserLoginRequest;
 import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
-import ssafy.m09.dto.response.RFIDLoginResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
