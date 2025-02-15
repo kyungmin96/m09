@@ -16,6 +16,7 @@ const DEFAULT_TODAY_WORKS = [
         comment: '최근 시동 시 비정상 소음 발생 이력 있음',
         scheduledEndTime: '2025-02-15T17:00:00',
         taskState: WORK_STATUS.READY,
+        specialNotes: [] // 특이사항 배열 추가
     },
     {
         id: 2,
@@ -25,6 +26,7 @@ const DEFAULT_TODAY_WORKS = [
         comment: '지난 정비 시 우측 유압 압력 불안정 현상 있었음',
         scheduledEndTime: '2025-02-16T17:00:00',
         taskState: WORK_STATUS.READY,
+        specialNotes: []
     },
     {
         id: 3,
@@ -34,25 +36,23 @@ const DEFAULT_TODAY_WORKS = [
         comment: '배터리 교체 후 첫 점검',
         scheduledEndTime: '2025-02-15T15:00:00',
         taskState: WORK_STATUS.READY,
+        specialNotes: []
     }
 ];
 
 const WorksContext = createContext();
 
 export const WorksProvider = ({ children }) => {
-    // 서버에서 받은 전체 작업 목록
     const [todayWorks, setTodayWorks] = useState(() => {
         const storedWorks = localStorage.getItem('todayWorks');
         return storedWorks ? JSON.parse(storedWorks) : DEFAULT_TODAY_WORKS;
     });
     
-    // 서버 날짜
     const [serverDate, setServerDate] = useState(() => {
         const storedDate = localStorage.getItem('serverDate');
         return storedDate || '';
     });
 
-    // 작업자가 선택하고 공동작업자를 설정한 작업 목록
     const [selectedWorks, setSelectedWorks] = useState(() => {
         const storedSelectedWorks = localStorage.getItem('selectedWorks');
         return storedSelectedWorks ? JSON.parse(storedSelectedWorks) : [];
@@ -80,6 +80,41 @@ export const WorksProvider = ({ children }) => {
         localStorage.setItem('selectedWorks', JSON.stringify(works));
     };
 
+    // 특이사항 관련 함수들 추가
+    const addSpecialNote = (workId, content) => {
+        const newNote = {
+            id: Date.now(),
+            content,
+            timestamp: new Date().toISOString()
+        };
+
+        const updatedWorks = selectedWorks.map(work => {
+            if (work.id === workId) {
+                return {
+                    ...work,
+                    specialNotes: [...(work.specialNotes || []), newNote]
+                };
+            }
+            return work;
+        });
+
+        updateSelectedWorks(updatedWorks);
+    };
+
+    const deleteSpecialNote = (workId, noteId) => {
+        const updatedWorks = selectedWorks.map(work => {
+            if (work.id === workId) {
+                return {
+                    ...work,
+                    specialNotes: work.specialNotes.filter(note => note.id !== noteId)
+                };
+            }
+            return work;
+        });
+
+        updateSelectedWorks(updatedWorks);
+    };
+
     return (
         <WorksContext.Provider value={{
             todayWorks,
@@ -87,6 +122,8 @@ export const WorksProvider = ({ children }) => {
             serverDate,
             updateTodayWorks,
             updateSelectedWorks,
+            addSpecialNote,
+            deleteSpecialNote
         }}>
             {children}
         </WorksContext.Provider>

@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTools } from '@/contexts/ToolsContext';
 import { Button } from '@/shared/ui/Button/Button';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
-import { WebcamView } from './components/WebcamView';
-import './ToolCheckPage.scss';
+import { WebcamView } from '@/shared/ui/Webcam/WebcamView';
+import './styles.scss';
 
 const DETECTION_STATUS = {
     DETECTING: 'DETECTING',
@@ -38,16 +38,19 @@ export const ToolCheckPage = () => {
     const [detectedTools, setDetectedTools] = useState(new Set());
     const [tools, setTools] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [lastDetectionRequest, setLastDetectionRequest] = useState('start');
 
     const routeConfig = ROUTE_CONFIG[checkType] || ROUTE_CONFIG.before;
 
     useEffect(() => {
-        const initialize = async () => {
-            await initializeTools();
-            startDetection();
-        };
-        initialize();
+        initializeTools();
     }, []);
+
+    useEffect(() => {
+        if (tools.length > 0 && detectionStatus === DETECTION_STATUS.DETECTING) {
+            detectTools();
+        }
+    }, [tools, detectedTools, detectionStatus]);
 
     const initializeTools = async () => {
         const activeTools = getActiveTools();
@@ -72,16 +75,34 @@ export const ToolCheckPage = () => {
         }
     };
 
-    const startDetection = async () => {
+    const sendDetectionRequest = async (action) => {
+        try {
+            // 실제 API 엔드포인트로 대체 필요
+            await fetch('/api/detection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action }),
+            });
+            setLastDetectionRequest(action);
+        } catch (error) {
+            console.error('Detection request failed:', error);
+        }
+    };
+
+    const detectTools = async () => {
         const undetectedTools = tools.filter(tool => !detectedTools.has(tool.id));
-        
+        if (undetectedTools.length === 0) return;
+
         try {
             const response = await mockDetectTools(undetectedTools);
+            const newlyDetectedTools = getNewlyDetectedTools(undetectedTools, response.undetectedTools);
             
-            if (response.detectedTools.length > 0) {
+            if (newlyDetectedTools.length > 0) {
                 setDetectedTools(prev => {
                     const newSet = new Set(prev);
-                    response.detectedTools.forEach(toolId => newSet.add(toolId));
+                    newlyDetectedTools.forEach(toolId => newSet.add(toolId));
                     return newSet;
                 });
             }
@@ -90,12 +111,23 @@ export const ToolCheckPage = () => {
         }
     };
 
-    const stopDetection = () => {
-        setDetectionStatus(DETECTION_STATUS.PAUSED);
-        setIsModalOpen(true);
+    const getNewlyDetectedTools = (previousUndetected, currentUndetected) => {
+        const previousIds = new Set(previousUndetected.map(tool => tool.id));
+        const currentIds = new Set(currentUndetected.map(tool => tool.id));
+        return Array.from(previousIds).filter(id => !currentIds.has(id));
     };
 
-    const handleManualCheck = (toolId) => {
+    const stopDetection = async () => {
+        await sendDetectionRequest('stop');
+        setDetectionStatus(DETECTION_STATUS.PAUSED);
+    };
+
+    const resumeDetection = async () => {
+        await sendDetectionRequest('start');
+        setDetectionStatus(DETECTION_STATUS.DETECTING);
+    };
+
+    const handleManualCheck = async (toolId) => {
         setDetectedTools(prev => {
             const newSet = new Set(prev);
             newSet.add(toolId);
@@ -103,10 +135,22 @@ export const ToolCheckPage = () => {
         });
     };
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
         if (detectedTools.size === tools.length) {
+            if (lastDetectionRequest === 'start') {
+                await sendDetectionRequest('stop');
+            }
             navigate(routeConfig.nextPage);
         }
+    };
+
+    const openManualCheckModal = async () => {
+        await stopDetection();
+        setIsModalOpen(true);
+    };
+
+    const closeManualCheckModal = () => {
+        setIsModalOpen(false);
     };
 
     const handleStreamStart = () => {
@@ -117,18 +161,24 @@ export const ToolCheckPage = () => {
         console.error('Camera stream error:', error);
     };
 
-    // Mock function for tool detection API
-    const mockDetectTools = async (toolsToDetect) => {
+    // Mock function for tool detection API - 실제 구현시 대체 필요
+    const mockDetectTools = async (undetectedTools) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        const randomDetectedTools = toolsToDetect
-            .filter(() => Math.random() > 0.5)
-            .map(tool => tool.id);
-        return { detectedTools: randomDetectedTools };
+        const remainingTools = undetectedTools
+            .filter(() => Math.random() > 0.3);
+        return { undetectedTools: remainingTools };
     };
 
     const getUndetectedTools = () => {
         return tools.filter(tool => !detectedTools.has(tool.id));
     };
+
+    // Sort tools to move detected ones to the bottom
+    const sortedTools = [...tools].sort((a, b) => {
+        const aDetected = detectedTools.has(a.id);
+        const bDetected = detectedTools.has(b.id);
+        return aDetected === bDetected ? 0 : aDetected ? 1 : -1;
+    });
 
     return (
         <div className="tool-check-page">
@@ -137,19 +187,34 @@ export const ToolCheckPage = () => {
                 <p>필요한 공구 {detectedTools.size}/{tools.length}개 탐지됨</p>
             </header>
 
-            {detectionStatus === DETECTION_STATUS.DETECTING && (
-                <div className="webcam-section">
-                    <WebcamView
-                        isActive={true}
-                        undetectedTools={getUndetectedTools()}
-                        onStreamStart={handleStreamStart}
-                        onStreamError={handleStreamError}
-                    />
-                </div>
-            )}
+            <div className="webcam-section">
+                <WebcamView
+                    isActive={true}
+                    isPaused={detectionStatus !== DETECTION_STATUS.DETECTING}
+                    onStreamStart={handleStreamStart}
+                    onStreamError={handleStreamError}
+                />
+            </div>
+
+            <div className="camera-controls">
+                <Button 
+                    variant="secondary" 
+                    onClick={detectionStatus === DETECTION_STATUS.DETECTING ? stopDetection : resumeDetection}
+                    className="control-button"
+                >
+                    {detectionStatus === DETECTION_STATUS.DETECTING ? '탐지 중지' : '탐지 재시작'}
+                </Button>
+                <Button 
+                    variant="secondary" 
+                    onClick={openManualCheckModal}
+                    className="control-button"
+                >
+                    수동 체크
+                </Button>
+            </div>
 
             <section className="tools-list">
-                {tools.map(tool => (
+                {sortedTools.map(tool => (
                     <div 
                         key={tool.id} 
                         className={`tool-item ${detectedTools.has(tool.id) ? 'detected' : ''}`}
@@ -162,42 +227,29 @@ export const ToolCheckPage = () => {
                 ))}
             </section>
 
-            <div className="detection-controls">
-                {detectionStatus === DETECTION_STATUS.DETECTING && (
-                    <Button 
-                        variant="secondary" 
-                        onClick={stopDetection}
-                        disabled={isLoading}
-                    >
-                        탐지 중지
-                    </Button>
-                )}
-
-                {detectionStatus === DETECTION_STATUS.PAUSED && (
-                    <Button 
-                        variant="main" 
-                        onClick={handleComplete}
-                        disabled={detectedTools.size !== tools.length}
-                    >
-                        {routeConfig.buttonText}
-                    </Button>
-                )}
+            <div className="next-step-controls">
+                <Button 
+                    variant="main" 
+                    onClick={handleComplete}
+                    disabled={detectedTools.size !== tools.length}
+                    className="next-button"
+                >
+                    {routeConfig.buttonText}
+                </Button>
             </div>
 
             <ModalFrame
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={closeManualCheckModal}
                 title="미탐지 공구 확인"
                 footerContent={
                     <Button
                         variant="main"
                         size="full"
-                        onClick={handleComplete}
+                        onClick={closeManualCheckModal}
                         disabled={detectedTools.size !== tools.length}
                     >
-                        {detectedTools.size === tools.length ? 
-                            routeConfig.buttonText : 
-                            `남은 공구 ${tools.length - detectedTools.size}개 확인 필요`}
+                        수동 체크 완료
                     </Button>
                 }
             >

@@ -19,7 +19,7 @@ export const WorkplaceMovePage = ({ mode = "to-workplace" }) => {
     if (mode === "to-workplace") {
       navigate("/worker/while-work");
     } else if (mode === "to-warehouse") {
-      navigate("/worker/complete-work");
+      navigate("/worker/tool-check/after");
     }
   };
 
