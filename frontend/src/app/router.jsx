@@ -14,6 +14,24 @@ import { WorkCompletePage } from '@/pages/worker/WorkCompletePage';
 
 // import { LoginControlPage } from '@/pages/control/LoginControlPage';
 // import { CartManagePage } from '@/pages/control/CartManagePage';
+import TestMainPage from '@/pages/TestMainPage';
+
+// import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
+import CheckSafetyPage from '@/pages/worker/CheckSafetyPage';
+import CartManagePage from '@/pages/control/CartManagePage';
+
+import RegisterTestPage from '@/pages/test/RegisterTestPage';
+import LoginTestPage from '@/pages/test/LoginTestPage';
+import LogoutTestPage from '@/pages/test/LogoutTestPage';
+import TaskCreateTestPage from '@/pages/test/task/TaskCreateTestPage';
+import TaskFetchTestPage from '@/pages/test/task/TaskFetchTestPage';
+import HelmetDetectionTestPage from '@/pages/test/embedded/HelmetDetectionTestPage';
+import ManualDriveTestPage from '@/pages/test/embedded/ManualDriveTestPage';
+import DriveTestPage from '@/pages/test/embedded/DriveTestPage';
+import TaskPdfTestPage from '@/pages/test/task/TaskPdfTestPage';
+import ReportTestPage from '@/pages/test/reports/ReportTestPage';
+import ReportTaskTestPage from '@/pages/test/task/ReportTaskTestPage';
+
 import { TestMainPage } from '@/pages/TestMainPage';
 
 export const AppRouter = () => {
@@ -21,6 +39,20 @@ export const AppRouter = () => {
     <Routes>
       {/* 테스트 메인 페이지 */}
       <Route path="/" element={<TestMainPage />} />
+      <Route path="/test/register" element={<RegisterTestPage />} />
+      <Route path="/test/login" element={<LoginTestPage />} />
+      <Route path="/test/logout" element={<LogoutTestPage />} />
+      {/* 테스트 task 페이지 */}
+      <Route path="/test/task/task-create" element={<TaskCreateTestPage />} />
+      <Route path="/test/task/task-fetch" element={<TaskFetchTestPage />} />
+      <Route path="/test/task/task-pdf" element={<TaskPdfTestPage />} />
+      <Route path="/test/task/report-task" element={<ReportTaskTestPage />} />
+      {/* 테스트 embedded 페이지 */}
+      <Route path="/test/embedded/detect-helmet/start" element={<HelmetDetectionTestPage />} />
+      <Route path="/test/embedded/manual-drive" element={<ManualDriveTestPage />} />
+      <Route path="/test/embedded/drive" element={<DriveTestPage />} />
+      {/* 테스트 reports 페이지 */}
+      <Route path="/test/reports/report" element={<ReportTestPage />} />
       {/* 작업자 영역 */}
       <Route path="/worker" element={<WorkerLayout />}>
         <Route path="login" element={<LoginWorkerPage />} />
