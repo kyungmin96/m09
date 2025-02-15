@@ -6,7 +6,7 @@ import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage';
 import { MainPage } from '@/pages/worker/MainPage';
 import { TaskAssignment } from '@/pages/worker/TaskAssignmentPage/TaskAssignment';
 import { PrepareToolPage } from '@/pages/worker/PrepareToolPage';
-// import { ToolCheckPage } from '@/pages/worker/ToolCheckPage';
+import { ToolCheckPage } from '@/pages/worker/ToolCheckPage';
 import { CheckSafetyPage } from '@/pages/worker/CheckSafetyPage';
 import { WorkplaceMovePage } from '@/pages/worker/WorkplaceMovePage';
 import { WorkProgressPage } from '@/pages/worker/WhileWorkPage';
@@ -14,11 +14,8 @@ import { WorkCompletePage } from '@/pages/worker/WorkCompletePage';
 
 // import { LoginControlPage } from '@/pages/control/LoginControlPage';
 // import { CartManagePage } from '@/pages/control/CartManagePage';
-import TestMainPage from '@/pages/TestMainPage';
 
 // import ToolReturnPage from '@/pages/worker/ToolReturnPage/index';
-import CheckSafetyPage from '@/pages/worker/CheckSafetyPage';
-import CartManagePage from '@/pages/control/CartManagePage';
 
 import RegisterTestPage from '@/pages/test/RegisterTestPage';
 import LoginTestPage from '@/pages/test/LoginTestPage';
@@ -59,6 +56,7 @@ export const AppRouter = () => {
         <Route path="main" element={<MainPage/>}/>
         <Route path="today-task" element={< TaskAssignment />}/>
         <Route path="prepare-tool" element={< PrepareToolPage />}/>
+        <Route path="tool-check/:checkType" element={<ToolCheckPage />} />
         {/* <Route path="prepare-toolcheck" element={<ToolCheckPage />} /> */}
         <Route path="safety-check" element={<CheckSafetyPage />} />
         <Route path="workplace-move" element={<WorkplaceMovePage mode="to-workplace" />} />

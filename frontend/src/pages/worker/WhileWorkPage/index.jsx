@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useWorks, WORK_STATUS } from '@/contexts/WorksContext';
 import './styles.scss';
 
 const getStatusEmoji = (taskState) => {
   switch(taskState) {
-    case 'COMPLETE':
+    case WORK_STATUS.COMPLETED:
       return '⭕';
-    case 'IN_PROGRESS':
+    case WORK_STATUS.IN_PROGRESS:
       return '⏳';
-    case 'START':
+    case WORK_STATUS.READY:
       return '';
     default:
       return '';
@@ -18,65 +19,29 @@ const getStatusEmoji = (taskState) => {
 const getTaskState = (koreanStatus) => {
   switch(koreanStatus) {
     case '작업완료':
-      return 'COMPLETE';
+      return WORK_STATUS.COMPLETED;
     case '작업중':
-      return 'IN_PROGRESS';
+      return WORK_STATUS.IN_PROGRESS;
     case '작업전':
-      return 'START';
+      return WORK_STATUS.READY;
     default:
-      return 'START';
+      return WORK_STATUS.READY;
   }
 };
 
 export const WorkProgressPage = () => {
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
+  const { selectedWorks, updateSelectedWorks, addSpecialNote, deleteSpecialNote } = useWorks();
   const [selectedTask, setSelectedTask] = useState(null);
-  const [workStatus, setWorkStatus] = useState('START');
+  const [workStatus, setWorkStatus] = useState(WORK_STATUS.READY);
   const [specialNote, setSpecialNote] = useState('');
-  const [specialNotes, setSpecialNotes] = useState([]);
 
   useEffect(() => {
-    // selectedTasks에서 작업 정보 가져오기
-    const savedTasks = localStorage.getItem('selectedTasks');
-    const storedNotes = localStorage.getItem('specialNotes');
-    const dailyWorkStatus = localStorage.getItem('dailyWorkStatus');
-    
-    if (savedTasks) {
-      const parsedTasks = JSON.parse(savedTasks);
-      // 기존 taskState 유지하면서 추가 정보 병합
-      const tasksWithStatus = parsedTasks.map(task => ({
-        id: task.id,
-        title: task.title,
-        content: task.content,
-        comment: task.comment,
-        location: task.location,
-        taskState: task.taskState || 'START',
-        assignedUser: task.assignedUser,
-        scheduledStartTime: task.scheduledStartTime,
-        scheduledEndTime: task.scheduledEndTime
-      }));
-
-      // 이전에 저장된 작업 상태가 있다면 복원
-      if (dailyWorkStatus) {
-        const savedStatus = JSON.parse(dailyWorkStatus);
-        tasksWithStatus.forEach(task => {
-          const savedTaskStatus = savedStatus.find(s => s.id === task.id);
-          if (savedTaskStatus) {
-            task.taskState = savedTaskStatus.taskState;
-          }
-        });
-      }
-
-      setTasks(tasksWithStatus);
-      setSelectedTask(tasksWithStatus[0]);
-      setWorkStatus(tasksWithStatus[0]?.taskState || 'START');
+    if (selectedWorks.length > 0) {
+      setSelectedTask(selectedWorks[0]);
+      setWorkStatus(selectedWorks[0]?.taskState || WORK_STATUS.READY);
     }
-
-    if (storedNotes) {
-      setSpecialNotes(JSON.parse(storedNotes));
-    }
-  }, []);
+  }, [selectedWorks]);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);
@@ -87,47 +52,27 @@ export const WorkProgressPage = () => {
     if (!selectedTask) return;
     
     const newTaskState = getTaskState(koreanStatus);
-    const updatedTasks = tasks.map(task => {
-      if (task.id === selectedTask.id) {
+    const updatedWorks = selectedWorks.map(work => {
+      if (work.id === selectedTask.id) {
         return { 
-          ...task, 
+          ...work, 
           taskState: newTaskState,
           updatedAt: new Date().toISOString()
         };
       }
-      return task;
+      return work;
     });
 
-    setTasks(updatedTasks);
+    updateSelectedWorks(updatedWorks);
     setWorkStatus(newTaskState);
     setSelectedTask({ ...selectedTask, taskState: newTaskState });
-
-    // 작업 상태 저장
-    const statusToSave = updatedTasks.map(({ id, taskState }) => ({ id, taskState }));
-    localStorage.setItem('dailyWorkStatus', JSON.stringify(statusToSave));
-    localStorage.setItem('selectedTasks', JSON.stringify(updatedTasks));
   };
 
   const handleSpecialNoteSubmit = () => {
-    if (!specialNote.trim()) return;
-
-    const newNote = {
-      id: Date.now(),
-      taskId: selectedTask.id,
-      content: specialNote,
-      timestamp: new Date().toISOString()
-    };
-
-    const updatedNotes = [...specialNotes, newNote];
-    setSpecialNotes(updatedNotes);
+    if (!specialNote.trim() || !selectedTask) return;
+    
+    addSpecialNote(selectedTask.id, specialNote);
     setSpecialNote('');
-    localStorage.setItem('specialNotes', JSON.stringify(updatedNotes));
-  };
-
-  const handleDeleteNote = (noteId) => {
-    const updatedNotes = specialNotes.filter(note => note.id !== noteId);
-    setSpecialNotes(updatedNotes);
-    localStorage.setItem('specialNotes', JSON.stringify(updatedNotes));
   };
 
   const handleManualView = () => {
@@ -149,7 +94,7 @@ export const WorkProgressPage = () => {
       </header>
 
       <div className="task-menu-bar">
-        {tasks.map((task) => (
+        {selectedWorks.map((task) => (
           <button
             key={task.id}
             className={`task-button ${selectedTask?.id === task.id ? 'active' : ''} ${
@@ -168,21 +113,28 @@ export const WorkProgressPage = () => {
       {selectedTask && (
         <div className="task-detail">
           <h2>{selectedTask.title}</h2>
+          <div className="task-info">
+            <p>{selectedTask.content}</p>
+            {selectedTask.comment && (
+              <p className="comment">참고사항: {selectedTask.comment}</p>
+            )}
+          </div>
+
           <div className="status-buttons">
             <button
-              className={`status-button ${workStatus === 'START' ? 'active' : ''}`}
+              className={`status-button ${workStatus === WORK_STATUS.READY ? 'active' : ''}`}
               onClick={() => handleStatusChange('작업전')}
             >
               작업 전
             </button>
             <button
-              className={`status-button ${workStatus === 'IN_PROGRESS' ? 'active' : ''}`}
+              className={`status-button ${workStatus === WORK_STATUS.IN_PROGRESS ? 'active' : ''}`}
               onClick={() => handleStatusChange('작업중')}
             >
               작업중
             </button>
             <button
-              className={`status-button ${workStatus === 'COMPLETE' ? 'active' : ''}`}
+              className={`status-button ${workStatus === WORK_STATUS.COMPLETED ? 'active' : ''}`}
               onClick={() => handleStatusChange('작업완료')}
             >
               작업완료
@@ -203,23 +155,21 @@ export const WorkProgressPage = () => {
           </button>
 
           <div className="special-notes-list">
-            {specialNotes
-              .filter((note) => note.taskId === selectedTask.id)
-              .map((note) => (
-                <div key={note.id} className="note-item">
-                  <div className="note-content">
-                    <p>{note.content}</p>
-                    <span>{new Date(note.timestamp).toLocaleString()}</span>
-                  </div>
-                  <button 
-                    className="delete-button"
-                    onClick={() => handleDeleteNote(note.id)}
-                    aria-label="삭제"
-                  >
-                    ×
-                  </button>
+            {selectedTask.specialNotes?.map((note) => (
+              <div key={note.id} className="note-item">
+                <div className="note-content">
+                  <p>{note.content}</p>
+                  <span>{new Date(note.timestamp).toLocaleString()}</span>
                 </div>
-              ))}
+                <button 
+                  className="delete-button"
+                  onClick={() => deleteSpecialNote(selectedTask.id, note.id)}
+                  aria-label="삭제"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
