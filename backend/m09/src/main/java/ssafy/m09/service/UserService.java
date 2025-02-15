@@ -20,7 +20,7 @@ public class UserService {
 
     // member 작업자들 전체 조회
     public ApiResponse<Map<String, List<String>>> getAllMemberEmployeeIdsAndNames() {
-        List<User> members = userRepository.findAllByPosition(UserRole.ROLE_MEMBER);
+        List<User> members = userRepository.findAllByPositionAndIsEnabled(UserRole.ROLE_MEMBER, true);
 
         if (members.isEmpty()) {
             return ApiResponse.error(HttpStatus.NOT_FOUND, "ROLE_MEMBER 권한을 가진 사용자가 없습니다.");
