@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@/shared/ui/Button/Button.jsx';
+import { validateId, validatePassword, isFormValid } from '@/features/auth/lib/auth.helpers';
 import './LoginForm.scss';
 
 export const LoginForm = () => {
+  const { login } = useAuth();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState(null);
@@ -38,31 +41,6 @@ export const LoginForm = () => {
     };
   }, [showError]);
 
-  // 사번 유효성 검사
-  const validateId = (value) => {
-    if (!value) return '';
-    const idRegex = /^\d{7}$/;
-    if (!idRegex.test(value)) {
-      return '사번은 7자리 숫자로 구성되어 있습니다.';
-    }
-    return '';
-  };
-
-  // 비밀번호 유효성 검사
-  const validatePassword = (value) => {
-    if (!value) return '';
-    if (value.length < 8) {
-      return '비밀번호는 특수문자 포함 8자 이상입니다.';
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-      return '비밀번호는 특수문자 포함 8자 이상입니다.';
-    }
-    if (/\s/.test(value)) {
-      return '비밀번호에 공백을 포함할 수 없습니다.';
-    }
-    return '';
-  };
-
   const handleFocus = (inputName) => {
     setFocusedInput(inputName);
     setShowError(false);
@@ -75,7 +53,6 @@ export const LoginForm = () => {
       [inputName]: true
     }));
 
-    // blur 시에만 전체 유효성 검사 실행
     if (inputName === 'id') {
       setValidationErrors(prev => ({
         ...prev,
@@ -94,25 +71,12 @@ export const LoginForm = () => {
     const value = e.target.value;
     setId(value);
 
-    if (value) {
-      // 입력 중에도 숫자가 아닌 문자가 포함되거나 7자리를 초과할 경우 에러 메시지 표시
-      if (value.length > 7 || /[^0-9]/.test(value)) {
-        setValidationErrors(prev => ({
-          ...prev,
-          id: '사번은 7자리 숫자로 구성되어 있습니다.'
-        }));
-        setTouched(prev => ({
-          ...prev,
-          id: true
-        }));
-      } else {
-        setValidationErrors(prev => ({
-          ...prev,
-          id: ''
-        }));
-      }
+    if (value && touched.id) {
+      setValidationErrors(prev => ({
+        ...prev,
+        id: validateId(value)
+      }));
     } else {
-      // 값이 비어있을 때는 에러 메시지 제거
       setValidationErrors(prev => ({
         ...prev,
         id: ''
@@ -144,15 +108,6 @@ export const LoginForm = () => {
     setShowPassword(!showPassword);
   };
 
-  const isFormValid = () => {
-    // 1. 값이 비어있지 않은지 확인
-    // 2. 유효성 검사 에러가 없는지 확인
-    return id.length > 0 &&
-      password.length > 0 &&
-      !validateId(id) &&
-      !validatePassword(password);
-  };
-
   const handleButtonClick = (e) => {
     e.preventDefault();
 
@@ -161,15 +116,12 @@ export const LoginForm = () => {
       password: true
     });
 
-    const idError = validateId(id);
-    const passwordError = validatePassword(password);
-
     setValidationErrors({
-      id: idError,
-      password: passwordError
+      id: validateId(id),
+      password: validatePassword(password)
     });
 
-    if (!isFormValid()) {
+    if (!isFormValid(id, password)) {
       setIsErrorFading(false);
       setShowError(true);
     } else {
@@ -177,9 +129,16 @@ export const LoginForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempted with:', { id, password });
+    try {
+      await login({ employeeId: id, password });
+      console.log('로그인 성공');
+      navigate('/worker/main');
+    } catch (error) {
+      console.error('로그인 실패:', error);
+      setShowError(true);
+    }
   };
 
   return (
