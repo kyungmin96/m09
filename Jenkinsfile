@@ -28,7 +28,7 @@ pipeline {
         stage('Check Docker Compose Path') {
             steps {
                 script {
-                    sh 'PATH=$PATH:/snap/bin'
+                    sh 'export PATH=$PATH:/snap/bin'
                     sh 'echo $PATH'
                     sh 'which docker-compose'
                 }
