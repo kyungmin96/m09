@@ -38,6 +38,6 @@
 
 - 와이어프레임
 
-![img](./etc/README(와이어프레임).png)
+![img](./etc/assets/image/README(와이어프레임).png)
 
 이후 ERD등 추가 예정.
