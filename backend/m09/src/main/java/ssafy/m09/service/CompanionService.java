@@ -72,8 +72,8 @@ public class CompanionService {
                 User user = userOptional.get();
 
                 // isEnabled 값을 false로 변경
-                user.setEnabled(false);
-                userRepository.save(user);  // 변경된 User 저장
+//                user.setEnabled(false);
+//                userRepository.save(user);  // 변경된 User 저장
 
                 // Companion 생성 및 저장
                 Companion companion = Companion.builder()

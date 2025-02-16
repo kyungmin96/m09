@@ -3,7 +3,10 @@ package ssafy.m09.controller.member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.dto.common.ApiResponse;
+import ssafy.m09.dto.request.TaskEndRequest;
 import ssafy.m09.service.TaskService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/member/tasks")
@@ -30,5 +33,10 @@ public class MemberTaskController {
     public ApiResponse<?> getTodaySelectedTasks(@RequestHeader("Authorization") String token)
     {
         return taskService.getTodaySelectedTasks(token);
+    }
+
+    @PostMapping("/update-end")
+    public ApiResponse<String> updateEndTask(@RequestBody List<TaskEndRequest> requests) {
+        return taskService.updateEndTask(requests);
     }
 }

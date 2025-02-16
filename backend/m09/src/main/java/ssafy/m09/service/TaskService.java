@@ -9,6 +9,7 @@ import ssafy.m09.domain.TaskToolBuilder;
 import ssafy.m09.domain.User;
 import ssafy.m09.domain.en.TaskStatus;
 import ssafy.m09.dto.common.ApiResponse;
+import ssafy.m09.dto.request.TaskEndRequest;
 import ssafy.m09.dto.request.TaskRequest;
 import ssafy.m09.global.error.ErrorCode;
 import ssafy.m09.repository.TaskRepository;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -132,6 +134,35 @@ public class TaskService {
         }
 
         return ApiResponse.success(tasks,"오늘 선택했던 작업 조회 성공");
+    }
+
+    @Transactional
+    public ApiResponse<String> updateEndTask(List<TaskEndRequest> requests){
+        List<Integer> taskIds = requests.stream()
+                .map(TaskEndRequest::getTaskId)
+                .collect(Collectors.toList());
+
+        List<Task> tasks = taskRepository.findAllById(taskIds);
+
+        if (tasks.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "해당하는 작업을 찾을 수 없습니다.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Task task : tasks) {
+            TaskEndRequest updateRequest = requests.stream()
+                    .filter(req -> req.getTaskId() == task.getId())
+                    .findFirst()
+                    .orElse(null);
+
+            task.setEndTime(now);
+            task.setTaskState(updateRequest.getTaskStatus());
+        }
+
+        taskRepository.saveAll(tasks);
+
+        return ApiResponse.success(null,"작업 종료 동작 성공");
     }
 
     // 업데이트는 모든 필드 업데이트 가능하게 열어둠
