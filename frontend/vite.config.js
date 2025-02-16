@@ -4,6 +4,10 @@ import path from "path"
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  server: {
+    host: true,  // 외부 접속 허용
+    port: 3000,  // 개발 서버 포트 3000으로 변경
+  },
   preview: {
     host: true,
     port: 4173,
