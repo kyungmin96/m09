@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/snap/bin:$PATH"
-        DOCKER_COMPOSE_PATH = '/home/ubuntu/dev/S12P11A202'
+        HOST_IP = 'i12a202.p.ssafy.io'  // EC2의 퍼블릭 DNS
+        SSH_USER = 'ubuntu'  // EC2의 사용자 (ubuntu)
+        SSH_KEY = credentials('prefix')  // Jenkins에서 저장한 SSH Key Credential ID
     }
 
     stages {
@@ -25,48 +26,19 @@ pipeline {
             }
         }
 
-        stage('Check Docker Compose Path') {
+        stage('SSH into EC2 and Deploy') {
             steps {
                 script {
-                    sh 'export PATH=$PATH:/snap/bin'
-                    sh 'echo $PATH'
-                    sh 'which docker-compose'
-                }
-            }
-        }
-
-        stage('Shutdown Docker Containers') {
-            steps {
-                script {
-                    sh 'cd /home/ubuntu/dev/S12P11A202 && docker-compose down'
-                }
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    dir("$DOCKER_COMPOSE_PATH") {
-                        sh 'docker-compose -f docker-compose.yml build --no-cache'
-                    }
-                }
-            }
-        }
-
-        stage('Start Docker Containers') {
-            steps {
-                script {
-                    dir("$DOCKER_COMPOSE_PATH") {
-                        sh 'docker-compose -f docker-compose.yml up -d'
-                    }
-                }
-            }
-        }
-
-        stage('Verify Deployment') {
-            steps {
-                script {
-                    sh 'docker ps'
+                    // EC2에 SSH로 접속한 후 여러 명령을 한 번에 실행
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${HOST_IP} << 'EOF'
+                        cd /home/ubuntu/dev/S12P11A202
+                        docker-compose down
+                        docker-compose build --no-cache
+                        docker-compose up -d
+                        docker ps
+                        EOF
+                    """
                 }
             }
         }
