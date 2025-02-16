@@ -8,16 +8,24 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://i12a202.p.ssafy.io:3306/m09
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     networks:
       - mynetwork
 
   frontend:
     build: ./frontend
     container_name: frontend
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
+    networks:
+      - mynetwork
+
+  embedded:
+    build: ./embedded
+    container_name: embedded
+    expose:
+      - "8765"
     networks:
       - mynetwork
 
