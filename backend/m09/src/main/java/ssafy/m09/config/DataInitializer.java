@@ -3,17 +3,11 @@ package ssafy.m09.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import ssafy.m09.domain.Task;
-import ssafy.m09.domain.TaskTool;
-import ssafy.m09.domain.Tool;
-import ssafy.m09.domain.User;
+import ssafy.m09.domain.*;
 import ssafy.m09.domain.en.TaskStatus;
 import ssafy.m09.domain.en.ToolCategory;
 import ssafy.m09.domain.en.UserRole;
-import ssafy.m09.repository.TaskRepository;
-import ssafy.m09.repository.TaskToolRepository;
-import ssafy.m09.repository.ToolRepository;
-import ssafy.m09.repository.UserRepository;
+import ssafy.m09.repository.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -29,13 +23,14 @@ public class DataInitializer implements CommandLineRunner {
     private final TaskRepository taskRepository;
     private final TaskToolRepository taskToolRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final VehicleRepository vehicleRepository;
     @Override
     public void run(String... args) {
         initializeUsers();
         initializeTools();
         initializeTasks();
         initializeTaskTools();
+        initializeVehicle();
     }
 
     private void initializeUsers() {
@@ -197,4 +192,20 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
     }
+
+    private void initializeVehicle(){
+        String vehicleName = "Model9";
+        Optional<Vehicle> existVehicle = vehicleRepository.findByName(vehicleName);
+        if(existVehicle.isEmpty())
+        {
+            Vehicle vehicle = Vehicle.builder()
+                    .name(vehicleName)
+                    .isCharging(false)
+                    .isUsing(false)
+                    .build();
+            vehicleRepository.save(vehicle);
+            System.out.println("✅ Vehicle 생성 완료: Vehicle(" + vehicle.getName() + ")");
+        }
+    }
+
 }

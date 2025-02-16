@@ -16,6 +16,7 @@ import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.TaskToolRepository;
 import ssafy.m09.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,8 @@ public class CompanionService {
             }
 
             Task task = taskOptional.get();
+            task.setStartTime(LocalDateTime.now());
+            taskRepository.save(task);
 
             for (String employeeId : request.getEmployeeIds()) {
                 Optional<User> userOptional = userRepository.findByEmployeeId(employeeId);
@@ -69,8 +72,8 @@ public class CompanionService {
                 User user = userOptional.get();
 
                 // isEnabled 값을 false로 변경
-                user.setEnabled(false);
-                userRepository.save(user);  // 변경된 User 저장
+//                user.setEnabled(false);
+//                userRepository.save(user);  // 변경된 User 저장
 
                 // Companion 생성 및 저장
                 Companion companion = Companion.builder()
