@@ -1,6 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import * as authAPI from "@/features/auth/api/auth.api";
 
+// 개발용 임시 사용자 데이터
+// const DEFAULT_USER = {
+//   employeeId: "1234567",
+//   name: "김동우",
+//   position: "ROLE_MANAGER", // ROLE_MEMBER
+//   token: "dummy-token",
+// };
+
 const AuthContext = createContext();
 
 const clearLocalStorage = () => {

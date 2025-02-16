@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom';
-import { ControlLayout } from '@/shared/Layouts/ControlLayout';
+import { ControlLayout } from '@/shared/layouts/ControlLayout';
 
 // import { CartManagePage } from '@/pages/control/CartManagePage';
 

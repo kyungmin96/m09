@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom';
-import { WorkerLayout } from '@/shared/Layouts/WorkerLayout';
+import { WorkerLayout } from '@/shared/layouts/WorkerLayout';
 
 import { MainPage } from '@/pages/worker/MainPage';
 import { TaskAssignment } from '@/pages/worker/TaskAssignmentPage/TaskAssignment';
