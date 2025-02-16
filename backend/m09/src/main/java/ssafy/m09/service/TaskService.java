@@ -16,6 +16,7 @@ import ssafy.m09.repository.TaskToolBuilderRepository;
 import ssafy.m09.repository.UserRepository;
 import ssafy.m09.security.JwtTokenProvider;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -115,6 +116,23 @@ public class TaskService {
         return ApiResponse.success(tasks, "진행 중인 작업 조회 성공");
     }
 
+    public ApiResponse<List<Task>> getTodaySelectedTasks(String token)
+    {
+        String employeeId = jwtTokenProvider.getEmployeeId(token);
+        LocalDate today = LocalDate.now();
+
+        List<Task> tasks = taskRepository.findByAssignedUser_EmployeeIdAndStartTimeBetweenAndEndTimeIsNull(
+                employeeId,
+                today.atStartOfDay(),
+                today.plusDays(1).atStartOfDay()
+        );
+
+        if (tasks.isEmpty()) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "오늘 할당된 작업이 없습니다.");
+        }
+
+        return ApiResponse.success(tasks,"오늘 선택했던 작업 조회 성공");
+    }
 
     // 업데이트는 모든 필드 업데이트 가능하게 열어둠
     @Transactional

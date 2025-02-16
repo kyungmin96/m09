@@ -16,6 +16,7 @@ import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.TaskToolRepository;
 import ssafy.m09.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,8 @@ public class CompanionService {
             }
 
             Task task = taskOptional.get();
+            task.setStartTime(LocalDateTime.now());
+            taskRepository.save(task);
 
             for (String employeeId : request.getEmployeeIds()) {
                 Optional<User> userOptional = userRepository.findByEmployeeId(employeeId);

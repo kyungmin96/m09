@@ -21,4 +21,6 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     List<Task> findByScheduledStartTimeBeforeAndTaskStateInAndAssignedUser(LocalDateTime now, List<TaskStatus> start, User user);
 
     Collection<Object> findByTitle(String title);
+
+    List<Task> findByAssignedUser_EmployeeIdAndStartTimeBetweenAndEndTimeIsNull(String employeeId, LocalDateTime localDateTime, LocalDateTime localDateTime1);
 }

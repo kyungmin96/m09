@@ -35,34 +35,35 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getEmployeeId(String token) {
-        return extractAllClaims(token).getSubject();
-    }
+    public String getEmployeeId(String token) {return extractAllClaims(cleanToken(token)).getSubject();}
 
     public String extractRole(String token) {
-        return (String) extractAllClaims(token).get("role");
+        return (String) extractAllClaims(cleanToken(token)).get("role");
     }
 
     private Claims extractAllClaims(String token) {
+        String cleanedToken = cleanToken(token);
+
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(cleanedToken)
                 .getBody();
     }
 
     public boolean validateToken(String token) {
         try {
-            if (isTokenBlacklisted(token)) {
+            String cleanedToken = cleanToken(token);
+            if (isTokenBlacklisted(cleanedToken)) {
                 return false;
             }
 
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(token);
+                    .parseClaimsJws(cleanedToken);
 
-            return !isTokenExpired(token);
+            return !isTokenExpired(cleanedToken);
         } catch (Exception e) {
             return false;
         }
@@ -79,5 +80,12 @@ public class JwtTokenProvider {
 
     public boolean isTokenBlacklisted(String token) {
         return blacklistedTokens.contains(token);
+    }
+
+    private String cleanToken(String token) {
+        if (token.startsWith("Bearer ")) {
+            return token.substring(7).trim();  // "Bearer " 제거 후 trim
+        }
+        return token.trim();
     }
 }

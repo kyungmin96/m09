@@ -25,4 +25,10 @@ public class MemberTaskController {
     public ApiResponse<?> getInProcessTasks(@RequestHeader("Authorization") String token) {
         return taskService.getInProcessTasks(token);
     }
+
+    @GetMapping("/posts/today")
+    public ApiResponse<?> getTodaySelectedTasks(@RequestHeader("Authorization") String token)
+    {
+        return taskService.getTodaySelectedTasks(token);
+    }
 }
