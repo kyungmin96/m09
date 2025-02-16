@@ -25,6 +25,14 @@ pipeline {
             }
         }
 
+        stage('Check Docker Compose Path') {
+            steps {
+                script {
+                    sh 'which docker-compose'
+                }
+            }
+        }
+
         stage('Shutdown Docker Containers') {
             steps {
                 script {
