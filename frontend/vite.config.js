@@ -48,8 +48,8 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         additionalData: `
-          @use "@/styles/reset";
-          @use "@/styles/variables" as *;
+          @use "@/app/styles/reset";
+          @use "@/app/styles/variables" as *;
         `,
       },
     },
