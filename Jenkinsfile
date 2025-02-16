@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/snap/bin:$PATH"
         DOCKER_COMPOSE_PATH = '/home/ubuntu/dev/S12P11A202'
     }
 
