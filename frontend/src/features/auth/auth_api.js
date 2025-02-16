@@ -27,7 +27,10 @@ export const login = async (payload) => {
   try {
     const response = await axios_api.post("/all/auth/login", payload);
     if (response.data) {
-      localStorage.setItem('auth-token', response.data);
+      console.log(response.data);
+      // console.log(response.data.data.token);
+      
+      localStorage.setItem('auth-token', response.data?.data?.token);
     }
     return response.data;
   } catch (error) {

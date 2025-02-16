@@ -23,8 +23,8 @@ const LoginTestPage = () => {
       const response = await login(loginData);
       console.log('로그인 성공:', response);
       
-      if (response.data) {
-        localStorage.setItem('auth-token', response.data);
+      if (response) {
+        // localStorage.setItem('auth-token', response);
         setIsLoggedIn(true);
         alert('로그인 성공!');
       }
