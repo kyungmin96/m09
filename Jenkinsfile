@@ -27,7 +27,7 @@ pipeline {
         stage('Shutdown Docker Containers') {
             steps {
                 script {
-                    sh 'docker-compose -f $DOCKER_COMPOSE_PATH/docker-compose.yml down'
+                    sh 'cd /home/ubuntu/dev/S12P11A202 && docker-compose down'
                 }
             }
         }
