@@ -3,41 +3,29 @@ package ssafy.m09.controller.member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.DetectionStartRequest;
 import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
 import ssafy.m09.service.EmbeddedService;
-import ssafy.m09.service.StreamWebSocketHandler;
-import java.util.Map;
+import ssafy.m09.service.EmbeddedWebSocketHandler;
 
 @RestController
 @RequestMapping("/embedded")
 @RequiredArgsConstructor
 public class MemberEmbeddedController {
     private final EmbeddedService embeddedService;
-    private final StreamWebSocketHandler streamWebSocketHandler;
+    private final EmbeddedWebSocketHandler embeddedWebSocketHandler;
 
-    // 헬멧 감지
     @PostMapping("/helmet-detection")
-    public ResponseEntity<String> receiveHelmetDetectionResult(@RequestBody Map<String, Boolean> result) {
-        boolean helmetDetected = result.getOrDefault("helmet", false);
-
-        if (helmetDetected) {
-            streamWebSocketHandler.broadcastToClient("{\"status\":\"success\", \"message\":\"Helmet detected\"}");
-            return ResponseEntity.ok("Helmet detected and client notified");
-        } else {
-            streamWebSocketHandler.broadcastToClient("{\"status\":\"failed\", \"message\":\"No helmet detected\"}");
-            return ResponseEntity.ok("No helmet detected and client notified");
-        }
+    public ResponseEntity<String> handlerHelmetDetection(){
+        return embeddedWebSocketHandler.handleHelmetDetection();
     }
-
     // NFC 시작
-    @PostMapping("/nfc/start")
-    public ResponseEntity<String> startNfc() {
-        return embeddedService.nfcStart();
-    }
+//    @PostMapping("/nfc/start")
+//    public ResponseEntity<String> startNfc() {
+//        return embeddedService.nfcStart();
+//    }
 
     // NFC 중지
     @PostMapping("/nfc/stop")

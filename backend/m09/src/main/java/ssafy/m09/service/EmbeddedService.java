@@ -22,10 +22,10 @@ public class EmbeddedService {
     private final RestTemplate restTemplate;
     private final RFIDLoginService rfidLoginService;
 
-    public ResponseEntity<String> nfcStart(){
-        String url = EMBEDDED_API_URL + "/nfc/start";
-        return restTemplate.postForEntity(url, null, String.class);
-    }
+//    public ResponseEntity<String> nfcStart(){
+//        String url = EMBEDDED_API_URL + "/nfc/start";
+//        return restTemplate.postForEntity(url, null, String.class);
+//    }
 
     public ResponseEntity<String> nfcStop(){
         String url = EMBEDDED_API_URL + "/nfc/stop";
