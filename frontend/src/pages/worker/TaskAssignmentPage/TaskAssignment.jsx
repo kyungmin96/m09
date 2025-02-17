@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWorks } from '@/contexts/WorksContext';
+import { Header } from '@/shared/ui/Header/Header';
 import { Button } from '@/shared/ui/Button/Button';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import './TaskAssignment.scss';
@@ -59,7 +60,7 @@ export const TaskAssignment = () => {
   const handleTaskSelect = (task) => {
     setCurrentTask(task);
     // 현재 사용자를 기본으로 선택
-    setSelectedWorkers([user.id]);
+    setSelectedWorkers(user?.id ? [user.id] : []);
     setIsModalOpen(true);
   };
 
@@ -129,6 +130,7 @@ export const TaskAssignment = () => {
 
   return (
     <div className="task-assignment">
+      <Header isMainPage={false} pageName="오늘의 작업 선택"/>
       <section className="today-tasks">
         <h2>선택된 작업</h2>
         <div className="task-list">
@@ -219,7 +221,7 @@ export const TaskAssignment = () => {
       >
         <div className="worker-selection">
           {workers
-            .filter(worker => worker.id !== user.id) // 현재 사용자 제외
+            .filter(worker => user?.id ? worker.id !== user.id : true)
             .map(worker => (
               <div
                 key={worker.id}
