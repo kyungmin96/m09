@@ -9,7 +9,7 @@ pipeline {
         stage('SSH into EC2 and Deploy') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'gitlab-api-token', variable: 'GIT_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'gitlab-api-access-token', variable: 'GIT_TOKEN')]) {
                         sh """
                             ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${HOST_IP} << 'EOF'
                             cd /home/ubuntu/dev/S12P11A202
