@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Header } from '@/shared/ui/Header/Header';
 import "./styles.scss";
 import {
   manualDriveForward,
@@ -75,10 +76,7 @@ export const WorkplaceMovePage = ({ mode = "to-workplace" }) => {
 
   return (
     <div className="workplace-move">
-      <header className="header">
-        <h1>{mode === "to-workplace" ? "작업장 이동" : "물류 창고 이동"}</h1>
-      </header>
-
+      <Header mode={mode} />
       <div className="mode-selector">
         <button
           className={`mode-button ${activeMode === "follow" ? "active" : ""}`}

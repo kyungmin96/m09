@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useAuth } from '@/features/auth/context/AuthContext';
-import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/shared/ui/Button/Button';
 
 const LogoutButton = () => {
   const { logout } = useAuth();
