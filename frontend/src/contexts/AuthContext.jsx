@@ -26,7 +26,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
-      const userData = response.data.data;      
+      const userData = response.data?.user;
+      
+      console.log("[userData 정보]: ", userData);
 
       if (response.data?.token) {
         localStorage.setItem("auth-token", response.data.token);
