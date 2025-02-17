@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@/shared/ui/Button/Button.jsx';
 import { validateId, validatePassword, isFormValid } from '@/features/auth/lib/auth.helpers';
@@ -6,6 +7,7 @@ import './LoginForm.scss';
 
 export const LoginForm = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState(null);
@@ -218,7 +220,7 @@ export const LoginForm = () => {
             variant="main"
             size="full"
             onClick={handleButtonClick}
-            disabled={!isFormValid()}
+            disabled={!isFormValid(id, password)}
           >
             로그인
           </Button>
