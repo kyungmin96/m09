@@ -19,9 +19,9 @@ export const getTodayWorks = async () => {
       baseURL: api.defaults.baseURL
     });
 
-    console.log('요청 URL: ', API_ROUTES.TASKS.IN_PROGRESS);
+    console.log('요청 URL: ', API_ROUTES.TASKS.GET);
     
-    const response = await api.get(`${API_ROUTES.TASKS.IN_PROGRESS}`);
+    const response = await api.get(`${API_ROUTES.TASKS.GET}`);
 
     console.log('API 응답: ', response);
     
