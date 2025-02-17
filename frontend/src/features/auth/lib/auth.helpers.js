@@ -21,12 +21,12 @@ export const validateId = (value) => {
  */
 export const validatePassword = (value) => {
   if (!value) return '';
-  if (value.length < 8) {
-    return '비밀번호는 특수문자 포함 8자 이상입니다.';
-  }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-    return '비밀번호는 특수문자 포함 8자 이상입니다.';
-  }
+  // if (value.length < 8) {
+  //   return '비밀번호는 특수문자 포함 8자 이상입니다.';
+  // }
+  // if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+  //   return '비밀번호는 특수문자 포함 8자 이상입니다.';
+  // }
   if (/\s/.test(value)) {
     return '비밀번호에 공백을 포함할 수 없습니다.';
   }
