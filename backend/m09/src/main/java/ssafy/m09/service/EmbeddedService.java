@@ -18,7 +18,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class EmbeddedService {
-    private final String EMBEDDED_API_URL = "http://localhost:8765/barebone";
+    private final String EMBEDDED_API_URL = "http://embedded:8765/barebone";
     private final RestTemplate restTemplate;
     private final RFIDLoginService rfidLoginService;
 
