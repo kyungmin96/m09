@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { Header } from '@/shared/ui/Header/Header';
 import { useWorks } from '@/contexts/WorksContext';
 import { useTools } from '@/contexts/ToolsContext';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
@@ -80,10 +81,7 @@ export const PrepareToolPage = () => {
 
     return (
         <div className="work-page">
-            <header className="work-header">
-                <h1>공구 체크리스트</h1>
-            </header>
-
+            <Header isMainPage={false} pageName="공구 확정"/>
             <section className="required-tools">
                 <h2>필요한 공구</h2>
                 {requiredTools.map(tool => (

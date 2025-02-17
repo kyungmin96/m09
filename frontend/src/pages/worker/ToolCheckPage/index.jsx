@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTools } from '@/contexts/ToolsContext';
 import { Button } from '@/shared/ui/Button/Button';
+import { Header } from '@/shared/ui/Header/Header';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import { WebcamView } from '@/shared/ui/Webcam/WebcamView';
 import './styles.scss';
@@ -182,10 +183,10 @@ export const ToolCheckPage = () => {
 
     return (
         <div className="tool-check-page">
-            <header className="work-header">
-                <h1>{routeConfig.title}</h1>
+            <Header isMainPage={false} pageName={routeConfig.title}/>
+            <div className="work-title">
                 <p>필요한 공구 {detectedTools.size}/{tools.length}개 탐지됨</p>
-            </header>
+            </div>
 
             <div className="webcam-section">
                 <WebcamView

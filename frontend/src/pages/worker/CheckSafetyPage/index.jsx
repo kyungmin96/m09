@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
 import { useWorks } from '@/contexts/WorksContext';
+import { Header } from '@/shared/ui/Header/Header';
 import Helmet from "@/shared/assets/images/helmet.png";
 import "./styles.scss";
 
@@ -26,6 +27,7 @@ export const CheckSafetyPage = () => {
 
   // 작업자 목록 초기화
   useEffect(() => {
+    if (!user) return;
     const allWorkers = new Set([user.name]);
     selectedWorks.forEach(work => {
       work.workers?.forEach(worker => {
@@ -278,8 +280,7 @@ export const CheckSafetyPage = () => {
 
   return (
     <div className="check-safety-page">
-      <h1>복장 체크</h1>
-
+      <Header isMainPage={false} pageName="복장 체크"/>
       <div className="camera-container">
         <video
           ref={videoRef}

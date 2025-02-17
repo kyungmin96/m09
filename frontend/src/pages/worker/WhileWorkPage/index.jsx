@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorks, WORK_STATUS } from '@/contexts/WorksContext';
+import { Header } from '@/shared/ui/Header/Header';
 import './styles.scss';
 
 const getStatusEmoji = (taskState) => {
@@ -87,12 +88,7 @@ export const WorkProgressPage = () => {
 
   return (
     <div className="work-progress-page">
-      <header className="header">
-        <button className="back-button">←</button>
-        <h1>작업 중</h1>
-        <button className="menu-button">≡</button>
-      </header>
-
+      <Header isMainPage={false} pageName="작업 중 보고"/>
       <div className="task-menu-bar">
         {selectedWorks.map((task) => (
           <button
