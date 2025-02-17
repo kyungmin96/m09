@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import { Button } from '@/shared/ui/Button/Button';
 import './styles.scss';
+import { getTodayWorks } from './workers.api';
 
 // Mock 데이터 생성 함수들
 const generateMockTools = (workIds) => ({
@@ -37,7 +38,8 @@ export const MainPage = () => {
     // Mock: 오늘의 작업 목록 조회
     const fetchTodayWorks = async () => {
         try {
-            await simulateApiDelay();
+            await getTodayWorks();
+            // await simulateApiDelay();
             // 이미 WorksContext에서 기본 작업 목록을 제공하므로 
             // 추가 Mock 데이터 생성 없이 진행
         } catch (error) {
@@ -65,10 +67,10 @@ export const MainPage = () => {
     };
 
     useEffect(() => {
-        if (user && !todayWorks.length) {
+        if (user) {
             fetchTodayWorks();
         }
-    }, [user, todayWorks.length, updateTodayWorks]);
+    }, [user, updateTodayWorks]);
 
     // 카트 등록 핸들러
     const handleCartRegister = async () => {
