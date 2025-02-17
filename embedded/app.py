@@ -10,7 +10,7 @@ app = FastAPI()
 sio = AsyncServer(async_mode="asgi")
 socket_app = ASGIApp(sio, app)
 __byte_frame = None
-internal_server_address = "http://localhost:8080"
+internal_server_address = "http://backend:8080"
 
 # A dictionary to keep track of connected clients and their SIDs
 connected_clients = {}
