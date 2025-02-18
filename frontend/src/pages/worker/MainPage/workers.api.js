@@ -10,7 +10,7 @@ export const getTodayWorks = async () => {
     const response = await api.get(`${API_ROUTES.TASKS.IN_PROCESS}`);
     
     const todayWorks = response.data.data;
-    console.log("[오늘의 작업 목록]: ", todayWorks);
+    // console.log("[오늘의 작업 목록]: ", todayWorks);
 
     // todayWorks 로컬스토리지에 저장
     localStorage.setItem('todayWorks', JSON.stringify(todayWorks));
@@ -21,6 +21,24 @@ export const getTodayWorks = async () => {
       throw error.response?.data;
     }
     throw new Error("오늘의 작업 목록 오류 발생");
+  }
+};
+
+/**
+ * 카트 정보 API 요청
+ * @returns {Promise<Object>} 카트 정보 응답 데이터
+ */
+export const getCartInfo = async () => {
+  try {
+    const response = await api.get(API_ROUTES.VEHICLES.GET);
+    // console.log("[카트 정보]: ", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch cart info:', error);
+    if (error.response) {
+      throw error.response;
+    }
+    throw new Error("카트 정보 조회 오류 발생");
   }
 };
 

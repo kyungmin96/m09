@@ -36,6 +36,14 @@ export const API_ROUTES = {
     TASK_GET: (taskId) => `/reports/task/${taskId}`,
     TASK_POST: (taskId) => `/reports/task/${taskId}`,   // (POST, WorkCompletePage 작업 종료 버튼) 작업별 특이사항 보고
   },
+
+  // 카트 관련
+  VEHICLES: {
+    GET: '/manager/vehicles',  // (GET) 차량 모든 정보 조회
+    // POST: '/manager/vehicles',
+    // DELETE: (vehicleId) => `/manager/vehicles/${vehicleId}`,
+    // PUT: (vehicleId) => `/manager/vehicles/${vehicleId}`,
+  },
   
   EMBEDDED: {
     // 임베디드 통신 - NFC 카트 관련
