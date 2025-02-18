@@ -268,7 +268,7 @@ export const CheckSafetyPage = () => {
     if (isDetecting) {
       await stopDetection();
     }
-    navigate("/worker/workplace-move");
+    navigate("/worker/movement/go-workplace");
   };
 
   const getWorkerNameStyle = (worker) => {
