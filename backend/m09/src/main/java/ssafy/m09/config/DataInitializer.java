@@ -24,9 +24,15 @@ public class DataInitializer implements CommandLineRunner {
     private final TaskToolRepository taskToolRepository;
     private final PasswordEncoder passwordEncoder;
     private final VehicleRepository vehicleRepository;
+    private final RFIDRepository rfidRepository;
+
+    private final String cardKey_1 = "0x820x9d0x800x4e";
+    private final String cardKey_2 = "0xd30x470xc20xbd";
+
     @Override
     public void run(String... args) {
         initializeUsers();
+        initializeRFIDs();
         initializeTools();
         initializeTasks();
         initializeTaskTools();
@@ -85,6 +91,36 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(user);
             System.out.println("✅ 초기 사용자 데이터 삽입 완료: 4444444");
         }
+    }
+
+    private void initializeRFIDs() {
+        List<User> users = userRepository.findAll();
+        boolean isFirst = true;
+
+//        for (User user : users) {
+//            if (rfidRepository.findByUser(user).isEmpty() && isFirst) {
+//                isFirst = false;
+//                RFID rfid = RFID.builder()
+//                        .user(user)
+//                        .cardKey(cardKey_1) //
+//                        .createdAt(LocalDateTime.now())
+//                        .build();
+//                rfidRepository.save(rfid);
+//                System.out.println("✅ RFID 등록 완료: " + user.getEmployeeId() + " - " + rfid.getCardKey());
+//            }
+//        }
+
+//        for (User user : users) {
+//            if (rfidRepository.findByUser(user).isEmpty()) {
+//                RFID rfid = RFID.builder()
+//                        .user(user)
+//                        .cardKey(cardKey_2) //
+//                        .createdAt(LocalDateTime.now())
+//                        .build();
+//                rfidRepository.save(rfid);
+//                System.out.println("✅ RFID 등록 완료: " + user.getEmployeeId() + " - " + rfid.getCardKey());
+//            }
+//        }
     }
 
     private void initializeTools() {

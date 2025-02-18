@@ -18,14 +18,14 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class EmbeddedService {
-    private final String EMBEDDED_API_URL = "http://embedded:8765/barebone";
+//    private final String EMBEDDED_API_URL = "http://embedded:8765/barebone";
+    private final String EMBEDDED_API_URL = "http://localhost:8765/barebone";
     private final RestTemplate restTemplate;
-    private final RFIDLoginService rfidLoginService;
 
-//    public ResponseEntity<String> nfcStart(){
-//        String url = EMBEDDED_API_URL + "/nfc/start";
-//        return restTemplate.postForEntity(url, null, String.class);
-//    }
+    public ResponseEntity<String> nfcStart(){
+        String url = EMBEDDED_API_URL + "/nfc/start";
+        return restTemplate.postForEntity(url, null, String.class);
+    }
 
     public ResponseEntity<String> nfcStop(){
         String url = EMBEDDED_API_URL + "/nfc/stop";

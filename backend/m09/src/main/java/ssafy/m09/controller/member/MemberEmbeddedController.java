@@ -3,29 +3,32 @@ package ssafy.m09.controller.member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.DetectionStartRequest;
 import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
 import ssafy.m09.service.EmbeddedService;
-import ssafy.m09.service.EmbeddedWebSocketHandler;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/embedded")
 @RequiredArgsConstructor
 public class MemberEmbeddedController {
     private final EmbeddedService embeddedService;
-    private final EmbeddedWebSocketHandler embeddedWebSocketHandler;
 
-    @PostMapping("/helmet-detection")
-    public ResponseEntity<String> handlerHelmetDetection(){
-        return embeddedWebSocketHandler.handleHelmetDetection();
-    }
+    @PostMapping("/detect-helmet/start")
+    public ResponseEntity<ApiResponse> detectHelmetStart() { return null;}
+
+    @PostMapping("/detect-helmet/stop")
+    public ResponseEntity<ApiResponse> detectHelmetStop() { return null;}
+
     // NFC 시작
-//    @PostMapping("/nfc/start")
-//    public ResponseEntity<String> startNfc() {
-//        return embeddedService.nfcStart();
-//    }
+    @PostMapping("/nfc/start")
+    public ResponseEntity<String> startNfc() {
+        return embeddedService.nfcStart();
+    }
 
     // NFC 중지
     @PostMapping("/nfc/stop")
