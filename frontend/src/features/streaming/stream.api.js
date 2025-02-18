@@ -12,3 +12,11 @@ export const getStreamingUrl = async () => {
         throw new Error('스트리밍 URL을 가져오는데 실패했습니다: ' + (error.message || '알 수 없는 오류'));
     }
 };
+
+/** (임베 / POST) 단순 카메라 streaming start POST
+ * response: 
+ */
+
+/** (임베 / POST) 단순 카메라 streaming stop POST
+ * response: 
+ */

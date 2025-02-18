@@ -1,0 +1,147 @@
+// 색상 변수
+$background-color: #FFFFFF;
+$mode-selector-background: #E9F5E9;
+$mode-selector-text: #000000;
+$mode-selector-active-background: #4CAF50;
+$mode-selector-active-text: #FFFFFF;
+$control-background: #F0F0F0;
+$primary-green: #4CAF50;
+
+.movement-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $background-color;
+  
+  // 상단 헤더 (작업자 따라가기)
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: $mode-selector-background;
+    
+    &-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: $mode-selector-text;
+    }
+  }
+  
+  // 모드 선택 영역
+  &__mode-selector {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    
+    &-button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &--inactive {
+        background-color: lighten($mode-selector-background, 5%);
+        color: $mode-selector-text;
+      }
+      
+      &--active {
+        background-color: $mode-selector-active-background;
+        color: $mode-selector-active-text;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+  
+  // 스트리밍 영역
+  &__streaming {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  // 제어 버튼 영역
+  &__control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
+    
+    &-button {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background-color: $control-background;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 10px;
+      cursor: pointer;
+      
+      button {
+        background: none;
+        border: none;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      &-icon {
+        width: 40px;
+        height: 40px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    }
+    
+    // 추종 주행 모드 버튼 스타일
+    &-follow {
+      display: flex;
+      gap: 20px;
+      
+      &-button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        
+        &--start {
+          background-color: $primary-green;
+          color: white;
+        }
+        
+        &--stop {
+          background-color: #FF5252;
+          color: white;
+        }
+      }
+    }
+  }
+  
+  // 작업 시작 버튼
+  &__start-button {
+    padding: 15px;
+    
+    button {
+      width: 100%;
+      padding: 15px;
+      background-color: $primary-green;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+}
