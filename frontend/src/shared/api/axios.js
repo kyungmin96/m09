@@ -4,7 +4,7 @@ const LOCAL_STORAGE_KEYS = {
   AUTH_TOKEN: 'auth-token'
 };
 
-/** 요청 인터셉터 설정 함수
+/** 백 요청 인터셉터 설정 함수
  * 토큰이 필요한 경우, localStorage에서 가져와서 헤더에 추가
  * 토큰이 있는 경우 Authorization 헤더에 Bearer 토큰 추가 (없으면 추가 X)
  * 요청이 성공한 경우, 요청 정보 로깅 / config 반환
@@ -77,6 +77,21 @@ const setResponseInterceptor = (instance) => {
   );
 };
 
+// 스트리밍용 응답 인터셉터 (로깅용)
+const setStreamingResponseInterceptor = (instance) => {
+  console.log()
+  instance.interceptors.response.use(
+    (response) => {
+      console.log(`[스트리밍 응답 시작] ${response.config.url}`);
+      return response;
+    },
+    (error) => {
+      console.error(`[스트리밍 오류] ${error}`);
+      return Promise.reject(error);
+    }
+  )
+};
+
 /** axios 인스턴스 생성
  * baseURL: API 기본 URL 설정 (환경 변수 사용)
  * headers: 요청 헤더 설정 (Content-Type: JSON 형식)
@@ -92,6 +107,17 @@ export const api = axios.create({
   timeout: 30000, // 30초
 });
 
+// 임베디드 스트리밍을 위한 axios 인스턴스 설정
+export const streamingApi = axios.create({
+  baseURL: import.meta.env.VITE_EM_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+  timeout: 0,
+});
+
 // 인터셉터 설정
 setRequestInterceptor(api);
 setResponseInterceptor(api);
+setStreamingResponseInterceptor(streamingApi);
