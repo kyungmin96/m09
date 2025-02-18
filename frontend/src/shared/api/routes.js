@@ -7,25 +7,25 @@ export const API_ROUTES = {
   // 인증 관련
   AUTH: {
     REGISTER: '/all/auth/register',
-    LOGIN: '/all/auth/login',                           // (POST) 로그인
-    LOGOUT: '/member/auth/logout',                      // (POST) 로그아웃
+    LOGIN: '/all/auth/login',                           // ✅ (POST, Login) 로그인
+    LOGOUT: '/member/auth/logout',                      // ✅ (POST, Header/Sidebar 내 로그아웃 버튼튼) 로그아웃
   },
   
   // 작업 게시물 관련
   TASKS: {
     GET: '/member/tasks/posts',
     POST: '/member/tasks/posts',
-    IN_PROCESS: '/member/tasks/posts/in-process',     // (GET) 사용자의 오늘 할당 예정 작업 조회
-    TODAY_ALLOCATE: '/tasks/posts/today-allocate',      // (POST) 선택한 작업 내용 갱신 요청 -> 응답으로 선택 작업 공구 목록 줌
-    ALL_TOOL: '/member/tools',                          // (GET) 전체 공구 목록 조회
-    SELECTED_TOOL: '/member/tasks/posts/today',         // (GET) 선택 작업 공구 목록 조회
-    ALL_WORKER: '/member/users/members',                // (GET) 전체 작업자 조회
-    UPLOAD_COMPANIONS: '/manager/companions',           // (POST) 선택된 작업 공동 작업자 정보 서버 저장
+    IN_PROCESS: '/member/tasks/posts/in-process',      // ✅ (GET, MainPage 로드) 사용자의 오늘 할당 예정 작업 조회
+    TODAY_ALLOCATE: '/manager/companions/allocate',     // (POST, PrepareTool 마운트) 선택한 작업 내용 갱신 요청 -> 응답으로 선택 작업 공구 목록 줌
+    ALL_TOOL: '/member/tools',                          // (GET, PrepareTool 공구 추가) 전체 공구 목록 조회
+    SELECTED_TOOL: '/member/tasks/posts/today',         // (GET, sync - 추후 적용) 선택 작업 공구 목록 조회
+    ALL_WORKER: '/member/users/members',                // (GET, TaskAssignment 공동 작업자 설정) 전체 작업자 조회
+    UPLOAD_COMPANIONS: '/manager/companions',           // (POST, 사용 안함) 선택된 작업 공동 작업자 정보 서버 저장
     DETAILS: (postId) => `/member/tasks/posts/${postId}`,
     DELETE: (postId) => `/manager/tasks/posts/${postId}`,
     PUT: (postId) => `/manager/tasks/posts/${postId}`,
-    PDF: (taskId) => `/member/pdf/tasks/${taskId}`,     // (GET) 작업 PDF 다운로드 (수정 가능성 있음)
-    STATUS_UPDATE: '/member/tasks/update-end'           // (POST) 작업 상태 갱신
+    PDF: (taskId) => `/member/pdf/tasks/${taskId}`,     // (GET, PrepareTool 오늘의 작업, 컴포넌트 구현 X) 작업 PDF 다운로드 (수정 가능성 있음)
+    STATUS_UPDATE: '/member/tasks/update-end'           // (POST, WorkCompltetPage 작업 종료 버튼) 작업 상태 갱신
   },
 
   // 리포트 관련
@@ -34,7 +34,7 @@ export const API_ROUTES = {
     POST: (reportId) => `/reports/${reportId}`,
     DELETE: (reportId) => `/reports/${reportId}`,
     TASK_GET: (taskId) => `/reports/task/${taskId}`,
-    TASK_POST: (taskId) => `/reports/task/${taskId}`,   // (POST) 작업별 특이사항 보고
+    TASK_POST: (taskId) => `/reports/task/${taskId}`,   // (POST, WorkCompletePage 작업 종료 버튼) 작업별 특이사항 보고
   },
   
   EMBEDDED: {
@@ -66,5 +66,9 @@ export const API_ROUTES = {
       START: '/embedded/drive/start',
       STOP: '/embedded/drive/stop',
     },
+  },
+
+  DIRECT_EMBEDDED: {
+    STREAMING: '/stream'
   },
 };
