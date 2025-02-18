@@ -39,7 +39,14 @@ const DUMMY_ALL_WORKERS = [
 export const TaskAssignment = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { todayWorks, selectedWorks, updateSelectedWorks } = useWorks();
+  const {
+     todayWorks,
+     selectedWorks,
+     updateSelectedWorks,
+     uniqueTools,
+     allocateCompanions,
+     prepareWorkersAllocation,
+    } = useWorks();
   
   const [availableTasks, setAvailableTasks] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -135,11 +142,18 @@ export const TaskAssignment = () => {
     setAvailableTasks(prev => [...prev, taskToRemove]);
   };
 
-  const handleConfirmSelection = () => {
+  const handleConfirmSelection = async () => {
     if (selectedWorks.length > 0) {
-      navigate('/worker/main');
+        try {
+            const workersAllocation = prepareWorkersAllocation();
+            await allocateCompanions(workersAllocation);
+            navigate('/worker/main');
+        } catch (error) {
+            console.error('Failed to allocate companions:', error);
+            // TODO: 에러 처리 (예: 알림 표시)
+        }
     }
-  };
+};
 
   return (
     <div className="task-assignment">
