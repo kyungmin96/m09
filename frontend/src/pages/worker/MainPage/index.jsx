@@ -38,7 +38,12 @@ export const MainPage = () => {
     // Mock: 오늘의 작업 목록 조회
     const fetchTodayWorks = async () => {
         try {
-            await getTodayWorks();
+            const response = await getTodayWorks();
+            console.log('API 응답 데이터: ', response);
+            
+            if (response && response.data) {
+                updateTodayWorks(response.data);
+            }
             // await simulateApiDelay();
             // 이미 WorksContext에서 기본 작업 목록을 제공하므로 
             // 추가 Mock 데이터 생성 없이 진행
@@ -70,7 +75,7 @@ export const MainPage = () => {
         if (user) {
             fetchTodayWorks();
         }
-    }, [user, updateTodayWorks]);
+    }, [user]);
 
     // 카트 등록 핸들러
     const handleCartRegister = async () => {
