@@ -37,23 +37,24 @@ export const API_ROUTES = {
     TASK_POST: (taskId) => `/reports/task/${taskId}`,   // (POST, WorkCompletePage 작업 종료 버튼) 작업별 특이사항 보고
   },
   
+  // 서버 -> 임베디드 통신 관련
   EMBEDDED: {
-    // 임베디드 통신 - NFC 카트 관련
+    // NFC 카트 관련
     NFC: {
       START: '/nfc/start',
       STOP: '/nfc/stop',
     },
-    // 임베디드 통신 - 공구 탐지 관련
+    // 공구 탐지 관련
     DETECTION_TOOL: {
       START: '/embedded/detect-09/start',                 // (소켓 / 수정 필요) 확정된 공구 활성화 목록 + 공구 탐지 시작
       STOP: '/embedded/detect-09/stop'                    // (소켓) 공구 탐지 중지지
     },
-    // 임베디드 통신 - 복장 체크 관련
+    // 복장 체크 관련
     HELMET: {
       START: '/embedded/detect-helmet/start',             // (소켓) 복장 탐지 시작
       STOP: '/embedded/detect-helmet/stop',               // (소켓) 복장 탐지 중지
     },
-    // 임베디드 통신 - 수동 주행 관련
+    // 수동 주행 관련
     MANUAL_DRIVE: {
       FORWARD: '/embedded/manual-drive/forward',
       BACKWARD: '/embedded/manual-drive/backward',
@@ -61,14 +62,17 @@ export const API_ROUTES = {
       RIGHT: '/embedded/manual-drive/right',
       STOP: '/embedded/manual-drive/stop',
     },
-    // 임베디드 통신 - 추종 주행 관련
+    // 추종 주행 관련
     DRIVE: {
       START: '/embedded/drive/start',
       STOP: '/embedded/drive/stop',
     },
   },
 
+  // 임베디드 직접 통신 관련
   DIRECT_EMBEDDED: {
-    STREAMING: '/stream'
+    STREAMING: '/stream',
+    CAMERA_START: '/camera/start',
+    CAMERA_STOP: '/camera/stop',
   },
 };
