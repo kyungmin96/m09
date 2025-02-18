@@ -7,27 +7,12 @@ import { API_ROUTES } from '@/shared/api/routes';
  */
 export const getTodayWorks = async () => {
   try {
-    console.log('API 호출 시작');
-
-    // 토큰 확인
-    const token = localStorage.getItem('auth-token');
-    console.log('현재 토큰:', token);
-
-    // 현재 헤더 설정 확인
-    console.log('요청 설정:', {
-      headers: api.defaults.headers,
-      baseURL: api.defaults.baseURL
-    });
-
-    console.log('요청 URL: ', API_ROUTES.TASKS.GET);
+    const response = await api.get(`${API_ROUTES.TASKS.IN_PROCESS}`);
     
-    const response = await api.get(`${API_ROUTES.TASKS.GET}`);
-
-    console.log('API 응답: ', response);
-    
-    const todayWorks = response.data;
-
+    const todayWorks = response.data.data;
     console.log("[오늘의 작업 목록]: ", todayWorks);
+
+    // todayWorks 로컬스토리지에 저장
     localStorage.setItem('todayWorks', JSON.stringify(todayWorks));
     
     return response.data;
@@ -35,7 +20,7 @@ export const getTodayWorks = async () => {
     if (error.response) {
       throw error.response?.data;
     }
-    // throw new Error("오늘의 작업 목록 오류 발생");
+    throw new Error("오늘의 작업 목록 오류 발생");
   }
 };
 

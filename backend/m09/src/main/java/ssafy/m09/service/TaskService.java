@@ -1,6 +1,7 @@
 package ssafy.m09.service;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -89,9 +91,11 @@ public class TaskService {
 
     public ApiResponse<List<Task>> getInProcessTasks(String token) {
         LocalDateTime now = LocalDateTime.now();
+        log.info("token: {}", token);
 
         // JWT에서 employeeId 추출
         String employeeId = jwtTokenProvider.getEmployeeId(token);
+        log.info("employeeId: {}", employeeId);
         if (employeeId == null) {
             return ApiResponse.error(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다.");
         }

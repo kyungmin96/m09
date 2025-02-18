@@ -15,7 +15,7 @@ export const API_ROUTES = {
   TASKS: {
     GET: '/member/tasks/posts',
     POST: '/member/tasks/posts',
-    IN_PROGRESS: '/member/tasks/posts/in-progress',     // (GET) 사용자의 오늘 할당 예정 작업 조회
+    IN_PROCESS: '/member/tasks/posts/in-process',     // (GET) 사용자의 오늘 할당 예정 작업 조회
     TODAY_ALLOCATE: '/tasks/posts/today-allocate',      // (POST) 선택한 작업 내용 갱신 요청 -> 응답으로 선택 작업 공구 목록 줌
     ALL_TOOL: '/member/tools',                          // (GET) 전체 공구 목록 조회
     SELECTED_TOOL: '/member/tasks/posts/today',         // (GET) 선택 작업 공구 목록 조회
