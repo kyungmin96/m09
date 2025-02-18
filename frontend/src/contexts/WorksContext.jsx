@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '@/shared/api/axios';
+import { API_ROUTES } from '@/shared/api/routes';
 
 export const WORK_STATUS = {
     READY: 'READY',
@@ -58,6 +60,11 @@ export const WorksProvider = ({ children }) => {
         return storedSelectedWorks ? JSON.parse(storedSelectedWorks) : [];
     });
 
+    const [uniqueTools, setUniqueTools] = useState(() => {
+        const storedTools = localStorage.getItem('uniqueTools');
+        return storedTools ? JSON.parse(storedTools) : [];
+    });
+
     useEffect(() => {
         const storedWorks = localStorage.getItem('todayWorks');
         const storedSelectedWorks = localStorage.getItem('selectedWorks');
@@ -115,15 +122,49 @@ export const WorksProvider = ({ children }) => {
         updateSelectedWorks(updatedWorks);
     };
 
+    // 작업별 공동 작업자 할당 및 공구 목록 조회
+    const allocateCompanions = async (workersAllocation) => {
+        try {
+            const response = await api.post(
+                API_ROUTES.TASKS.TODAY_ALLOCATE, 
+                workersAllocation
+            );
+            
+            if (response.data.success) {
+                const tools = response.data.data.uniqueTools;
+                setUniqueTools(tools);
+                localStorage.setItem('uniqueTools', JSON.stringify(tools));
+                return tools;
+            }
+            throw new Error('Failed to allocate companions');
+        } catch (error) {
+            console.error('Companions allocation error:', error);
+            throw error;
+        }
+    };
+
+    // 선택된 작업들의 공동 작업자 정보를 API 요청 형식으로 변환
+    const prepareWorkersAllocation = () => {
+        return selectedWorks
+            .filter(work => work.workers && work.workers.length > 0)
+            .map(work => ({
+                taskId: work.id,
+                employeeIds: work.workers.map(worker => worker.employeeId)
+            }));
+    };
+
     return (
         <WorksContext.Provider value={{
             todayWorks,
             selectedWorks,
             serverDate,
+            uniqueTools,
             updateTodayWorks,
             updateSelectedWorks,
             addSpecialNote,
-            deleteSpecialNote
+            deleteSpecialNote,
+            allocateCompanions,
+            prepareWorkersAllocation
         }}>
             {children}
         </WorksContext.Provider>
