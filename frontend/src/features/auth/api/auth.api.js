@@ -28,8 +28,14 @@ export const login = async (payload) => {
     const response = await api.post(API_ROUTES.AUTH.LOGIN, payload);
     return response.data;
   } catch (error) {
-    if (error.response) {
-      throw error.response?.data;
+    // 에러 객체 전체 구조 로깅
+    console.error('Auth API 로그인 에러 전체 구조:', JSON.stringify(error, null, 2));
+    console.error('response.data 구조:', error.response?.data);
+    console.error('error.message:', error.message);
+    
+    if (error.response?.data) {
+      // 에러 응답 데이터를 그대로 전달
+      throw error.response.data;
     }
     throw new Error("로그인 오류 발생");
   }

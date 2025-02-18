@@ -26,14 +26,19 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
-      const userData = response.data?.user;
       
-      console.log("[userData 정보]: ", userData);
-
-      if (response.data?.token) {
-        localStorage.setItem("auth-token", response.data.token);
+      if (!response.success && response.message) {
+        throw { message: response.message };
       }
-
+      
+      const userData = response.data?.user;
+      const token = response.data?.token;
+      
+      if (!userData || !token) {
+        throw { message: "유효하지 않은 로그인 응답" };
+      }
+  
+      localStorage.setItem("auth-token", token);
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
       return userData;
@@ -50,7 +55,6 @@ export const AuthProvider = ({ children }) => {
       clearLocalStorage();
     } catch (error) {
       console.error("Logout failed:", error);
-      // 로그아웃 실패시에도 로컬 상태는 초기화
       setUser(null);
       clearLocalStorage();
     }
