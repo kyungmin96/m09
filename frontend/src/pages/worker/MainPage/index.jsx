@@ -6,7 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import { Button } from '@/shared/ui/Button/Button';
 import './styles.scss';
-import { getTodayWorks } from './workers.api';
+import { getCartInfo, getTodayWorks } from './workers.api';
 
 // Mock 데이터 생성 함수들
 const generateMockTools = (workIds) => ({
@@ -25,10 +25,11 @@ export const MainPage = () => {
     const { user } = useAuth();
     const { todayWorks, selectedWorks, updateTodayWorks } = useWorks();
     const { 
-        cartInfo, 
-        isRegistering, 
-        registrationError, 
-        startRfidRegistration 
+        cartInfo,
+        isRegistering,
+        registrationError,
+        startRfidRegistration,
+        setCartInfo,
     } = useCart();
     
     const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ export const MainPage = () => {
     const fetchTodayWorks = async () => {
         try {
             const response = await getTodayWorks();
-            console.log('API 응답 데이터: ', response);
+            // console.log('API 응답 데이터: ', response);
             
             if (response && response.data) {
                 updateTodayWorks(response.data);
@@ -49,6 +50,24 @@ export const MainPage = () => {
             // 추가 Mock 데이터 생성 없이 진행
         } catch (error) {
             console.error('Failed to fetch today works:', error);
+        }
+    };
+
+    // 카트 정보 조회
+    const fetchCartInfo = async () => {
+        try {
+            const response = await getCartInfo();
+            if (response.success) {                
+                // API 응답 구조에 맞게 카트 정보 변환
+                const cartData = {
+                    name: response.name || `카트-${response.data[0].name}`,
+                    hasBattery: response.batteryStatus === 'FULL',  // 또는 적절한 조건
+                    isConnected: response.connectionStatus === 'CONNECTED',  // 또는 적절한 조건
+                };
+                setCartInfo(cartData);
+            }
+        } catch (error) {
+            console.error('Failed to fetch cart info:', error);
         }
     };
 
@@ -74,6 +93,7 @@ export const MainPage = () => {
     useEffect(() => {
         if (user) {
             fetchTodayWorks();
+            fetchCartInfo();
         }
     }, [user]);
 

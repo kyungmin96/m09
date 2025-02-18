@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { getCartInfo } from '../pages/worker/MainPage/workers.api';
 
 const CART_STORAGE_KEY = 'cartInfo';
 const RFID_TIMEOUT = 30000; // 30초
@@ -47,14 +48,17 @@ export const CartProvider = ({ children }) => {
     };
 
     const startRfidRegistration = async () => {
-        if (!user) return;
+        // if (!user) return;
         
         setIsRegistering(true);
         setRegistrationError(null);
 
         try {
             // Mock: RFID 등록 프로세스 시뮬레이션
-            const cartData = await mockRfidRegistration();
+            // const cartData = await mockRfidRegistration();
+            const cartData = await getCartInfo();
+            console.log('카트 정보:', cartData);
+            
             setCartInfo(cartData);
             return cartData;
         } catch (error) {
@@ -93,7 +97,8 @@ export const CartProvider = ({ children }) => {
             isRegistering,
             registrationError,
             startRfidRegistration,
-            clearCartInfo
+            clearCartInfo,
+            setCartInfo,
         }}>
             {children}
         </CartContext.Provider>
