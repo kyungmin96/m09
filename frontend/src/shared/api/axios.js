@@ -77,21 +77,6 @@ const setResponseInterceptor = (instance) => {
   );
 };
 
-// 스트리밍용 응답 인터셉터 (로깅용)
-const setStreamingResponseInterceptor = (instance) => {
-  console.log()
-  instance.interceptors.response.use(
-    (response) => {
-      console.log(`[스트리밍 응답 시작] ${response.config.url}`);
-      return response;
-    },
-    (error) => {
-      console.error(`[스트리밍 오류] ${error}`);
-      return Promise.reject(error);
-    }
-  )
-};
-
 /** axios 인스턴스 생성
  * baseURL: API 기본 URL 설정 (환경 변수 사용)
  * headers: 요청 헤더 설정 (Content-Type: JSON 형식)
@@ -107,17 +92,6 @@ export const api = axios.create({
   timeout: 30000, // 30초
 });
 
-// 임베디드 스트리밍을 위한 axios 인스턴스 설정
-export const streamingApi = axios.create({
-  baseURL: import.meta.env.VITE_EM_API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-  timeout: 0,
-});
-
 // 인터셉터 설정
 setRequestInterceptor(api);
 setResponseInterceptor(api);
-setStreamingResponseInterceptor(streamingApi);
