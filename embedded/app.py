@@ -5,6 +5,7 @@ from socketio import AsyncServer, ASGIApp
 import requests
 import json
 import asyncio
+from pydantic import BaseModel
 
 app = FastAPI()
 sio = AsyncServer(async_mode="asgi")
@@ -14,6 +15,9 @@ internal_server_address = "http://backend:8080"
 
 # A dictionary to keep track of connected clients and their SIDs
 connected_clients = {}
+
+class tool_list(BaseModel):
+    name: list
 
 # 이벤트 핸들러
 
@@ -108,12 +112,10 @@ async def helmet_detect_stop():
     return Response(status_code=200)
 
 @app.post("/barebone/detect-09/start")
-async def tool_detect_start(tool_list):
+async def tool_detect_start(tool_list: tool_list):
     try:
         global sio
-        if type(tool_list) is not dict:
-            tool_list = json.loads(tool_list)
-        await sio.emit("tool_detect_start", tool_list["name"])
+        await sio.emit("tool_detect_start", tool_list.name)
     except:
         return Response(status_code=502)
     
