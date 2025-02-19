@@ -1,0 +1,108 @@
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  color: #333;
+  padding: 14px 28px;
+  border-radius: 12px;
+  z-index: 9999;
+  max-width: 90%;
+  width: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: toast-fadeIn 0.3s, toast-fadeOut 0.3s 1.7s;
+  display: flex;
+  align-items: center;
+  
+  &__content {
+    text-align: center;
+    
+    p {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+  }
+  
+  // 타입별 스타일
+  &--info {
+    background: linear-gradient(to right, #2196F3 0%, #2196F3 4px, white 4px, white 100%);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232196F3'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E");
+      margin-right: 12px;
+    }
+  }
+  
+  &--success {
+    background: linear-gradient(to right, #4CAF50 0%, #4CAF50 4px, white 4px, white 100%);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234CAF50'%3E%3Cpath d='M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z'/%3E%3C/svg%3E");
+      margin-right: 12px;
+    }
+  }
+  
+  &--warning {
+    background: linear-gradient(to right, #FF9800 0%, #FF9800 4px, white 4px, white 100%);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF9800'%3E%3Cpath d='M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z'/%3E%3C/svg%3E");
+      margin-right: 12px;
+    }
+  }
+  
+  &--error {
+    background: linear-gradient(to right, #F44336 0%, #F44336 4px, white 4px, white 100%);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F44336'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E");
+      margin-right: 12px;
+    }
+  }
+}
+
+// 애니메이션
+@keyframes toast-fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translate(-50%, -20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translate(-50%, 0); 
+  }
+}
+
+@keyframes toast-fadeOut {
+  from { 
+    opacity: 1; 
+    transform: translate(-50%, 0); 
+  }
+  to { 
+    opacity: 0; 
+    transform: translate(-50%, -20px);
+  }
+}
