@@ -40,93 +40,99 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeUsers() {
-        if (userRepository.findByEmployeeId("1111111").isEmpty()) {
+        if (userRepository.findByEmployeeId("1864325").isEmpty()) {
             User user = User.builder()
-                    .employeeId("1111111")
+                    .employeeId("1864325")
                     .password(passwordEncoder.encode("123456")) // 비밀번호 암호화
-                    .name("Test")
+                    .name("목경민")
                     .isEnabled(true)
                     .createdAt(LocalDateTime.now())
                     .position(UserRole.ROLE_MANAGER)  // 권한 추가 (예시)
                     .build();
             userRepository.save(user);
-            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 1111111");
+            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 1864325");
         }
 
-        if (userRepository.findByEmployeeId("2222222").isEmpty()) {
+        if (userRepository.findByEmployeeId("9413215").isEmpty()) {
             User user = User.builder()
-                    .employeeId("2222222")
+                    .employeeId("9413215")
                     .password(passwordEncoder.encode("123456")) // 비밀번호 암호화
-                    .name("Test2")
+                    .name("김병지")
                     .isEnabled(true)
                     .createdAt(LocalDateTime.now())
                     .position(UserRole.ROLE_MEMBER)  // 권한 추가 (예시)
                     .build();
             userRepository.save(user);
-            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 2222222");
+            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 9413215");
         }
 
-        if (userRepository.findByEmployeeId("3333333").isEmpty()) {
+        if (userRepository.findByEmployeeId("9415467").isEmpty()) {
             User user = User.builder()
-                    .employeeId("3333333")
+                    .employeeId("9415467")
                     .password(passwordEncoder.encode("123456")) // 비밀번호 암호화
-                    .name("Test3")
+                    .name("김민지")
                     .isEnabled(true)
                     .createdAt(LocalDateTime.now())
                     .position(UserRole.ROLE_MEMBER)  // 권한 추가 (예시)
                     .build();
             userRepository.save(user);
-            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 3333333");
+            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 9415467");
         }
 
-        if (userRepository.findByEmployeeId("4444444").isEmpty()) {
+        if (userRepository.findByEmployeeId("9417425").isEmpty()) {
             User user = User.builder()
-                    .employeeId("4444444")
+                    .employeeId("9417425")
                     .password(passwordEncoder.encode("123456")) // 비밀번호 암호화
-                    .name("Test4")
+                    .name("정도영")
                     .isEnabled(true)
                     .createdAt(LocalDateTime.now())
                     .position(UserRole.ROLE_MEMBER)  // 권한 추가 (예시)
                     .build();
             userRepository.save(user);
-            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 4444444");
+            System.out.println("✅ 초기 사용자 데이터 삽입 완료: 9417425");
         }
     }
 
     private void initializeRFIDs() {
         List<User> users = userRepository.findAll();
-        boolean isFirst = true;
 
-//        for (User user : users) {
-//            if (rfidRepository.findByUser(user).isEmpty() && isFirst) {
-//                isFirst = false;
-//                RFID rfid = RFID.builder()
-//                        .user(user)
-//                        .cardKey(cardKey_1) //
-//                        .createdAt(LocalDateTime.now())
-//                        .build();
-//                rfidRepository.save(rfid);
-//                System.out.println("✅ RFID 등록 완료: " + user.getEmployeeId() + " - " + rfid.getCardKey());
-//            }
-//        }
+        for(User user : users) {
+            int userId = user.getId();
+            if(userId == 1){
+                if(rfidRepository.findByUser(user).isPresent()) continue;
+                RFID rfid = RFID.builder()
+                        .user(user)
+                        .cardKey(cardKey_1)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                rfidRepository.save(rfid);
+                System.out.println("RFID 초기 값 등록 완료!" + rfid.getCardKey());
+            }
 
-//        for (User user : users) {
-//            if (rfidRepository.findByUser(user).isEmpty()) {
-//                RFID rfid = RFID.builder()
-//                        .user(user)
-//                        .cardKey(cardKey_2) //
-//                        .createdAt(LocalDateTime.now())
-//                        .build();
-//                rfidRepository.save(rfid);
-//                System.out.println("✅ RFID 등록 완료: " + user.getEmployeeId() + " - " + rfid.getCardKey());
-//            }
-//        }
+            else if(userId == 2){
+                if(rfidRepository.findByUser(user).isPresent()) continue;
+                RFID rfid = RFID.builder()
+                        .user(user)
+                        .cardKey(cardKey_2)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+                rfidRepository.save(rfid);
+                System.out.println("RFID 초기 값 등록 완료!" + rfid.getCardKey());
+            }
+
+            else{
+                break;
+            }
+        }
     }
 
     private void initializeTools() {
+//        List<String> toolNames = List.of(
+//                "드라이버", "망치", "스패너", "펜치", "니퍼", "전동드릴", "톱", "육각렌치", "수평기", "테이프 메저",
+//                "볼트", "너트", "와셔", "타이랩", "전선커넥터", "케이블타이", "고무망치", "절단기", "글루건", "인두기"
+//        );
         List<String> toolNames = List.of(
-                "드라이버", "망치", "스패너", "펜치", "니퍼", "전동드릴", "톱", "육각렌치", "수평기", "테이프 메저",
-                "볼트", "너트", "와셔", "타이랩", "전선커넥터", "케이블타이", "고무망치", "절단기", "글루건", "인두기"
+                "hammer", "drill", "cable", "screw", "spanner"
         );
 
         toolNames.forEach(toolName -> {
@@ -162,7 +168,7 @@ public class DataInitializer implements CommandLineRunner {
                         .location("number 2 garage")
                         .assignedUser(user)
                         .scheduledStartTime(LocalDateTime.of(2025, 2, 9, 5, 0))
-                        .scheduledEndTime(LocalDateTime.of(2025, 2, 9, 5, 10))
+                        .scheduledEndTime(LocalDateTime.of(2025, 2, 11, 5, 10))
                         .taskState(TaskStatus.START)
                         .build(),
 
@@ -172,7 +178,7 @@ public class DataInitializer implements CommandLineRunner {
                         .location("number 1 garage")
                         .assignedUser(user)
                         .scheduledStartTime(LocalDateTime.of(2025, 2, 10, 8, 30))
-                        .scheduledEndTime(LocalDateTime.of(2025, 2, 10, 9, 0))
+                        .scheduledEndTime(LocalDateTime.of(2025, 2, 20, 9, 0))
                         .taskState(TaskStatus.START)
                         .build(),
 
@@ -182,7 +188,7 @@ public class DataInitializer implements CommandLineRunner {
                         .location("fuel station")
                         .assignedUser(user)
                         .scheduledStartTime(LocalDateTime.of(2025, 2, 11, 14, 0))
-                        .scheduledEndTime(LocalDateTime.of(2025, 2, 11, 15, 0))
+                        .scheduledEndTime(LocalDateTime.of(2025, 3, 1, 15, 0))
                         .taskState(TaskStatus.START)
                         .build()
         };

@@ -87,6 +87,7 @@ public class QueueService {
                 }
                 if (allToolsDetected) {
                     System.out.println("모든 공구 감지 완료!");
+                    webSocketManager.sendMessageToAll("ok");
                 } else {
                     System.out.println("공구 감지 진행 중: " + jsonObject);
                 }
