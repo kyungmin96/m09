@@ -108,9 +108,11 @@ async def helmet_detect_stop():
     return Response(status_code=200)
 
 @app.post("/barebone/detect-09/start")
-async def tool_detect_start(tool_list: dict):
+async def tool_detect_start(tool_list):
     try:
         global sio
+        if type(tool_list) is not dict:
+            tool_list = json.loads(tool_list)
         await sio.emit("tool_detect_start", tool_list["name"])
     except:
         return Response(status_code=502)
@@ -173,7 +175,7 @@ async def echo_frame(sid, message):
 @sio.on("detect-helmet")
 async def helmet_check_ack(sid, helmet_check):
     print(f"Helmet check: {str(helmet_check)}")
-    url = internal_server_address + "/api/v1/embedded/detect-helmet/check"
+    url = internal_server_address + "/api/v1/queue/helmet"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, data = json.dumps(helmet_check), headers=headers)
     print(f"Transmitted internal helmet check: {response}")
@@ -182,7 +184,7 @@ async def helmet_check_ack(sid, helmet_check):
 @sio.on("detect-09")
 async def tool_check_ack(sid, tool_check):
     print(f"Tool check: {str(tool_check)}")
-    url = internal_server_address + "/api/v1/embedded/detect-09/check"
+    url = internal_server_address + "/api/v1/queue/tool"
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, data = json.dumps(tool_check), headers=headers)
     print(f"Transmitted internal tool check: {response}")
