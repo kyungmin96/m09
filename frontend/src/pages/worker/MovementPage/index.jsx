@@ -22,8 +22,11 @@ export const MovementPage = () => {
   // 주행 모드 상태 관리
   const [currentMode, setCurrentMode] = useState('manual');
 
-  // 스트리밍 활성화 상태 관리
+  // 스트리밍 활성화 상태 관리 - API 요청 상태를 반영
   const [isStreamingActive, setIsStreamingActive] = useState(false);
+  
+  // 스트리밍 API 요청이 완료되었는지 확인하는 상태
+  const [streamingRequestComplete, setStreamingRequestComplete] = useState(false);
 
   // API 요청 진행 중 상태 관리
   const [isLoading, setIsLoading] = useState(false);
@@ -56,16 +59,10 @@ export const MovementPage = () => {
     };
   }, []);
 
-  // 에러 타이머 관련 로직 제거 - 서버 오류 알림을 표시하지 않으므로 불필요
-
   // 오류 처리 함수 - 모드 전환 오류만 UI에 표시
   const handleError = (errorMessage, operation = '', isCameraRelated = false, isModeChangeError = false) => {
-    // 카메라 관련 오류인 경우 별도 처리
-    if (isCameraRelated) {
-      setIsCameraError(true);
-    }
     // 모드 전환 오류는 별도로 표시
-    else if (isModeChangeError) {
+    if (isModeChangeError) {
       const fullMessage = operation ? `${operation}: ${errorMessage}` : errorMessage;
       setModeChangeError(fullMessage);
       console.error('[MovementPage]', operation, errorMessage);
@@ -82,6 +79,7 @@ export const MovementPage = () => {
   const initializeManualMode = async () => {
     console.log('[MovementPage] 수동 조작 모드 초기화 시작');
     setIsLoading(true);
+    setStreamingRequestComplete(false); // 요청 시작
 
     try {
       console.log('[MovementPage] 카메라 스트리밍 요청 전송');
@@ -89,11 +87,12 @@ export const MovementPage = () => {
       console.log('[MovementPage] 카메라 스트리밍 요청 성공');
       setIsStreamingActive(true);
       setIsCameraError(false);
+      setStreamingRequestComplete(true); // 요청 성공적으로 완료
     } catch (error) {
       console.error('[MovementPage] 수동 조작 모드 초기화 - 카메라 실패:', error);
       setIsCameraError(true);
-      setIsStreamingActive(false);
-      // 카메라 실패는 별도의 UI 요소로 표시되므로 일반 오류로 처리하지 않음
+      setIsStreamingActive(false); // 카메라 연결은 실패해도 UI 컴포넌트는 표시
+      setStreamingRequestComplete(true); // 요청은 완료되었으나 실패함
     } finally {
       setIsLoading(false);
       console.log('[MovementPage] 수동 조작 모드 초기화 완료');
@@ -104,16 +103,19 @@ export const MovementPage = () => {
   const retryCameraConnection = async () => {
     console.log('[MovementPage] 카메라 연결 재시도');
     setIsLoading(true);
+    setStreamingRequestComplete(false); // 재요청 시작
 
     try {
       await startCameraStreaming();
       console.log('[MovementPage] 카메라 스트리밍 재연결 성공');
       setIsStreamingActive(true);
       setIsCameraError(false);
+      setStreamingRequestComplete(true); // 재요청 성공
     } catch (error) {
       console.error('[MovementPage] 카메라 재연결 실패:', error);
       setIsCameraError(true);
       setIsStreamingActive(false);
+      setStreamingRequestComplete(true); // 재요청 실패
     } finally {
       setIsLoading(false);
     }
@@ -136,6 +138,7 @@ export const MovementPage = () => {
           console.log('[MovementPage] 수동 모드 카메라 스트리밍 중지 요청');
           try {
             await stopCameraStreaming();
+            setStreamingRequestComplete(false); // 스트리밍 중지
           } catch (cameraError) {
             console.warn('[MovementPage] 카메라 정리 실패, 무시하고 계속:', cameraError);
           }
@@ -160,7 +163,7 @@ export const MovementPage = () => {
     }
   };
 
-  // 주행 방향 제어 핸들러
+  // 주행 방향 제어 핸들러 (변경 없음)
   const handleControl = async (direction) => {
     console.log(`[MovementPage] 주행 방향 제어 요청: ${direction}`);
 
@@ -233,6 +236,7 @@ export const MovementPage = () => {
       }
 
       setIsStreamingActive(false);
+      setStreamingRequestComplete(false);
 
       // 다음 페이지로 이동
       if (type === 'go-workplace') {
@@ -260,6 +264,7 @@ export const MovementPage = () => {
     }
 
     setIsLoading(true);
+    setStreamingRequestComplete(false); // 모드 변경 시 스트리밍 상태 초기화
 
     try {
       if (currentMode === 'manual' && newMode === 'follow') {
@@ -287,6 +292,7 @@ export const MovementPage = () => {
         console.log('[MovementPage] 추종 주행 시작 성공');
         setCurrentMode(newMode);
         setIsStreamingActive(true);
+        setStreamingRequestComplete(true); // 모드 변경 완료, 스트리밍 활성화
 
       } else if (currentMode === 'follow' && newMode === 'manual') {
         // 추종 주행 중지
@@ -301,9 +307,11 @@ export const MovementPage = () => {
           console.log('[MovementPage] 수동 모드 카메라 시작 성공');
           setIsStreamingActive(true);
           setIsCameraError(false);
+          setStreamingRequestComplete(true); // 모드 변경 완료, 스트리밍 활성화
         } catch (cameraError) {
           console.error('[MovementPage] 카메라 시작 실패, 카메라 없이 수동 모드로 전환:', cameraError);
           setIsCameraError(true);
+          setStreamingRequestComplete(true); // 요청은 완료되었으나 실패함
         }
 
         setCurrentMode(newMode);
@@ -313,6 +321,7 @@ export const MovementPage = () => {
     } catch (error) {
       console.error(`[MovementPage] ${currentMode}에서 ${newMode}로 모드 변경 중 오류 발생:`, error);
       handleError(error.message || '모드 변경 중 오류가 발생했습니다', '모드 전환 실패', false, true);
+      setStreamingRequestComplete(true); // 오류 발생했지만 요청 처리는 완료됨
     } finally {
       setIsLoading(false);
     }
@@ -348,21 +357,18 @@ export const MovementPage = () => {
               <span>{modeChangeError}</span>
             </div>
           )}
-          <Streaming isActive={isStreamingActive} />
+          {/* 
+            isActive: 스트리밍이 활성화 상태인지 여부
+            streamingReady: API 요청이 완료되어 iframe을 로드할 준비가 되었는지 여부
+            onRetry: 카메라 재연결 시도 콜백
+          */}
+          <Streaming 
+            isActive={isStreamingActive} 
+            streamingReady={!isCameraError && streamingRequestComplete}
+            onRetry={retryCameraConnection}
+          />
 
-          {/* 카메라 연결 상태 */}
-          {isCameraError && (
-            <div className="movement-page__camera-status">
-              <span>카메라 연결 실패 - 주행 제어는 계속 사용 가능합니다</span>
-              <button
-                className="movement-page__retry-camera-button"
-                onClick={retryCameraConnection}
-                disabled={isLoading}
-              >
-                재시도
-              </button>
-            </div>
-          )}
+          {/* 카메라 연결 상태 메시지 제거 - Streaming 컴포넌트로 이동 */}
         </div>
 
         {/* 제어 버튼 영역 */}
