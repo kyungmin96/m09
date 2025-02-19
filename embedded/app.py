@@ -5,15 +5,20 @@ from socketio import AsyncServer, ASGIApp
 import requests
 import json
 import asyncio
+from pydantic import BaseModel
 
 app = FastAPI()
 sio = AsyncServer(async_mode="asgi")
 socket_app = ASGIApp(sio, app)
 __byte_frame = None
 internal_server_address = "http://backend:8080"
+cam_ok = False
 
 # A dictionary to keep track of connected clients and their SIDs
 connected_clients = {}
+
+class tool_list(BaseModel):
+    name: list
 
 # 이벤트 핸들러
 
@@ -45,7 +50,16 @@ async def camera_stream():
 async def camera_start():
     try:
         global sio
+        global cam_ok
+        cam_ok = False
         await sio.emit("camera_start")
+        
+        cnt = 100
+        while not cam_ok:
+            await asyncio.sleep(0.1)
+            cnt -= 1
+            if cnt <= 0:
+                return Response(status_code=501)
     except:
         return Response(status_code=502)
     
@@ -68,7 +82,16 @@ async def auto_drive(drive: str):
     
     try:
         global sio
+        global cam_ok
+        cam_ok = False
         await sio.emit("drive", drive)
+        
+        cnt = 100
+        while not cam_ok:
+            await asyncio.sleep(0.1)
+            cnt -= 1
+            if cnt <= 0:
+                return Response(status_code=501)
     except:
         return Response(status_code=502)
     
@@ -92,7 +115,16 @@ async def manual_drive(drive: str):
 async def helmet_detect_start():
     try:
         global sio
+        global cam_ok
+        cam_ok = False
         await sio.emit("helmet_detect_start", ["helmet"])
+       
+        cnt = 100
+        while not cam_ok:
+            await asyncio.sleep(0.1)
+            cnt -= 1
+            if cnt <= 0:
+                return Response(status_code=501)
     except:
         return Response(status_code=502)
     
@@ -108,12 +140,19 @@ async def helmet_detect_stop():
     return Response(status_code=200)
 
 @app.post("/barebone/detect-09/start")
-async def tool_detect_start(tool_list):
+async def tool_detect_start(tool_list: tool_list):
     try:
         global sio
-        if type(tool_list) is not dict:
-            tool_list = json.loads(tool_list)
-        await sio.emit("tool_detect_start", tool_list["name"])
+        global cam_ok
+        cam_ok = False
+        await sio.emit("tool_detect_start", tool_list.name)
+        
+        cnt = 100
+        while not cam_ok:
+            await asyncio.sleep(0.1)
+            cnt -= 1
+            if cnt <= 0:
+                return Response(status_code=501)
     except:
         return Response(status_code=502)
     
@@ -154,7 +193,7 @@ async def _stream_gen():
     try : 
         while True:
             if not __byte_frame:
-                continue
+                break
             yield (b"--frame\r\n"
                    b"Content-Type: image/jpg\r\n\r\n" + __byte_frame + b"\r\n")
 
@@ -188,6 +227,12 @@ async def tool_check_ack(sid, tool_check):
     headers = {"Content-Type": "application/json"}
     response = requests.post(url, data = json.dumps(tool_check), headers=headers)
     print(f"Transmitted internal tool check: {response}")
+
+@sio.on("cam_ok")
+async def enable_cam(sid):
+    global cam_ok
+    cam_ok = True
+    print("Cam available!")
 
 if __name__ == "__main__":
     import uvicorn
