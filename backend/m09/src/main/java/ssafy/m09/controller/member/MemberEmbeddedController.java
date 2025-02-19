@@ -10,8 +10,6 @@ import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
 import ssafy.m09.service.EmbeddedService;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/embedded")
 @RequiredArgsConstructor
@@ -19,10 +17,10 @@ public class MemberEmbeddedController {
     private final EmbeddedService embeddedService;
 
     @PostMapping("/detect-helmet/start")
-    public ResponseEntity<ApiResponse> detectHelmetStart() { return null;}
+    public ResponseEntity<ApiResponse> detectHelmetStart() { return embeddedService.helmetStart();}
 
     @PostMapping("/detect-helmet/stop")
-    public ResponseEntity<ApiResponse> detectHelmetStop() { return null;}
+    public ResponseEntity<ApiResponse> detectHelmetStop() { return embeddedService.helmetStop();}
 
     // NFC 시작
     @PostMapping("/nfc/start")
