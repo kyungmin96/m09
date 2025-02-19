@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { useWorks } from './WorksContext';
+import { fetchAllTools, filterTools } from '@/pages/worker/PrepareToolPage/prepareTool.api';
 
 const STORAGE_KEYS = {
     REQUIRED_TOOLS: 'requiredTools',
@@ -24,7 +26,7 @@ const MOCK_AVAILABLE_TOOLS = [
 const ToolsContext = createContext();
 
 export const ToolsProvider = ({ children }) => {
-    const { user } = useAuth();
+    const { uniqueTools } = useWorks();
     const [requiredTools, setRequiredTools] = useState(() => {
         const stored = localStorage.getItem(STORAGE_KEYS.REQUIRED_TOOLS);
         return stored ? JSON.parse(stored) : [];
@@ -38,45 +40,28 @@ export const ToolsProvider = ({ children }) => {
     const [availableTools, setAvailableTools] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    // LocalStorage 동기화
-    useEffect(() => {
-        if (requiredTools.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.REQUIRED_TOOLS, JSON.stringify(requiredTools));
-        }
-    }, [requiredTools]);
-
-    useEffect(() => {
-        if (additionalTools.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.ADDITIONAL_TOOLS, JSON.stringify(additionalTools));
-        }
-    }, [additionalTools]);
-
-    // Mock API 호출
-    const fetchRequiredTools = async () => {
+    // 공구 목록 초기화
+    const initializeTools = async () => {
         setIsLoading(true);
         try {
-            // 실제 API 호출로 대체 예정
-            await new Promise(resolve => setTimeout(resolve, 800));
-            setRequiredTools(MOCK_REQUIRED_TOOLS);
+            const allTools = await fetchAllTools();
+            if (uniqueTools && uniqueTools.length > 0) {
+                const { required, available } = filterTools(allTools, uniqueTools);
+                setRequiredTools(required);
+                setAvailableTools(available);
+                localStorage.setItem(STORAGE_KEYS.REQUIRED_TOOLS, JSON.stringify(required));
+            }
         } catch (error) {
-            console.error('Failed to fetch required tools:', error);
+            console.error('Failed to initialize tools:', error);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const fetchAvailableTools = async () => {
-        setIsLoading(true);
-        try {
-            // 실제 API 호출로 대체 예정
-            await new Promise(resolve => setTimeout(resolve, 800));
-            setAvailableTools(MOCK_AVAILABLE_TOOLS);
-        } catch (error) {
-            console.error('Failed to fetch available tools:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    // uniqueTools가 변경될 때 공구 목록 초기화
+    useEffect(() => {
+        initializeTools();
+    }, [uniqueTools]);
 
     // 공구 상태 관리 함수들
     const toggleToolStatus = (toolId) => {
@@ -123,8 +108,6 @@ export const ToolsProvider = ({ children }) => {
             additionalTools,
             availableTools,
             isLoading,
-            fetchRequiredTools,
-            fetchAvailableTools,
             toggleToolStatus,
             addTools,
             removeAdditionalTool,
