@@ -63,6 +63,31 @@ export const ToolsProvider = ({ children }) => {
         initializeTools();
     }, [uniqueTools]);
 
+    // 필요한 공구 목록 업데이트 및 저장
+    const updateAndSaveRequiredTools = (additionalToolsList = []) => {
+        const updatedTools = [...requiredTools];
+        
+        // 추가된 공구들을 필요한 공구 목록에 추가
+        additionalToolsList.forEach(tool => {
+            const isDuplicate = updatedTools.some(existingTool => existingTool.id === tool.id);
+            if (!isDuplicate) {
+                updatedTools.push({
+                    ...tool,
+                    isRequired: true,
+                    isActive: true
+                });
+            }
+        });
+
+        // 상태 업데이트
+        setRequiredTools(updatedTools);
+        
+        // localStorage에 저장
+        localStorage.setItem(STORAGE_KEYS.REQUIRED_TOOLS, JSON.stringify(updatedTools));
+        
+        return updatedTools;
+    };
+
     // 공구 상태 관리 함수들
     const toggleToolStatus = (toolId) => {
         setRequiredTools(prev => prev.map(tool => 
@@ -113,7 +138,8 @@ export const ToolsProvider = ({ children }) => {
             removeAdditionalTool,
             clearToolsData,
             getActiveTools,
-            getInactiveTools
+            getInactiveTools,
+            updateAndSaveRequiredTools
         }}>
             {children}
         </ToolsContext.Provider>

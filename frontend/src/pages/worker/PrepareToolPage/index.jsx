@@ -21,7 +21,8 @@ export const PrepareToolPage = () => {
         addTools,
         removeAdditionalTool,
         getActiveTools,
-        getInactiveTools
+        getInactiveTools,
+        updateAndSaveRequiredTools
     } = useTools();  // fetchRequiredTools, fetchAvailableTools 제거
 
     const [isToolModalOpen, setIsToolModalOpen] = useState(false);
@@ -78,6 +79,40 @@ export const PrepareToolPage = () => {
         }
     };
 
+    const handleNextStep = () => {
+        try {
+            // 1. 현재 활성화된 필수 공구만 필터링
+            const activeRequiredTools = requiredTools.filter(tool => tool.isActive);
+            console.log('활성화된 필수 공구:', activeRequiredTools);
+
+            // 2. 추가된 공구 목록과 병합
+            const mergedTools = [
+                ...activeRequiredTools,
+                ...additionalTools
+            ];
+            console.log('병합된 전체 공구:', mergedTools);
+
+            // 3. id 기준으로 중복 제거
+            const uniqueTools = Array.from(
+                new Map(mergedTools.map(tool => [tool.id, {
+                    ...tool,
+                    isRequired: true,  // 최종 목록에 추가되는 모든 공구는 필수로 설정
+                    isActive: true     // 모든 공구를 활성 상태로 설정
+                }])).values()
+            );
+            console.log('중복 제거된 최종 공구:', uniqueTools);
+
+            // 4. localStorage와 Context 상태 모두 업데이트
+            localStorage.setItem('requiredTools', JSON.stringify(uniqueTools));
+            updateAndSaveRequiredTools(uniqueTools);
+
+            // 5. 다음 페이지로 이동
+            navigate('/worker/tool-check/before');
+        } catch (error) {
+            console.error('Failed to save tools:', error);
+        }
+    };
+
     return (
         <div className="work-page">
             <Header isMainPage={false} pageName="공구 확정"/>
@@ -126,10 +161,10 @@ export const PrepareToolPage = () => {
                 </Button>
                 <Button 
                     variant="main" 
-                    onClick={handleStartWork}
-                    disabled={isLoading || isStarting}
+                    onClick={handleNextStep}
+                    disabled={isLoading}
                 >
-                    {isStarting ? '공구 탐지 준비 중...' : '다음 단계 이동'}
+                    다음 단계 이동
                 </Button>
             </div>
 
