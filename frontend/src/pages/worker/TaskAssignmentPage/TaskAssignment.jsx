@@ -142,16 +142,9 @@ export const TaskAssignment = () => {
     setAvailableTasks(prev => [...prev, taskToRemove]);
   };
 
-  const handleConfirmSelection = async () => {
+  const handleConfirmSelection = () => {
     if (selectedWorks.length > 0) {
-        try {
-            const workersAllocation = prepareWorkersAllocation();
-            await allocateCompanions(workersAllocation);
-            navigate('/worker/main');
-        } catch (error) {
-            console.error('Failed to allocate companions:', error);
-            // TODO: 에러 처리 (예: 알림 표시)
-        }
+        navigate('/worker/main');
     }
 };
 

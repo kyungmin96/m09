@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/shared/ui/Header/Header';
@@ -17,25 +17,24 @@ export const PrepareToolPage = () => {
         additionalTools,
         availableTools,
         isLoading,
-        fetchRequiredTools,
-        fetchAvailableTools,
         toggleToolStatus,
         addTools,
         removeAdditionalTool,
         getActiveTools,
         getInactiveTools
-    } = useTools();
+    } = useTools();  // fetchRequiredTools, fetchAvailableTools 제거
 
     const [isToolModalOpen, setIsToolModalOpen] = useState(false);
     const [selectedToolIds, setSelectedToolIds] = useState(new Set());
     const [isStarting, setIsStarting] = useState(false);
 
-    useEffect(() => {
-        fetchRequiredTools();
-    }, [selectedWorks]);
+    // 이 useEffect는 제거 (ToolsContext에서 자동으로 처리됨)
+    // useEffect(() => {
+    //     fetchRequiredTools();
+    // }, [selectedWorks]);
 
-    const handleOpenToolModal = async () => {
-        await fetchAvailableTools();
+    const handleOpenToolModal = () => {
+        // fetchAvailableTools 호출 제거
         setIsToolModalOpen(true);
     };
 

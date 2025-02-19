@@ -75,12 +75,14 @@ export const API_ROUTES = {
       START: '/embedded/drive/start',
       STOP: '/embedded/drive/stop',
     },
+    CAMERA: {
+      START: '/embedded/camera/start',
+      STOP: '/embedded/camera/stop',
+    }
   },
 
   // 임베디드 직접 통신 관련
   DIRECT_EMBEDDED: {
     STREAMING: '/stream',
-    CAMERA_START: '/camera/start',
-    CAMERA_STOP: '/camera/stop',
   },
 };
