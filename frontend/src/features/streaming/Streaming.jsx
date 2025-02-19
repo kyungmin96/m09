@@ -1,66 +1,92 @@
 import { useEffect, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Streaming.scss';
 
-export const Streaming = ({ isActive = true }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+export const Streaming = ({ isActive = true, streamingReady = false, onRetry }) => {
+  const location = useLocation();
+  const [streamStatus, setStreamStatus] = useState('loading'); // 'loading', 'success', 'error'
+  const [streamUrl, setStreamUrl] = useState('');
   const iframeRef = useRef(null);
-  const streamingUrl = 'http://i12a202.p.ssafy.io/streaming/';
+  const isDirectStreamAccess = location.pathname.startsWith('/stream/');
 
-  // 컴포넌트 마운트/언마운트 시 로깅
   useEffect(() => {
-    console.log('[Streaming] 컴포넌트 마운트됨, isActive:', isActive);
+    console.log('[Streaming] 컴포넌트 마운트됨, isActive:', isActive, 'streamingReady:', streamingReady, 'isDirectAccess:', isDirectStreamAccess);
+    
+    // 직접 /stream/ 경로로 접근한 경우 (iframe 내부가 아닌 직접 URL 접근)
+    if (isDirectStreamAccess) {
+      // 이미 스트림 URL에 있으므로 iframe을 표시하지 않고 현재 페이지를 그대로 사용
+      return () => {
+        console.log('[Streaming] 직접 접근 컴포넌트 언마운트됨');
+      };
+    }
+    
+    // isActive가 false면 그냥 loading 상태를 유지
+    if (isActive && streamingReady) {
+      // 부모 컴포넌트에서 API 통신이 성공한 경우
+      const baseStreamUrl =  'https://i12a202.p.ssafy.io/stream/'; //"http://70.12.246.80:8765/barebone/camera/stream"
+      setStreamUrl(baseStreamUrl);
+      setStreamStatus('success');
+    } else if (isActive && !streamingReady) {
+      setStreamStatus('loading');
+    } else {
+      setStreamStatus('loading');
+    }
     
     return () => {
       console.log('[Streaming] 컴포넌트 언마운트됨');
     };
-  }, []);
+  }, [isActive, streamingReady, isDirectStreamAccess]);
 
-  // isActive 변경 시 상태 업데이트
-  useEffect(() => {
-    console.log('[Streaming] isActive 변경됨:', isActive);
-    
-    if (isActive) {
-      // 로딩 상태만 짧게 표시 후 스트리밍 시작
-      setIsLoading(true);
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setIsLoading(true);
-      setHasError(false);
+  // 재시도 핸들러 - 부모 컴포넌트의 onRetry 콜백 호출
+  const handleRetry = () => {
+    console.log('[Streaming] 스트리밍 재시도 요청');
+    if (onRetry && typeof onRetry === 'function') {
+      onRetry();
     }
-  }, [isActive]);
-  
+  };
+
+  // 직접 스트림 URL에 접근한 경우 iframe 없이 컨텐츠를 직접 표시
+  if (isDirectStreamAccess) {
+    return (
+      <div className="direct-stream-content">
+        {/* 여기는 스트림 서버의 실제 컨텐츠가 표시됨 - 아무것도 렌더링하지 않음 */}
+      </div>
+    );
+  }
+
+  // 상태에 따른 CSS 클래스 계산
   const getContainerClass = () => {
     let className = 'streaming-container';
-    if (isLoading) className += ' is-loading';
-    if (hasError) className += ' has-error';
-    if (!isActive) className += ' is-inactive';
+    if (streamStatus === 'loading') className += ' is-loading';
+    if (streamStatus === 'error') className += ' has-error';
     return className;
   };
 
   return (
     <div className={getContainerClass()}>
-      {isLoading ? (
+      {streamStatus === 'loading' && (
         <div className="message loading-message">
-          {isActive ? '카메라 스트림을 준비 중입니다. 잠시만 기다려주세요...' : '카메라 활성화 대기 중...'}
+          카메라 스트림을 준비 중입니다. 잠시만 기다려주세요...
         </div>
-      ) : hasError ? (
+      )}
+      
+      {streamStatus === 'error' && (
         <div className="message error-message">
           카메라 스트림을 불러오는데 실패했습니다.<br />
-          잠시 후 다시 시도해주세요.
+          <button 
+            className="retry-button"
+            onClick={handleRetry}
+          >
+            재시도
+          </button>
         </div>
-      ) : !isActive ? (
-        <div className="message inactive-message">
-          현재 카메라가 활성화되어 있지 않습니다.
-        </div>
-      ) : (
+      )}
+      
+      {streamStatus === 'success' && (
         <iframe
           ref={iframeRef}
-          src={streamingUrl}
-          className={isActive && !isLoading && !hasError ? 'iframe-visible' : 'iframe-hidden'}
+          src={streamUrl}
+          className="streaming-iframe"
           title="임베디드 카메라 스트리밍"
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

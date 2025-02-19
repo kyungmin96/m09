@@ -5,6 +5,7 @@ import { controlRoutes } from './routes/control.routes';
 import { LoginWorkerPage } from '@/pages/worker/LoginWorkerPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PublicRoute } from '@/app/routes/guards/auth.guard';
+import { Streaming } from '@/features/streaming/Streaming';
 
 export const AppRouter = () => {
   // testRoutes가 배열인 경우, 각 요소에 key가 있는지 확인
@@ -30,6 +31,9 @@ export const AppRouter = () => {
           </PublicRoute>
         } 
       />
+      
+      {/* 스트리밍 경로 - 라우터가 404로 처리하지 않도록 명시적 처리 */}
+      <Route key="stream" path="/stream/*" element={<Streaming isActive={true} />} />
       
       {/* 각 라우트 그룹 - 이미 각 파일에서 ProtectedRoute 적용됨 */}
       {workerRoutes}
