@@ -71,9 +71,11 @@ public class CompanionService {
 
                 User user = userOptional.get();
 
-                // isEnabled 값을 false로 변경
-//                user.setEnabled(false);
-//                userRepository.save(user);  // 변경된 User 저장
+                // ✅ 이미 해당 Task와 User가 연결된 Companion이 존재하면 추가하지 않음
+                if (companionRepository.existsByTaskAndUser(task, user)) {
+                    System.out.println("⚠️ 중복 Companion 생성을 방지: " + user.getEmployeeId() + " - Task ID " + task.getId());
+                    continue;  // 중복이면 다음 루프로 이동
+                }
 
                 // Companion 생성 및 저장
                 Companion companion = Companion.builder()
