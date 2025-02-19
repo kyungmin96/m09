@@ -9,13 +9,13 @@ pipeline {
         stage('SSH into EC2 and Deploy') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'gitlab-basic', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    withCredentials([string(credentialsId: 'gitlab-api-access-token', variable: 'GIT_TOKEN')]) {
                         sh """
                             ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${HOST_IP} << 'EOF'
                             cd /home/ubuntu/dev/S12P11A202
                             git reset --hard
-                            git switch fix/INFRA-MySQL-connection
-                            git pull https://$GIT_USER:$GIT_PASS@lab.ssafy.com/s12-webmobile3-sub1/S12P11A202.git fix/INFRA-MySQL-connection
+                            git switch release
+                            git pull https://oauth2:${GIT_TOKEN}@lab.ssafy.com/s12-webmobile3-sub1/S12P11A202.git release
                             docker-compose down
                             docker-compose build --no-cache
                             docker-compose up -d

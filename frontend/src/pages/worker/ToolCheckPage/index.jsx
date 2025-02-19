@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTools } from '@/contexts/ToolsContext';
 import { Button } from '@/shared/ui/Button/Button';
+import { Header } from '@/shared/ui/Header/Header';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
-import { WebcamView } from '@/shared/ui/Webcam/WebcamView';
+import { Streaming } from '@/features/streaming/Streaming';
 import './styles.scss';
 
 const DETECTION_STATUS = {
@@ -153,14 +154,6 @@ export const ToolCheckPage = () => {
         setIsModalOpen(false);
     };
 
-    const handleStreamStart = () => {
-        console.log('Camera stream started');
-    };
-
-    const handleStreamError = (error) => {
-        console.error('Camera stream error:', error);
-    };
-
     // Mock function for tool detection API - 실제 구현시 대체 필요
     const mockDetectTools = async (undetectedTools) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -182,17 +175,10 @@ export const ToolCheckPage = () => {
 
     return (
         <div className="tool-check-page">
-            <header className="work-header">
-                <h1>{routeConfig.title}</h1>
-                <p>필요한 공구 {detectedTools.size}/{tools.length}개 탐지됨</p>
-            </header>
-
+            <Header isMainPage={false} pageName={routeConfig.title}/>
             <div className="webcam-section">
-                <WebcamView
-                    isActive={true}
-                    isPaused={detectionStatus !== DETECTION_STATUS.DETECTING}
-                    onStreamStart={handleStreamStart}
-                    onStreamError={handleStreamError}
+                <Streaming
+                    isActive={detectionStatus === DETECTION_STATUS.DETECTING}
                 />
             </div>
 
@@ -212,7 +198,9 @@ export const ToolCheckPage = () => {
                     수동 체크
                 </Button>
             </div>
-
+            <div className="work-title">
+                <p>필요한 공구 {detectedTools.size}/{tools.length}개 탐지됨</p>
+            </div>
             <section className="tools-list">
                 {sortedTools.map(tool => (
                     <div 

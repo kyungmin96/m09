@@ -1,6 +1,7 @@
 package ssafy.m09.controller.member;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.TaskEndRequest;
@@ -8,6 +9,7 @@ import ssafy.m09.service.TaskService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/member/tasks")
 @RequiredArgsConstructor
@@ -26,6 +28,8 @@ public class MemberTaskController {
 
     @GetMapping("/posts/in-process")
     public ApiResponse<?> getInProcessTasks(@RequestHeader("Authorization") String token) {
+        log.info("Request received for in-process tasks");
+        log.info("Authorization header: {}", token);
         return taskService.getInProcessTasks(token);
     }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWorks, WORK_STATUS } from '@/contexts/WorksContext';
 import { useTools } from '@/contexts/ToolsContext';
 import { useCart } from '@/contexts/CartContext';
+import { Header } from '@/shared/ui/Header/Header';
 import './styles.scss';
 
 export const WorkCompletePage = () => {
@@ -91,11 +92,8 @@ export const WorkCompletePage = () => {
 
   return (
     <div className="work-complete-page">
-      <header className="header">
-        <h1>작업 종료</h1>
-        <p>작업 내용을 확인하고 종료해주세요.</p>
-      </header>
-
+      <Header isMainPage={false} pageName="작업 종료"/>
+      <p>작업 내용을 확인하고 종료해주세요.</p>
       <div className="work-list">
         {selectedWorks.map(work => (
           <div key={work.id} className="work-card">

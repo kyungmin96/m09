@@ -39,7 +39,7 @@ class nfc:
         self._initiated = True
         
         # 요청을 보낼 URL
-        url = self.base_url + "/api/rfid/login"
+        url = self.base_url + "/api/v1/queue/rfid"
         # 요청 헤더 설정 (JSON 형식 명시)
         headers = {
             "Content-Type": "application/json"
@@ -47,6 +47,7 @@ class nfc:
         
         while self._initiated:
             try:
+                self.lcd.clear()
                 self.lcd.write_string("Tag your ID Card")
                 uid = self.pn532.read_passive_target(timeout=0.5)
                 if uid:
@@ -69,15 +70,18 @@ class nfc:
     def start(self):
         if self._thread and self._thread.is_alive():
             self.stop()
+        self.lcd.clear()
         self._thread = Thread(target=self._run)
         self._thread.start()
 
     def stop(self):
         self._initiated = False
+        self.lcd.clear()
         if self._thread and self._thread.is_alive():
             self._thread.join()
 
 nfc_reader = nfc()
+# nfc_reader.start()
 __address = os.environ["M09_SERVER_ADDRESS"] 
 sio_cli = socketio.Client()
 sio_cli.connect(__address)
@@ -111,6 +115,7 @@ try:
     while True:
         sleep(1)
 except KeyboardInterrupt:
+    nfc_reader.stop()
     print("Program end...")
     GPIO.cleanup()
     pass

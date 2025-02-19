@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { useAuth } from '@/features/auth/context/AuthContext';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/shared/ui/Button/Button';
 
 const LogoutButton = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
       setIsLoading(true);
       await logout();
+      navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

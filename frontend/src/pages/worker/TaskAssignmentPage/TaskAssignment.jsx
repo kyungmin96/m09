@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWorks } from '@/contexts/WorksContext';
+import { Header } from '@/shared/ui/Header/Header';
 import { Button } from '@/shared/ui/Button/Button';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import './TaskAssignment.scss';
+import { getAllWorkers } from './workers.api';
 
 // 임시 전체 작업자 데이터
 const DUMMY_ALL_WORKERS = [
@@ -37,7 +39,14 @@ const DUMMY_ALL_WORKERS = [
 export const TaskAssignment = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { todayWorks, selectedWorks, updateSelectedWorks } = useWorks();
+  const {
+     todayWorks,
+     selectedWorks,
+     updateSelectedWorks,
+     uniqueTools,
+     allocateCompanions,
+     prepareWorkersAllocation,
+    } = useWorks();
   
   const [availableTasks, setAvailableTasks] = useState([]);
   const [workers, setWorkers] = useState([]);
@@ -45,9 +54,21 @@ export const TaskAssignment = () => {
   const [currentTask, setCurrentTask] = useState(null);
   const [selectedWorkers, setSelectedWorkers] = useState([]);
 
+  const fetchAllWorkers = async () => {
+    try {
+      const workersList = await getAllWorkers();
+      console.log('작업자 목록:', workersList);
+      setWorkers(workersList);
+    } catch (error) {
+      console.error('Failed to fetch all workers:', error);
+      setWorkers([]); // 에러 시 빈 배열로 초기화
+    }
+  };
+
   useEffect(() => {
     // 작업자 목록 가져오기 (실제로는 API 호출)
-    setWorkers(DUMMY_ALL_WORKERS);
+    fetchAllWorkers();
+    // setWorkers(DUMMY_ALL_WORKERS);
 
     // todayWorks에서 아직 선택되지 않은 작업만 필터링
     const unselectedTasks = todayWorks.filter(
@@ -59,7 +80,7 @@ export const TaskAssignment = () => {
   const handleTaskSelect = (task) => {
     setCurrentTask(task);
     // 현재 사용자를 기본으로 선택
-    setSelectedWorkers([user.id]);
+    setSelectedWorkers(user?.id ? [user.id] : []);
     setIsModalOpen(true);
   };
 
@@ -121,14 +142,22 @@ export const TaskAssignment = () => {
     setAvailableTasks(prev => [...prev, taskToRemove]);
   };
 
-  const handleConfirmSelection = () => {
+  const handleConfirmSelection = async () => {
     if (selectedWorks.length > 0) {
-      navigate('/worker/main');
+        try {
+            const workersAllocation = prepareWorkersAllocation();
+            await allocateCompanions(workersAllocation);
+            navigate('/worker/main');
+        } catch (error) {
+            console.error('Failed to allocate companions:', error);
+            // TODO: 에러 처리 (예: 알림 표시)
+        }
     }
-  };
+};
 
   return (
     <div className="task-assignment">
+      <Header isMainPage={false} pageName="오늘의 작업 선택"/>
       <section className="today-tasks">
         <h2>선택된 작업</h2>
         <div className="task-list">
@@ -218,8 +247,8 @@ export const TaskAssignment = () => {
         }
       >
         <div className="worker-selection">
-          {workers
-            .filter(worker => worker.id !== user.id) // 현재 사용자 제외
+          {Array.isArray(workers) && workers
+            .filter(worker => user?.employeeId ? worker.employeeId !== user.employeeId : true)
             .map(worker => (
               <div
                 key={worker.id}
@@ -229,6 +258,7 @@ export const TaskAssignment = () => {
                 onClick={() => handleWorkerSelect(worker.id)}
               >
                 <span className="worker-name">{worker.name}</span>
+                <span className="worker-id">({worker.employeeId})</span>
               </div>
             ))}
         </div>

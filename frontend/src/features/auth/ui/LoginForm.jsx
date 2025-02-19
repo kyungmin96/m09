@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from '@/shared/ui/Button/Button.jsx';
 import { validateId, validatePassword, isFormValid } from '@/features/auth/lib/auth.helpers';
@@ -6,6 +7,7 @@ import './LoginForm.scss';
 
 export const LoginForm = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState(null);
@@ -110,20 +112,27 @@ export const LoginForm = () => {
 
   const handleButtonClick = (e) => {
     e.preventDefault();
-
+  
     setTouched({
       id: true,
       password: true
     });
-
+  
+    const idError = validateId(id);
+    const pwError = validatePassword(password);
+    
     setValidationErrors({
-      id: validateId(id),
-      password: validatePassword(password)
+      id: idError,
+      password: pwError
     });
-
+  
     if (!isFormValid(id, password)) {
       setIsErrorFading(false);
       setShowError(true);
+      setValidationErrors(prev => ({
+        ...prev,
+        general: 'ID와 PW를 모두 입력해주세요.'
+      }));
     } else {
       handleSubmit(e);
     }
@@ -132,11 +141,27 @@ export const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login({ employeeId: id, password });
-      console.log('로그인 성공');
+      const userData = await login({ employeeId: id, password });
       navigate('/worker/main');
     } catch (error) {
-      console.error('로그인 실패:', error);
+      // 에러 메시지 추출
+      let errorMessage = "로그인에 실패했습니다";
+      
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        errorMessage = error.message || 
+                      error.errorMessage || 
+                      error.error || 
+                      (error.status && `오류 코드: ${error.status}`) ||
+                      "아이디 또는 비밀번호가 올바르지 않습니다.";
+      }
+      
+      setValidationErrors(prev => ({
+        ...prev,
+        general: errorMessage
+      }));
+      
       setShowError(true);
     }
   };
@@ -218,13 +243,13 @@ export const LoginForm = () => {
             variant="main"
             size="full"
             onClick={handleButtonClick}
-            disabled={!isFormValid()}
+            disabled={!isFormValid(id, password)}
           >
             로그인
           </Button>
-          {showError && !isFormValid() && (
+          {showError && (
             <p className={`error-message ${isErrorFading ? 'fade-out' : ''}`}>
-              ID와 PW를 모두 입력해주세요.
+              {validationErrors.general || 'ID와 PW를 모두 입력해주세요.'}
             </p>
           )}
         </div>

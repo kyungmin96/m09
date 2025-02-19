@@ -1,0 +1,83 @@
+// src/pages/NotFoundPage.scss
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 20px;
+  
+  .not-found-content {
+    max-width: 500px;
+    text-align: center;
+    background-color: white;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .not-found-title {
+    font-size: 6rem;
+    font-weight: 700;
+    color: #e74c3c;
+    margin: 0;
+    line-height: 1;
+  }
+  
+  .not-found-subtitle {
+    font-size: 1.8rem;
+    margin: 20px 0 10px;
+    color: #2c3e50;
+  }
+  
+  .not-found-message {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  
+  .not-found-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    @media (min-width: 576px) {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+  
+  .not-found-button {
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    outline: none;
+    
+    &--primary {
+      background-color: #4DAF50;
+      color: white;
+      
+      &:hover {
+        background-color: #277e2a;
+      }
+    }
+    
+    &--secondary {
+      background-color: #ecf0f1;
+      color: #34495e;
+      
+      &:hover {
+        background-color: #bdc3c7;
+      }
+    }
+    
+    @media (min-width: 576px) {
+      min-width: 180px;
+    }
+  }
+}
