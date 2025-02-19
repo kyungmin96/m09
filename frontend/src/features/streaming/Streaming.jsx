@@ -23,7 +23,7 @@ export const Streaming = ({ isActive = true, streamingReady = false, onRetry }) 
     // isActive가 false면 그냥 loading 상태를 유지
     if (isActive && streamingReady) {
       // 부모 컴포넌트에서 API 통신이 성공한 경우
-      const baseStreamUrl =  'https://i12a202.p.ssafy.io/stream/'; //"http://70.12.246.80:8765/barebone/camera/stream"
+      const baseStreamUrl =  'https://i12a202.p.ssafy.io/stream'; //"http://70.12.246.80:8765/barebone/camera/stream"
       setStreamUrl(baseStreamUrl);
       setStreamStatus('success');
     } else if (isActive && !streamingReady) {
