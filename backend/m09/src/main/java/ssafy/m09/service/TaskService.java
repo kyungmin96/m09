@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ssafy.m09.domain.Companion;
 import ssafy.m09.domain.Task;
 import ssafy.m09.domain.TaskToolBuilder;
 import ssafy.m09.domain.User;
@@ -12,7 +13,9 @@ import ssafy.m09.domain.en.TaskStatus;
 import ssafy.m09.dto.common.ApiResponse;
 import ssafy.m09.dto.request.TaskEndRequest;
 import ssafy.m09.dto.request.TaskRequest;
+import ssafy.m09.dto.response.TodayTaskResponse;
 import ssafy.m09.global.error.ErrorCode;
+import ssafy.m09.repository.CompanionRepository;
 import ssafy.m09.repository.TaskRepository;
 import ssafy.m09.repository.TaskToolBuilderRepository;
 import ssafy.m09.repository.UserRepository;
@@ -32,6 +35,7 @@ public class TaskService {
     private final UserRepository userRepository;
     private final TaskToolBuilderRepository taskToolBuilderRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CompanionRepository companionRepository;
     // 초기 필수: 제목, 내용, 위치, 담당자, 예정 시작/끝 시간, 기본 START enum
     // 서비스 로직에서 이후 user page에서 추가 코멘트, 사용 차량, 작업 시작/끝 시간 추가됨
 
@@ -122,7 +126,7 @@ public class TaskService {
         return ApiResponse.success(tasks, "진행 중인 작업 조회 성공");
     }
 
-    public ApiResponse<List<Task>> getTodaySelectedTasks(String token)
+    public ApiResponse<List<TodayTaskResponse>> getTodaySelectedTasks(String token)
     {
         String employeeId = jwtTokenProvider.getEmployeeId(token);
         LocalDate today = LocalDate.now();
@@ -137,7 +141,30 @@ public class TaskService {
             return ApiResponse.error(HttpStatus.NOT_FOUND, "오늘 할당된 작업이 없습니다.");
         }
 
-        return ApiResponse.success(tasks,"오늘 선택했던 작업 조회 성공");
+        // Task별 Companion 조회 후 TodayTaskResponse로 변환
+        List<TodayTaskResponse> todayTaskResponses = tasks.stream()
+                .map(task -> {
+                    List<Companion> companions = companionRepository.findAllByTaskId(task.getId());
+
+                    // Companion에서 employeeId와 name만 추출
+                    List<String> employeeIds = companions.stream()
+                            .map(companion -> companion.getUser().getEmployeeId())
+                            .collect(Collectors.toList());
+
+                    List<String> names = companions.stream()
+                            .map(companion -> companion.getUser().getName())
+                            .collect(Collectors.toList());
+
+                    return TodayTaskResponse.builder()
+                            .taskId(task.getId())
+                            .taskName(task.getTitle()) // Task 이름 포함
+                            .employeeIds(employeeIds)
+                            .names(names)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(todayTaskResponses, "오늘 선택했던 작업 조회 성공");
     }
 
     @Transactional

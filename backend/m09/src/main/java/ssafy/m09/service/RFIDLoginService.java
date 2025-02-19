@@ -24,7 +24,7 @@ public class RFIDLoginService {
         if (cardKey == null || cardKey.isEmpty()) {
             return ApiResponse.error(HttpStatus.BAD_REQUEST, "카드 키가 비어 있습니다.");
         }
-
+        System.out.println("카드 키: " + cardKey);
         Optional<RFID> rfidOptional = rfidRepository.findByCardKey(cardKey);
 
         if (rfidOptional.isEmpty()) {

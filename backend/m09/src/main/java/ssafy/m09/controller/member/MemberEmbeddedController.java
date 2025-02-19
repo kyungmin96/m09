@@ -9,29 +9,18 @@ import ssafy.m09.dto.response.CameraStreamResponse;
 import ssafy.m09.dto.response.DetectionCheckResponse;
 import ssafy.m09.dto.response.DetectionStartResponse;
 import ssafy.m09.service.EmbeddedService;
-import ssafy.m09.service.StreamWebSocketHandler;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/embedded")
 @RequiredArgsConstructor
 public class MemberEmbeddedController {
     private final EmbeddedService embeddedService;
-    private final StreamWebSocketHandler streamWebSocketHandler;
 
-    // 헬멧 감지
-    @PostMapping("/helmet-detection")
-    public ResponseEntity<String> receiveHelmetDetectionResult(@RequestBody Map<String, Boolean> result) {
-        boolean helmetDetected = result.getOrDefault("helmet", false);
+    @PostMapping("/detect-helmet/start")
+    public ResponseEntity<ApiResponse> detectHelmetStart() { return embeddedService.helmetStart();}
 
-        if (helmetDetected) {
-            streamWebSocketHandler.broadcastToClient("{\"status\":\"success\", \"message\":\"Helmet detected\"}");
-            return ResponseEntity.ok("Helmet detected and client notified");
-        } else {
-            streamWebSocketHandler.broadcastToClient("{\"status\":\"failed\", \"message\":\"No helmet detected\"}");
-            return ResponseEntity.ok("No helmet detected and client notified");
-        }
-    }
+    @PostMapping("/detect-helmet/stop")
+    public ResponseEntity<ApiResponse> detectHelmetStop() { return embeddedService.helmetStop();}
 
     // NFC 시작
     @PostMapping("/nfc/start")
