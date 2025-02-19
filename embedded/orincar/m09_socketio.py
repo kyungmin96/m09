@@ -3,6 +3,7 @@ import socketio
 import os
 import __main__
 from threading import Thread
+from time import sleep
 
 __address = os.environ["M09_SERVER_ADDRESS"] 
 sio_cli = socketio.Client()
@@ -28,6 +29,9 @@ def transmit_detect_check(tool_check, prefix):
 @sio_cli.event
 def camera_start():
     __main__.cap.start()
+    while not __main__.cap._initiated:
+        sleep(0.1)
+    sio_cli.emit("cam_ok")
 # 카메라 종료
 @sio_cli.event
 def camera_stop():
@@ -38,6 +42,9 @@ def camera_stop():
 def drive(operation):
     if operation == "start":
         __main__.object_tracer.start()
+        while not __main__.object_tracer._initiated:
+            sleep(0.1)
+        sio_cli.emit("cam_ok")
     elif operation == "stop":
         __main__.object_tracer.stop()
 
@@ -59,6 +66,9 @@ def manual_drive(operation):
 @sio_cli.event
 def helmet_detect_start(helmet_list):
     __main__.helmet_detect.start(detect_list=helmet_list)
+    while not __main__.helmet_detect._initiated:
+        sleep(0.1)
+    sio_cli.emit("cam_ok")
 
 @sio_cli.event
 def helmet_detect_stop():
@@ -68,6 +78,9 @@ def helmet_detect_stop():
 @sio_cli.event
 def tool_detect_start(tool_list):
     __main__.object_detect.start(detect_list=tool_list)
+    while not __main__.object_detect._initiated:
+        sleep(0.1)
+    sio_cli.emit("cam_ok")
 
 @sio_cli.event
 def tool_detect_stop():

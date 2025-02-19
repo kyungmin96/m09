@@ -19,7 +19,6 @@ class camera:
     
     def _run(self):
         # 메인 루프
-        self._initiated = True
 
         # cuda 사용
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
@@ -28,7 +27,8 @@ class camera:
             print("[OrinCar] CUDA activated.")
         else:
             print("[OrinCar] Unable to activate CUDA, Using CPU...")
-
+        
+        self._initiated = True
         while self._initiated:
             ret, frame = self.cap.read()
             if not ret:

@@ -46,7 +46,6 @@ class trace:
 
     def _run(self):
         # 주행 루프
-        self._initiated = True
         # GPU에서 CUDA 사용 가능 여부
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
 
@@ -69,6 +68,8 @@ class trace:
         threshold = int(os.environ["M09_DANGER_THRESHOLD"])
 
         prev_speed = 0
+
+        self._initiated = True
         while self._initiated:
             ret, frame = self.camera.read()
             if not ret:

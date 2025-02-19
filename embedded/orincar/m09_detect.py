@@ -19,8 +19,6 @@ class detect:
     
     def _run(self, detect_list):
         # 메인 루프
-        self._initiated = True
-
         detect_state = {}
         for item in detect_list:
             detect_state[item] = 0
@@ -36,6 +34,7 @@ class detect:
         else:
             print("[OrinCar] Unable to activate CUDA, Using CPU...")
 
+        self._initiated = True
         while self._initiated:
             ret, frame = self.camera.read()
             if not ret:
