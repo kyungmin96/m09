@@ -23,7 +23,7 @@ const simulateApiDelay = () => new Promise(resolve => setTimeout(resolve, 1000))
 export const MainPage = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { todayWorks, selectedWorks, updateTodayWorks } = useWorks();
+    const { todayWorks, selectedWorks, updateTodayWorks, isAllocated, allocateCompanions, prepareWorkersAllocation, resetAllocation } = useWorks();
     const { 
         cartInfo,
         isRegistering,
@@ -116,20 +116,24 @@ export const MainPage = () => {
 
     // 작업 시작 처리
     const handleStartWorkClick = async () => {
-        if (!cartInfo || !selectedWorks.length) return;
-
         try {
             setIsLoading(true);
-            const workIds = selectedWorks.map(work => work.id);
             
-            const toolsData = await startWorkAndFetchTools(workIds);
+            if (!isAllocated) {
+                const workersAllocation = prepareWorkersAllocation();
+                await allocateCompanions(workersAllocation);
+            }
+
+            // 작업 시작 처리
+            await startWorkAndFetchTools(selectedWorks.map(work => work.id));
             
-            // 공구 목록 저장
-            localStorage.setItem('workTools', JSON.stringify(toolsData));
+            // 작업 시작 후 allocation 상태 초기화
+            resetAllocation();
+            
+            // 공구 준비 페이지로 이동
             navigate('/worker/prepare-tool');
         } catch (error) {
             console.error('Failed to start work:', error);
-            // TODO: 에러 알림 UI 추가
         } finally {
             setIsLoading(false);
         }

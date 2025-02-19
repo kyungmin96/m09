@@ -65,6 +65,11 @@ export const WorksProvider = ({ children }) => {
         return storedTools ? JSON.parse(storedTools) : [];
     });
 
+    const [isAllocated, setIsAllocated] = useState(() => {
+        const allocated = localStorage.getItem('isAllocated');
+        return allocated ? JSON.parse(allocated) : false;
+    });
+
     useEffect(() => {
         const storedWorks = localStorage.getItem('todayWorks');
         const storedSelectedWorks = localStorage.getItem('selectedWorks');
@@ -133,7 +138,9 @@ export const WorksProvider = ({ children }) => {
             if (response.data.success) {
                 const tools = response.data.data.uniqueTools;
                 setUniqueTools(tools);
+                setIsAllocated(true);
                 localStorage.setItem('uniqueTools', JSON.stringify(tools));
+                localStorage.setItem('isAllocated', 'true');
                 return tools;
             }
             throw new Error('Failed to allocate companions');
@@ -141,6 +148,12 @@ export const WorksProvider = ({ children }) => {
             console.error('Companions allocation error:', error);
             throw error;
         }
+    };
+
+    // allocation 상태 초기화 함수 추가
+    const resetAllocation = () => {
+        setIsAllocated(false);
+        localStorage.removeItem('isAllocated');
     };
 
     // 선택된 작업들의 공동 작업자 정보를 API 요청 형식으로 변환
@@ -159,11 +172,13 @@ export const WorksProvider = ({ children }) => {
             selectedWorks,
             serverDate,
             uniqueTools,
+            isAllocated,
             updateTodayWorks,
             updateSelectedWorks,
             addSpecialNote,
             deleteSpecialNote,
             allocateCompanions,
+            resetAllocation,
             prepareWorkersAllocation
         }}>
             {children}
