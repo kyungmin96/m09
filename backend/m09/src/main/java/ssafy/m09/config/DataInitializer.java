@@ -150,7 +150,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initializeTasks() {
-        String fixedEmployeeId = "1111111";  // 고정된 employeeId 사용
+        String fixedEmployeeId = "1864325";  // 고정된 employeeId 사용
 
         Optional<User> userOptional = userRepository.findByEmployeeId(fixedEmployeeId);
         if (userOptional.isEmpty()) {
@@ -249,5 +249,4 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("✅ Vehicle 생성 완료: Vehicle(" + vehicle.getName() + ")");
         }
     }
-
 }
