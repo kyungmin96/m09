@@ -13,8 +13,8 @@ import ssafy.m09.dto.response.DetectionStartResponse;
 @Service
 @RequiredArgsConstructor
 public class EmbeddedService {
-//    private final String EMBEDDED_API_URL = "http://embedded:8765/barebone";
-    private final String EMBEDDED_API_URL = "http://localhost:8765/barebone";
+   private final String EMBEDDED_API_URL = "http://embedded:8765/barebone";
+    // private final String EMBEDDED_API_URL = "http://localhost:8765/barebone";
     private final RestTemplate restTemplate;
 
     public ResponseEntity<ApiResponse> helmetStart() {
