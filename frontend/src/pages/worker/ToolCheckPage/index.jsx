@@ -8,6 +8,7 @@ import { Streaming } from '@/features/streaming/Streaming';
 import websocketService from '@/features/websocket/websocketService';
 import './styles.scss';
 import { startToolDetection, stopToolDetection } from './toolCheck.api';
+import { convertToolListToKorean, convertToolListToEnglish, getEnglishToolName } from '@/utils/toolNameMapper';
 
 const DETECTION_STATUS = {
     DETECTING: 'DETECTING',
@@ -42,7 +43,7 @@ export const ToolCheckPage = () => {
     const [tools, setTools] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastDetectionRequest, setLastDetectionRequest] = useState('start');
-    const [streamingReady, setStreamingReady] = useState(false);
+    const [streamingReady, setStreamingReady] = useState(true);
     const [isConnected, setIsConnected] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -70,14 +71,16 @@ export const ToolCheckPage = () => {
                     return;
                 }
                 
-                setTools(updatedTools);
+                // 한글 이름으로 변환하여 설정
+                setTools(convertToolListToKorean(updatedTools));
                 await startWebSocketConnection(updatedTools);
             } catch (error) {
                 console.error('Failed to initialize:', error);
                 navigate('/worker/prepare-tool');
             }
         } else {
-            setTools(activeTools);
+            // 한글 이름으로 변환하여 설정
+            setTools(convertToolListToKorean(activeTools));
             await startWebSocketConnection(activeTools);
         }
     };
@@ -98,11 +101,12 @@ export const ToolCheckPage = () => {
             websocketService.setOnMessageCallback((data) => {
                 try {
                     const result = JSON.parse(data);
-                    console.log('[WebSocket] 공구 탐지 결과:', result);
+                    console.log('공구 탐지 결과:', result);
                     
-                    // 공구 탐지 상태 업데이트
+                    // 영문 이름으로 비교하여 공구 탐지 상태 업데이트
                     toolsList.forEach(tool => {
-                        if (result[tool.name] === true) {
+                        const englishName = getEnglishToolName(tool.name);
+                        if (result[englishName] === true) {
                             setDetectedTools(prev => {
                                 const newSet = new Set(prev);
                                 newSet.add(tool.id);
@@ -111,7 +115,7 @@ export const ToolCheckPage = () => {
                         }
                     });
                 } catch (error) {
-                    console.error('[WebSocket] JSON 파싱 오류:', error);
+                    console.error('JSON 파싱 오류:', error);
                 }
             });
             
@@ -119,6 +123,8 @@ export const ToolCheckPage = () => {
             websocketService.setOnCloseCallback(() => {
                 setIsConnected(false);
                 setDetectionStatus(DETECTION_STATUS.PAUSED);
+                console.log('1. 여기냐?');
+                
                 setStreamingReady(false);
             });
             
@@ -126,20 +132,27 @@ export const ToolCheckPage = () => {
             websocketService.setOnErrorCallback((error) => {
                 setErrorMessage(`연결 오류: ${error.message}`);
                 setDetectionStatus(DETECTION_STATUS.PAUSED);
+                console.log('2. 여기냐?');
+
                 setStreamingReady(false);
             });
             
-            // 공구 탐지 시작 API 요청
-            const toolNames = toolsList.map(tool => tool.name);
-            await startToolDetection(toolNames);
+            // 영문 이름으로 변환하여 공구 탐지 시작 요청
+            const englishToolNames = toolsList.map(tool => getEnglishToolName(tool.name));
+            await startToolDetection(englishToolNames);
             
             // 스트리밍 준비 완료
             setStreamingReady(true);
+            console.log('3. true 여기냐?');
+
             
         } catch (error) {
+            console.log('[StreamingReady true로 변경 실패');
             setErrorMessage(`오류 발생: ${error.message}`);
             setDetectionStatus(DETECTION_STATUS.PAUSED);
             setIsConnected(false);
+            console.log('4. 여기냐?');
+
             setStreamingReady(false);
         }
     };
@@ -160,6 +173,8 @@ export const ToolCheckPage = () => {
                 websocketService.closeConnection();
             }
             setIsConnected(false);
+            console.log('5. 여기냐?');
+
             setStreamingReady(false);
         } catch (error) {
             console.error('Failed to stop websocket:', error);

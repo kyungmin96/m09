@@ -30,9 +30,9 @@ class detect:
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
 
         if use_cuda:
-            print("[OrinCar] CUDA activated.")
+            print("[OrinCar] CUDA activated for DETECT.")
         else:
-            print("[OrinCar] Unable to activate CUDA, Using CPU...")
+            print("[OrinCar] Unable to activate CUDA, Using CPU for DETECT...")
 
         # 구 프레임 버리기
         for _ in range(2):
@@ -43,7 +43,7 @@ class detect:
             ret, frame = self.camera.read()
             if not ret:
                 print("[OrinCar] Error: Could not read frame.")
-                break
+                continue
 
             # GPU를 사용한 이미지 처리
             if use_cuda:
@@ -59,7 +59,7 @@ class detect:
                 frame = cv2.resize(frame, (self.camera.cam_width, self.camera.cam_height))
                 frame = frame
             
-            yolo_results = self.yolo(frame)
+            yolo_results = self.yolo(frame, verbose=False)
 
             for result in yolo_results:
                 for box in result.boxes:
@@ -76,19 +76,22 @@ class detect:
                     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
                     cv2.putText(frame, label, (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
+                    print(f"[OrinCar] Detected: {label}")
+
                     if detect_name not in detect_list:
                         continue
 
                     detect_state[detect_name] += 1
                     if not detect_check[detect_name] and detect_state[detect_name] >= 60:
                         detect_check[detect_name] = True
+                        print(f"[OrinCar] Transmit detect: {label}")
                         transmit_detect_check(detect_check, self.prefix)
                     
             stream_cv_frame(frame)
 
     def start(self, detect_list=[]):
-        if self._thread and self._thread.is_alive():
-            self.stop()
+        if self._thread:
+            return
         self._thread = Thread(target=self._run, args=(detect_list,))
         self._thread.start()
 
@@ -96,3 +99,5 @@ class detect:
         self._initiated = False
         if self._thread and self._thread.is_alive():
             self._thread.join()
+        self._thread = None
+        print("[OrinCar] Stopped DETECT")

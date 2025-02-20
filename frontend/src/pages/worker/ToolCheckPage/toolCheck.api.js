@@ -12,7 +12,7 @@ export const startToolDetection = async (toolNames) => {
       name: toolNames
     });
     console.log("[공구 체크 API 요청값]:", { name: toolNames });
-    console.log("[공구 체크 API 응답값]:", response.data);
+    console.log("[공구 체크 API 응답값]:", response);
     return response.data;
   } catch (error) {
     console.error("Failed to start tool detection:", error);

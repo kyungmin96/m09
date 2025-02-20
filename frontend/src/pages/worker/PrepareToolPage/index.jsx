@@ -7,6 +7,7 @@ import { useTools } from '@/contexts/ToolsContext';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import { Button } from '@/shared/ui/Button/Button';
 import './styles.scss';
+import { convertToolListToKorean } from '@/utils/toolNameMapper';
 
 export const PrepareToolPage = () => {
     const navigate = useNavigate();
@@ -113,12 +114,17 @@ export const PrepareToolPage = () => {
         }
     };
 
+    // 공구 목록 렌더링 시 한글 이름으로 변환
+    const koreanRequiredTools = convertToolListToKorean(requiredTools);
+    const koreanAdditionalTools = convertToolListToKorean(additionalTools);
+    const koreanAvailableTools = convertToolListToKorean(availableTools);
+
     return (
         <div className="work-page">
             <Header isMainPage={false} pageName="공구 확정"/>
             <section className="required-tools">
                 <h2>필요한 공구</h2>
-                {requiredTools.map(tool => (
+                {koreanRequiredTools.map(tool => (
                     <div 
                         key={tool.id} 
                         className={`tool-item ${tool.isActive ? 'active' : 'inactive'}`}
@@ -134,10 +140,10 @@ export const PrepareToolPage = () => {
                 ))}
             </section>
 
-            {additionalTools.length > 0 && (
+            {koreanAdditionalTools.length > 0 && (
                 <section className="additional-tools">
                     <h2>추가된 공구</h2>
-                    {additionalTools.map(tool => (
+                    {koreanAdditionalTools.map(tool => (
                         <div key={tool.id} className="tool-item">
                             <span>{tool.name}</span>
                             <Button 
@@ -187,7 +193,7 @@ export const PrepareToolPage = () => {
                 }
             >
                 <div className="tool-selection">
-                    {availableTools.map(tool => (
+                    {koreanAvailableTools.map(tool => (
                         <div 
                             key={tool.id} 
                             className={`tool-item ${selectedToolIds.has(tool.id) ? 'selected' : ''}`}
