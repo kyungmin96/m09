@@ -53,9 +53,9 @@ class trace:
             from m09_socketio import stream_cv_frame
 
         if use_cuda:
-            print("[OrinCar] CUDA activated.")
+            print("[OrinCar] CUDA activated for TRACE.")
         else:
-            print("[OrinCar] Unable to activate CUDA, Using CPU...")
+            print("[OrinCar] Unable to activate CUDA, Using CPU for TRACE...")
 
         prev_depth = 0.0
         depth_scale = 1.0
@@ -78,7 +78,7 @@ class trace:
             ret, frame = self.camera.read()
             if not ret:
                 print("[OrinCar] Error: Could not read frame.")
-                break
+                continue
 
             # GPU를 사용한 이미지 처리
             if use_cuda:
@@ -121,7 +121,7 @@ class trace:
             print(F"[OrinCar] Distance Center: {frame_center_distance}")
 
             # YOLO 모델을 사용하여 객체 감지
-            yolo_results = self.yolo(frame)
+            yolo_results = self.yolo(frame, verbose=False)
             speed = 0
             is_danger = False
             ref_dist = 998244353
@@ -152,7 +152,7 @@ class trace:
 
                     if int(class_id) == self.target_label:
                         print("[OrinCar] Hey! There's a leader vest!")
-
+                        
                         found_target = True
                         ref_dist = object_distance
 
@@ -240,8 +240,8 @@ class trace:
                 stream_cv_frame(frame)
                 
     def start(self):
-        if self._thread and self._thread.is_alive():
-            self.stop()
+        if self._thread:
+            return
         if self._headless:
             from m09_socketio import stream_cv_frame
         self._thread = Thread(target=self._run)
@@ -249,6 +249,7 @@ class trace:
 
     def stop(self):
         self._initiated = False
-        self.motor_controller.brake()
         if self._thread and self._thread.is_alive():
             self._thread.join()
+        self._thread = None
+        print("[OrinCar] Stopped TRACE")
