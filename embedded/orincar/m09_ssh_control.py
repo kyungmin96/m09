@@ -6,8 +6,6 @@ class ssh_control:
     def __init__(self, motor_control):
         self.motor_controller = motor_control
         self._thread = None
-        self._is_steering = False
-        self._steer_thread = None
 
     def _on_press(self, key):
         try:
@@ -38,13 +36,13 @@ class ssh_control:
             self.motor_controller.middle()
 
     def start(self):
+        if self._thread:
+            return
         self._thread = Thread(target=listen_keyboard, args=(self._on_press, self._on_release))
         self._thread.start()
     
     def stop(self):
         self._on_press("p")
         if self._thread and self._thread.is_alive():
-            self._is_steering = False
-            if self._steer_thread and self._steer_thread.is_alive():
-                self._steer_thread.join()
             self._thread.join()
+        self._thread = None

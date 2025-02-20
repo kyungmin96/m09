@@ -13,6 +13,8 @@ if __name__ == "__main__":
     if _headless:
         matploblib_use("Agg")
         print("[OrinCar] Headless Mode.")
+    else:
+        print("[OrinCar] VNC mode.")
 
     motor_controller = motor_control(0)
     cap = camera(640, 360)

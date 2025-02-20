@@ -24,21 +24,21 @@ class camera:
         use_cuda = cv2.cuda.getCudaEnabledDeviceCount() > 0
 
         if use_cuda:
-            print("[OrinCar] CUDA activated.")
+            print("[OrinCar] CUDA activated for CAMERA.")
         else:
-            print("[OrinCar] Unable to activate CUDA, Using CPU...")
+            print("[OrinCar] Unable to activate CUDA, Using CPU for CAMERA...")
         
         # 구 프레임 버리기
         for _ in range(2):
-            self.camera.cap.grab()
+            self.cap.grab()
 
         self._initiated = True
         while self._initiated:
             ret, frame = self.cap.read()
             if not ret:
                 print("[OrinCar] Error: Could not read frame.")
-                break
-            
+                continue
+
             # GPU를 사용한 이미지 처리
             if use_cuda:
                 gpu_frame = cv2.cuda_GpuMat()
@@ -56,8 +56,8 @@ class camera:
             stream_cv_frame(frame)
 
     def start(self):
-        if self._thread and self._thread.is_alive():
-            self.stop()
+        if self._thread:
+            return
         self._thread = Thread(target=self._run)
         self._thread.start()
 
@@ -65,3 +65,5 @@ class camera:
         self._initiated = False
         if self._thread and self._thread.is_alive():
             self._thread.join()
+        self._thread = None
+        print("[OrinCar] Stopped CAMERA")
