@@ -6,6 +6,7 @@ import { Header } from '@/shared/ui/Header/Header';
 import Helmet from "@/shared/assets/images/helmet.png";
 import websocketService from '@/features/websocket/websocketService';
 import { Streaming } from '@/features/streaming/Streaming';
+import { Button } from '@/shared/ui/Button/Button';
 import "./styles.scss";
 
 const DETECTION_TIMEOUT = 100000; // 20초
@@ -79,7 +80,7 @@ export const CheckSafetyPage = () => {
   // 장비 탐지 시작
   const startDetection = async (worker) => {
     if (isDetecting) return;
-    
+
     setIsDetecting(true);
     setCurrentWorker(worker);
     setErrorMessage('');
@@ -88,37 +89,37 @@ export const CheckSafetyPage = () => {
     try {
       // 웹소켓 연결
       await websocketService.connectWebSocket();
-      
+
       // 메시지 수신 콜백 설정
       websocketService.setOnMessageCallback((data) => {
         console.log('헬멧 탐지 메시지 수신:', data);
-        
+
         if (data === 'ok') {
           handleDetectionSuccess(worker);
         } else {
           handleDetectionFailure(worker);
         }
       });
-      
+
       // 연결 종료 콜백 설정
       websocketService.setOnCloseCallback(() => {
         setIsDetecting(false);
       });
-      
+
       // 에러 콜백 설정
       websocketService.setOnErrorCallback((error) => {
         setErrorMessage(`탐지 오류: ${error.message}`);
         handleDetectionFailure(worker);
       });
-      
+
       // 탐지 시작 요청
       await websocketService.startHelmetDetection();
-      
+
       // 타임아웃 설정
       detectionTimeoutRef.current = setTimeout(() => {
         handleDetectionTimeout(worker);
       }, DETECTION_TIMEOUT);
-      
+
     } catch (error) {
       console.error('탐지 시작 오류:', error);
       setErrorMessage('탐지 시작 오류: ' + error.message);
@@ -129,7 +130,7 @@ export const CheckSafetyPage = () => {
   // 장비 탐지 중지
   const stopDetection = async () => {
     clearTimeout(detectionTimeoutRef.current);
-    
+
     try {
       await websocketService.stopHelmetDetection();
       websocketService.closeConnection();
@@ -137,7 +138,7 @@ export const CheckSafetyPage = () => {
       console.error('탐지 중지 실패:', error);
       setErrorMessage('탐지 중지 실패: ' + error.message);
     }
-    
+
     setIsDetecting(false);
   };
 
@@ -178,7 +179,7 @@ export const CheckSafetyPage = () => {
 
   const handleWorkerSelect = async (worker) => {
     if (worker === currentWorker) return;
-    
+
     if (isDetecting) {
       setPendingWorkerChange(worker);
       setShowManualCheckDialog(true);
@@ -222,7 +223,7 @@ export const CheckSafetyPage = () => {
     }
 
     setShowManualCheckDialog(false);
-    
+
     // 다음 작업자로 전환 및 탐지 시작
     if (pendingWorkerChange) {
       setCurrentWorker(pendingWorkerChange);
@@ -283,106 +284,106 @@ export const CheckSafetyPage = () => {
 
   return (
     <div className="check-safety-page">
-      <Header isMainPage={false} pageName="복장 체크"/>
-      <div className="camera-container">
-        <Streaming 
-          isActive={streamingActive}
-          streamingReady={streamingReady}
-          onRetry={handleStreamingRetry}
-        />
-        {isDetecting && (
-          <div className="detection-overlay">
-            <span>장비 탐지 중...</span>
-          </div>
-        )}
-      </div>
+      <Header isMainPage={false} pageName="복장 체크" />
 
-      {errorMessage && (
-        <div className="error-message">
-          {errorMessage}
+      <main>
+        <div className="camera-container">
+          <Streaming
+            isActive={streamingActive}
+            streamingReady={streamingReady}
+            onRetry={handleStreamingRetry}
+          />
+          {isDetecting && (
+            <div className="detection-overlay">
+              <span>복장 탐지 중...</span>
+            </div>
+          )}
         </div>
-      )}
 
-      <div className="worker-list">
-        {workerList.map(worker => (
-          <button
-            key={worker}
-            onClick={() => handleWorkerSelect(worker)}
-            className={`worker-button ${getWorkerNameStyle(worker)}`}
-          >
-            {worker}
-          </button>
-        ))}
-      </div>
-
-      <div className="equipment-list">
-        {EQUIPMENT_LIST.map(equipment => {
-          const status = currentWorker ? workerStatuses[currentWorker]?.[equipment.id] : null;
-          return (
-            <div
-              key={equipment.id}
-              className={`equipment-item ${
-                status?.checked ? (status.success || status.manualChecked ? 'success' : 'failure') : ''
-              }`}
+        <div className="worker-list">
+          {workerList.map(worker => (
+            <button
+              key={worker}
+              onClick={() => handleWorkerSelect(worker)}
+              className={`worker-button ${getWorkerNameStyle(worker)}`}
             >
-              <div className="equipment-icon">
-                <img src={equipment.icon} alt={equipment.name} />
-              </div>
-              <span className="equipment-name">{equipment.name}</span>
-              <span className="equipment-status">
-                {status?.checked ? (
-                  status.success || status.manualChecked ? '인식 완료' : '인식 실패'
-                ) : '미인식'}
-              </span>
-              {status?.checked && !status.success && !status.manualChecked && (
-                <button
-                  className="manual-check-button"
-                  onClick={() => handleManualCheck(currentWorker, equipment.id)}
-                >
-                  수동 체크
-                </button>
-              )}
-            </div>
-          );
-        })}
-        {currentWorker && !isDetecting && !isWorkerFullyChecked(currentWorker) && (
-          <button 
-            className="retry-detection-button"
-            onClick={() => startDetection(currentWorker)}
-          >
-            <div className="button-content">
-              <span className="icon">🔄</span>
-              <span>카메라 재탐지</span>
-            </div>
-          </button>
-        )}
-      </div>
+              {worker}
+            </button>
+          ))}
+        </div>
 
-      {showManualCheckDialog && (
-        <div className="manual-check-dialog">
-          <div className="dialog-content">
-            <p>현재 작업자의 미탐지된 장비를 수동으로 체크하시겠습니까?</p>
-            <div className="dialog-buttons">
-              <button onClick={() => handleManualCheckDialogResponse(true)}>
-                예
-              </button>
-              <button onClick={() => handleManualCheckDialogResponse(false)}>
-                아니오
-              </button>
+        <div className="equipment-list">
+          {EQUIPMENT_LIST.map(equipment => {
+            const status = currentWorker ? workerStatuses[currentWorker]?.[equipment.id] : null;
+            return (
+              <div
+                key={equipment.id}
+                className={`equipment-item ${status?.checked ? (status.success || status.manualChecked ? 'success' : 'failure') : ''
+                  }`}
+              >
+                <div className="equipment-icon">
+                  <img src={equipment.icon} alt={equipment.name} />
+                </div>
+                <span className="equipment-name">{equipment.name}</span>
+                <span className="equipment-status">
+                  {status?.checked ? (
+                    status.success || status.manualChecked ? '인식 완료' : '인식 실패'
+                  ) : '미인식'}
+                </span>
+                {status?.checked && !status.success && !status.manualChecked && (
+                  <Button
+                    size="small"
+                    variant="secondary"
+                    onClick={() => handleManualCheck(currentWorker, equipment.id)}
+                  >
+                    수동 체크
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+          {currentWorker && !isDetecting && !isWorkerFullyChecked(currentWorker) && (
+            <Button
+              variant="secondary"
+              onClick={() => startDetection(currentWorker)}
+            >
+              🔄 카메라 재탐지
+            </Button>
+          )}
+        </div>
+
+        {showManualCheckDialog && (
+          <div className="manual-check-dialog">
+            <div className="dialog-content">
+              <p>현재 작업자의 미탐지된 장비를 수동으로 체크하시겠습니까?</p>
+              <div className="dialog-buttons">
+                <Button
+                  variant="main"
+                  onClick={() => handleManualCheckDialogResponse(true)}
+                >
+                  예
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => handleManualCheckDialogResponse(false)}
+                >
+                  아니오
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
 
-      <div className="action-area">
-        <button 
-          className="complete-button" 
-          onClick={handleComplete}
-          disabled={!isAllChecked()}
-        >
-          {isAllChecked() ? "현장 이동" : "모든 작업자의 복장을 준수해주세요"}
-        </button>
-      </div>
+      <Button
+        variant="main"
+        size="full"
+        disabled={!isAllChecked()}
+        onClick={handleComplete}
+        className="complete-button"
+      >
+        {isAllChecked() ? "현장 이동" : "모든 작업자의 복장을 준수해주세요"}
+      </Button>
     </div>
   );
 };

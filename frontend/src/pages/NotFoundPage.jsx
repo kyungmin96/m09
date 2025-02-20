@@ -1,5 +1,3 @@
-// src/pages/NotFoundPage.jsx
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './NotFoundPage.scss'; // SCSS 파일 임포트
 

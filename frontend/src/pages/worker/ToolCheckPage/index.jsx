@@ -226,6 +226,11 @@ export const ToolCheckPage = () => {
         return tools.filter(tool => !detectedTools.has(tool.id));
     };
 
+    // 미탐지 공구가 있는지 확인하는 함수
+    const hasUndetectedTools = () => {
+        return getUndetectedTools().length > 0;
+    };
+
     // Sort tools to move detected ones to the bottom
     const sortedTools = [...tools].sort((a, b) => {
         const aDetected = detectedTools.has(a.id);
@@ -255,6 +260,7 @@ export const ToolCheckPage = () => {
                     variant="secondary" 
                     onClick={openManualCheckModal}
                     className="control-button"
+                    disabled={!hasUndetectedTools()}
                 >
                     수동 체크
                 </Button>
@@ -278,7 +284,8 @@ export const ToolCheckPage = () => {
 
             <div className="next-step-controls">
                 <Button 
-                    variant="main" 
+                    variant="main"
+                    size="full"
                     onClick={handleComplete}
                     disabled={detectedTools.size !== tools.length}
                     className="next-button"
@@ -286,12 +293,6 @@ export const ToolCheckPage = () => {
                     {routeConfig.buttonText}
                 </Button>
             </div>
-
-            {errorMessage && (
-                <div className="error-message">
-                    {errorMessage}
-                </div>
-            )}
 
             <ModalFrame
                 isOpen={isModalOpen}
@@ -302,25 +303,31 @@ export const ToolCheckPage = () => {
                         variant="main"
                         size="full"
                         onClick={closeManualCheckModal}
-                        disabled={detectedTools.size !== tools.length}
                     >
                         수동 체크 완료
                     </Button>
                 }
             >
                 <div className="undetected-tools">
-                    <p>다음 공구들이 아직 탐지되지 않았습니다:</p>
-                    {getUndetectedTools().map(tool => (
-                        <div key={tool.id} className="tool-item">
-                            <span>{tool.name}</span>
-                            <Button
-                                variant="secondary"
-                                onClick={() => handleManualCheck(tool.id)}
-                            >
-                                수동 체크
-                            </Button>
-                        </div>
-                    ))}
+                    {hasUndetectedTools() ? (
+                        <>
+                            <p>다음 공구들이 아직 탐지되지 않았습니다:</p>
+                            {getUndetectedTools().map(tool => (
+                                <div key={tool.id} className="tool-item">
+                                    <span>{tool.name}</span>
+                                    <Button
+                                        size="small"
+                                        variant="secondary"
+                                        onClick={() => handleManualCheck(tool.id)}
+                                    >
+                                        수동 체크
+                                    </Button>
+                                </div>
+                            ))}
+                        </>
+                    ) : (
+                        <p>모든 공구가 탐지되었습니다.</p>
+                    )}
                 </div>
             </ModalFrame>
         </div>

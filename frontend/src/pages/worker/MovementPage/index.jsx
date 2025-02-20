@@ -24,7 +24,7 @@ export const MovementPage = () => {
 
   // 스트리밍 활성화 상태 관리 - API 요청 상태를 반영
   const [isStreamingActive, setIsStreamingActive] = useState(false);
-  
+
   // 스트리밍 API 요청이 완료되었는지 확인하는 상태
   const [streamingRequestComplete, setStreamingRequestComplete] = useState(false);
 
@@ -232,7 +232,11 @@ export const MovementPage = () => {
         }
       } else if (currentMode === 'follow') {
         console.log('[MovementPage] 추종 주행 모드 중지 요청');
-        await stopDrive();
+        try {
+          await stopDrive();
+        } catch (driveStopError) {
+          console.warn('[MovementPage] 추종 주행 중지 명령 실패, 무시하고 계속:', driveStopError);
+        }
       }
 
       setIsStreamingActive(false);
@@ -329,57 +333,59 @@ export const MovementPage = () => {
 
   return (
     <div>
-      <Header isMainPage={false} pageName="오늘의 작업 선택"/>
+      <Header isMainPage={false} pageName="오늘의 작업 선택" />
       <div className="movement-page">
-        {/* 모드 선택 영역 */}
-        <div className="movement-page__mode-selector">
-          <button
-            className={`movement-page__mode-selector-button ${currentMode === 'manual' ? 'movement-page__mode-selector-button--active' : 'movement-page__mode-selector-button--inactive'}`}
-            onClick={() => handleModeChange('manual')}
-            disabled={isLoading}
-          >
-            수동 조작 모드
-          </button>
-          <button
-            className={`movement-page__mode-selector-button ${currentMode === 'follow' ? 'movement-page__mode-selector-button--active' : 'movement-page__mode-selector-button--inactive'}`}
-            onClick={() => handleModeChange('follow')}
-            disabled={isLoading}
-          >
-            추종 주행 모드
-          </button>
-        </div>
+        <div className="movment-page__content">
+          {/* 모드 선택 영역 */}
+          <div className="movement-page__mode-selector">
+            <button
+              className={`movement-page__mode-selector-button ${currentMode === 'manual' ? 'movement-page__mode-selector-button--active' : 'movement-page__mode-selector-button--inactive'}`}
+              onClick={() => handleModeChange('manual')}
+              disabled={isLoading}
+            >
+              수동 조작 모드
+            </button>
+            <button
+              className={`movement-page__mode-selector-button ${currentMode === 'follow' ? 'movement-page__mode-selector-button--active' : 'movement-page__mode-selector-button--inactive'}`}
+              onClick={() => handleModeChange('follow')}
+              disabled={isLoading}
+            >
+              추종 주행 모드
+            </button>
+          </div>
 
-        {/* 스트리밍 영역 */}
-        <div className="movement-page__streaming">
-          {/* 모드 전환 오류 메시지 표시 영역 */}
-          {modeChangeError && (
-            <div className="movement-page__error-message">
-              <span>{modeChangeError}</span>
-            </div>
-          )}
-          {/* 
+          {/* 스트리밍 영역 */}
+          <div className="movement-page__streaming">
+            {/* 모드 전환 오류 메시지 표시 영역 */}
+            {modeChangeError && (
+              <div className="movement-page__error-message">
+                <span>{modeChangeError}</span>
+              </div>
+            )}
+            {/* 
             isActive: 스트리밍이 활성화 상태인지 여부
             streamingReady: API 요청이 완료되어 iframe을 로드할 준비가 되었는지 여부
             onRetry: 카메라 재연결 시도 콜백
           */}
-          <Streaming 
-            isActive={isStreamingActive} 
-            streamingReady={!isCameraError && streamingRequestComplete}
-            onRetry={retryCameraConnection}
-          />
+            <Streaming
+              isActive={isStreamingActive}
+              streamingReady={!isCameraError && streamingRequestComplete}
+              onRetry={retryCameraConnection}
+            />
 
-          {/* 카메라 연결 상태 메시지 제거 - Streaming 컴포넌트로 이동 */}
-        </div>
+            {/* 카메라 연결 상태 메시지 제거 - Streaming 컴포넌트로 이동 */}
+          </div>
 
-        {/* 제어 버튼 영역 */}
-        <div className="movement-page__control">
-          {currentMode === 'manual' ? (
-            <ManualControlButton onControl={handleControl} />
-          ) : (
-            <div className="movement-page__control-follow-message">
-              <span>추종 주행 중입니다</span>
-            </div>
-          )}
+          {/* 제어 버튼 영역 */}
+          <div className="movement-page__control">
+            {currentMode === 'manual' ? (
+              <ManualControlButton onControl={handleControl} />
+            ) : (
+              <div className="movement-page__control-follow-message">
+                <span>추종 주행 중입니다</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 주행 종료 버튼 */}
