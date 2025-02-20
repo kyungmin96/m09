@@ -51,13 +51,13 @@ export const WorkCompletePage = () => {
       updateSelectedWorks([]);
       clearTools();
       clearCartInfo();
-      clearToolsData();
+      // clearToolsData();
       
       // 로컬 스토리지 추가 정리
       localStorage.removeItem('dailyWorkStatus');
       localStorage.removeItem('specialNotes');
 
-      navigate('/worker/complete');
+      navigate('/worker/main');
     } catch (error) {
       console.error('Failed to complete works:', error);
       // TODO: 에러 처리
