@@ -8,6 +8,7 @@ import { API_ROUTES } from '@/shared/api/routes';
 export const startCameraStreaming = async () => {
     try {
         const response = await api.post(API_ROUTES.EMBEDDED.CAMERA.START);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         throw new Error('카메라 스트리밍 시작에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
