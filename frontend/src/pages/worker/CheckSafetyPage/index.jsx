@@ -4,9 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWorks } from '@/contexts/WorksContext';
 import { Header } from '@/shared/ui/Header/Header';
 import Helmet from "@/shared/assets/images/helmet.png";
+import websocketService from '@/features/websocket/websocketService';
+import { Streaming } from '@/features/streaming/Streaming';
 import "./styles.scss";
 
-const DETECTION_TIMEOUT = 10000; // 10초
+const DETECTION_TIMEOUT = 100000; // 20초
 const EQUIPMENT_LIST = [
   { id: 'helmet', name: '안전모', icon: Helmet }
 ];
@@ -19,10 +21,12 @@ export const CheckSafetyPage = () => {
   const [workerList, setWorkerList] = useState([]);
   const [workerStatuses, setWorkerStatuses] = useState({});
   const [isDetecting, setIsDetecting] = useState(false);
-  const [videoStream, setVideoStream] = useState(null);
   const [showManualCheckDialog, setShowManualCheckDialog] = useState(false);
   const [pendingWorkerChange, setPendingWorkerChange] = useState(null);
-  const videoRef = useRef(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  // 스트리밍 관련 상태 추가
+  const [streamingReady, setStreamingReady] = useState(false);
+  const [streamingActive, setStreamingActive] = useState(true);
   const detectionTimeoutRef = useRef(null);
 
   // 작업자 목록 초기화
@@ -52,6 +56,9 @@ export const CheckSafetyPage = () => {
     });
     setWorkerStatuses(initialStatuses);
 
+    // 스트리밍 준비 설정
+    setStreamingReady(true);
+
     // 첫 번째 작업자에 대한 탐지 자동 시작
     if (workerArray.length > 0) {
       setCurrentWorker(workerArray[0]);
@@ -59,29 +66,13 @@ export const CheckSafetyPage = () => {
     }
   }, [selectedWorks, user]);
 
-  // 카메라 스트림 시작
+  // 컴포넌트 언마운트 시 정리
   useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setVideoStream(stream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('카메라 접근 오류:', error);
-      }
-    };
-
-    startCamera();
-
     return () => {
-      if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
-      }
       if (isDetecting) {
         stopDetection();
       }
+      setStreamingActive(false);
     };
   }, []);
 
@@ -91,58 +82,62 @@ export const CheckSafetyPage = () => {
     
     setIsDetecting(true);
     setCurrentWorker(worker);
+    setErrorMessage('');
+    setStreamingActive(true);
 
-    /* 실제 서버 통신 코드
     try {
-      const response = await fetch('/api/v1/safety-detection/start', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`
-        },
-        body: JSON.stringify({ workerId: worker })
+      // 웹소켓 연결
+      await websocketService.connectWebSocket();
+      
+      // 메시지 수신 콜백 설정
+      websocketService.setOnMessageCallback((data) => {
+        console.log('헬멧 탐지 메시지 수신:', data);
+        
+        if (data === 'ok') {
+          handleDetectionSuccess(worker);
+        } else {
+          handleDetectionFailure(worker);
+        }
       });
-
-      if (!response.ok) throw new Error('탐지 시작 실패');
-
+      
+      // 연결 종료 콜백 설정
+      websocketService.setOnCloseCallback(() => {
+        setIsDetecting(false);
+      });
+      
+      // 에러 콜백 설정
+      websocketService.setOnErrorCallback((error) => {
+        setErrorMessage(`탐지 오류: ${error.message}`);
+        handleDetectionFailure(worker);
+      });
+      
+      // 탐지 시작 요청
+      await websocketService.startHelmetDetection();
+      
+      // 타임아웃 설정
       detectionTimeoutRef.current = setTimeout(() => {
         handleDetectionTimeout(worker);
       }, DETECTION_TIMEOUT);
-
-      startPollingDetectionResult(worker);
+      
     } catch (error) {
-      console.error('탐지 오류:', error);
+      console.error('탐지 시작 오류:', error);
+      setErrorMessage('탐지 시작 오류: ' + error.message);
       handleDetectionFailure(worker);
     }
-    */
-
-    // 임시 Mock 코드
-    detectionTimeoutRef.current = setTimeout(() => {
-      const success = Math.random() > 0.5;
-      if (success) {
-        handleDetectionSuccess(worker);
-      } else {
-        handleDetectionFailure(worker);
-      }
-    }, 2000);
   };
 
   // 장비 탐지 중지
   const stopDetection = async () => {
-    /* 실제 서버 통신 코드
+    clearTimeout(detectionTimeoutRef.current);
+    
     try {
-      await fetch('/api/v1/safety-detection/stop', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${user.token}`
-        }
-      });
+      await websocketService.stopHelmetDetection();
+      websocketService.closeConnection();
     } catch (error) {
       console.error('탐지 중지 실패:', error);
+      setErrorMessage('탐지 중지 실패: ' + error.message);
     }
-    */
-
-    clearTimeout(detectionTimeoutRef.current);
+    
     setIsDetecting(false);
   };
 
@@ -177,6 +172,7 @@ export const CheckSafetyPage = () => {
   };
 
   const handleDetectionTimeout = (worker) => {
+    setErrorMessage('탐지 시간이 초과되었습니다.');
     handleDetectionFailure(worker);
   };
 
@@ -257,17 +253,14 @@ export const CheckSafetyPage = () => {
   };
 
   const isAllChecked = () => {
-    return Object.values(workerStatuses).every(status => 
-      Object.values(status).every(equipment => 
-        equipment.checked && (equipment.success || equipment.manualChecked)
-      )
-    );
+    return workerList.length > 0 && workerList.every(worker => isWorkerFullyChecked(worker));
   };
 
   const handleComplete = async () => {
     if (isDetecting) {
       await stopDetection();
     }
+    setStreamingActive(false);
     navigate("/worker/movement/go-workplace");
   };
 
@@ -278,15 +271,24 @@ export const CheckSafetyPage = () => {
     return status.success || status.manualChecked ? 'success' : 'failure';
   };
 
+  // 스트리밍 재시도 핸들러
+  const handleStreamingRetry = () => {
+    console.log('스트리밍 재시도 요청됨');
+    setStreamingReady(false);
+    // 잠시 후 다시 시도
+    setTimeout(() => {
+      setStreamingReady(true);
+    }, 1000);
+  };
+
   return (
     <div className="check-safety-page">
       <Header isMainPage={false} pageName="복장 체크"/>
       <div className="camera-container">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          className="camera-stream"
+        <Streaming 
+          isActive={streamingActive}
+          streamingReady={streamingReady}
+          onRetry={handleStreamingRetry}
         />
         {isDetecting && (
           <div className="detection-overlay">
@@ -294,6 +296,12 @@ export const CheckSafetyPage = () => {
           </div>
         )}
       </div>
+
+      {errorMessage && (
+        <div className="error-message">
+          {errorMessage}
+        </div>
+      )}
 
       <div className="worker-list">
         {workerList.map(worker => (
@@ -378,5 +386,3 @@ export const CheckSafetyPage = () => {
     </div>
   );
 };
-
-export default CheckSafetyPage;
