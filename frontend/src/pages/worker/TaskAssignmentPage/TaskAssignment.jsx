@@ -166,10 +166,10 @@ export const TaskAssignment = () => {
                   </div>
                 )}
                 <div className="task-details">
-                  <p><strong>위치:</strong> {task.location}</p>
-                  <p><strong>내용:</strong> {task.content}</p>
-                  <p><strong>예정 종료 시간:</strong> {task.scheduledEndTime}</p>
-                  {task.comment && <p><strong>비고:</strong> {task.comment}</p>}
+                  <p className="task-info"><strong>위치:</strong> {task.location}</p>
+                  <p className="task-info"><strong>내용:</strong> {task.content}</p>
+                  <p className="task-info"><strong>납기일:</strong> {task.scheduledEndTime}</p>
+                  {task.comment && <p className="task-info"><strong>비고:</strong> {task.comment}</p>}
                 </div>
                 <Button 
                   variant="secondary"
