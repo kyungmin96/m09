@@ -163,9 +163,9 @@ public class DataInitializer implements CommandLineRunner {
         // Task 목록
         Task[] tasks = new Task[]{
                 Task.builder()
-                        .title("maintenance airplane 30days")
-                        .content("detach missile")
-                        .location("number 2 garage")
+                        .title("30일 주기 항공기 정비")
+                        .content("미사일 분리 작업")
+                        .location("2번 정비고")
                         .assignedUser(user)
                         .scheduledStartTime(LocalDateTime.of(2025, 2, 9, 5, 0))
                         .scheduledEndTime(LocalDateTime.of(2025, 2, 11, 5, 10))
@@ -173,9 +173,9 @@ public class DataInitializer implements CommandLineRunner {
                         .build(),
 
                 Task.builder()
-                        .title("engine oil check")
-                        .content("check engine oil pressure")
-                        .location("number 1 garage")
+                        .title("엔진 오일 점검")
+                        .content("엔진 오일 압력 확인")
+                        .location("1번 정비고")
                         .assignedUser(user)
                         .scheduledStartTime(LocalDateTime.of(2025, 2, 10, 8, 30))
                         .scheduledEndTime(LocalDateTime.of(2025, 2, 20, 9, 0))
@@ -183,9 +183,9 @@ public class DataInitializer implements CommandLineRunner {
                         .build(),
 
                 Task.builder()
-                        .title("fuel system inspection")
-                        .content("inspect and refuel fuel tank")
-                        .location("fuel station")
+                        .title("연료 시스템 검사")
+                        .content("연료 탱크 검사 및 재급유")
+                        .location("급유소")
                         .assignedUser(user)
                         .scheduledStartTime(LocalDateTime.of(2025, 2, 11, 14, 0))
                         .scheduledEndTime(LocalDateTime.of(2025, 3, 1, 15, 0))
