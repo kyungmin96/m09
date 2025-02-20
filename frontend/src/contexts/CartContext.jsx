@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import websocketService from '@/features/websocket/websocketService';
 import { getCartInfo } from '../pages/worker/MainPage/workers.api';
 
 const CART_STORAGE_KEY = 'cartInfo';
@@ -48,26 +49,78 @@ export const CartProvider = ({ children }) => {
     };
 
     const startRfidRegistration = async () => {
-        // if (!user) return;
-        
         setIsRegistering(true);
         setRegistrationError(null);
-
+      
         try {
-            // Mock: RFID 등록 프로세스 시뮬레이션
-            // const cartData = await mockRfidRegistration();
-            const cartData = await getCartInfo();
-            console.log('카트 정보:', cartData);
+          // 웹소켓 연결 및 NFC 인식 시작
+          await websocketService.connectWebSocket();
+          
+          // NFC 메시지 수신 처리를 위한 Promise 생성
+          const nfcDetectionResult = new Promise((resolve, reject) => {
+            // 시간 제한 설정
+            const timeoutId = setTimeout(() => {
+              websocketService.closeConnection();
+              reject(new Error('RFID 카드 인식 시간이 초과되었습니다.'));
+            }, RFID_TIMEOUT);
+            
+            // 메시지 수신 콜백 설정
+            websocketService.setOnMessageCallback((data) => {
+              if (data === 'ok') {
+                clearTimeout(timeoutId);
+                resolve('success');
+              }
+            });
+            
+            // 오류 콜백 설정
+            websocketService.setOnErrorCallback((error) => {
+              clearTimeout(timeoutId);
+              reject(new Error(`RFID 카드 인식 중 오류가 발생했습니다: ${error.message}`));
+            });
+            
+            // 연결 종료 콜백
+            websocketService.setOnCloseCallback(() => {
+              clearTimeout(timeoutId);
+            });
+          });
+          
+          // NFC 감지 시작
+          await websocketService.startNFCDetection();
+          
+          // NFC 인식 결과 대기
+          await nfcDetectionResult;
+          
+          // NFC 인식 성공 후 웹소켓 연결 종료
+          websocketService.closeConnection();
+          
+          // 인식 성공 후 카트 정보 API 요청
+          const response = await getCartInfo();
+          
+          // 응답에서 실제 카트 데이터 추출
+          if (response && response.success && response.data && response.data.length > 0) {
+            const cartData = {
+              id: response.data[0].id,
+              name: response.data[0].name,
+              location: response.data[0].location,
+              hasBattery: true, // 기본값 설정 또는 적절한 필드가 있으면 해당 값 사용
+              isConnected: true, // 기본값 설정 또는 적절한 필드가 있으면 해당 값 사용
+              // 필요한 다른 정보 추가
+            };
             
             setCartInfo(cartData);
             return cartData;
+          } else {
+            throw new Error('카트 정보를 가져오는데 실패했습니다.');
+          }
+          
         } catch (error) {
-            setRegistrationError(error.message);
-            throw error;
+          websocketService.closeConnection();
+          setRegistrationError(error.message);
+          throw error;
         } finally {
-            setIsRegistering(false);
+          setIsRegistering(false);
         }
-    };
+      };
 
     const clearCartInfo = () => {
         setCartInfo(null);
