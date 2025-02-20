@@ -83,7 +83,7 @@ export const WorkProgressPage = () => {
   };
 
   const handleReturn = () => {
-    navigate('/worker/return-move');
+    navigate('/worker/movement/return');
   };
 
   return (
