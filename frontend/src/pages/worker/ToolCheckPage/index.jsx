@@ -6,6 +6,7 @@ import { Header } from '@/shared/ui/Header/Header';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import { Streaming } from '@/features/streaming/Streaming';
 import './styles.scss';
+import { startToolDetection, stopToolDetection } from './toolCheck.api';
 
 const DETECTION_STATUS = {
     DETECTING: 'DETECTING',
@@ -40,6 +41,7 @@ export const ToolCheckPage = () => {
     const [tools, setTools] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastDetectionRequest, setLastDetectionRequest] = useState('start');
+    const [streamingReady, setStreamingReady] = useState(false);
 
     const routeConfig = ROUTE_CONFIG[checkType] || ROUTE_CONFIG.before;
 
@@ -67,30 +69,36 @@ export const ToolCheckPage = () => {
                 }
                 
                 setTools(updatedTools);
+                // 공구 탐지 시작 API 호출
+                await startToolDetection(updatedTools.map(tool => tool.name));
+                setStreamingReady(true);
             } catch (error) {
-                console.error('Failed to fetch tools:', error);
+                console.error('Failed to initialize:', error);
                 navigate('/worker/prepare-tool');
             }
         } else {
             setTools(activeTools);
+            // 공구 탐지 시작 API 호출
+            await startToolDetection(activeTools.map(tool => tool.name));
+            setStreamingReady(true);
         }
     };
 
-    const sendDetectionRequest = async (action) => {
-        try {
-            // 실제 API 엔드포인트로 대체 필요
-            await fetch('/api/detection', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action }),
-            });
-            setLastDetectionRequest(action);
-        } catch (error) {
-            console.error('Detection request failed:', error);
-        }
-    };
+    // const sendDetectionRequest = async (action) => {
+    //     try {
+    //         // 실제 API 엔드포인트로 대체 필요
+    //         await fetch('/api/detection', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({ action }),
+    //         });
+    //         setLastDetectionRequest(action);
+    //     } catch (error) {
+    //         console.error('Detection request failed:', error);
+    //     }
+    // };
 
     const detectTools = async () => {
         const undetectedTools = tools.filter(tool => !detectedTools.has(tool.id));
@@ -119,13 +127,23 @@ export const ToolCheckPage = () => {
     };
 
     const stopDetection = async () => {
-        await sendDetectionRequest('stop');
-        setDetectionStatus(DETECTION_STATUS.PAUSED);
+        try {
+            // 공구 탐지 중지 API 호출
+            await stopToolDetection();
+            setDetectionStatus(DETECTION_STATUS.PAUSED);
+        } catch (error) {
+            console.error('Failed to stop detection:', error);
+        }
     };
 
     const resumeDetection = async () => {
-        await sendDetectionRequest('start');
-        setDetectionStatus(DETECTION_STATUS.DETECTING);
+        try {
+            // 공구 탐지 시작 API 호출 (필요한 공구 목록 전달)
+            await startToolDetection(tools.map(tool => tool.name));
+            setDetectionStatus(DETECTION_STATUS.DETECTING);
+        } catch (error) {
+            console.error('Failed to resume detection:', error);
+        }
     };
 
     const handleManualCheck = async (toolId) => {
@@ -179,6 +197,7 @@ export const ToolCheckPage = () => {
             <div className="webcam-section">
                 <Streaming
                     isActive={detectionStatus === DETECTION_STATUS.DETECTING}
+                    streamingReady={streamingReady}
                 />
             </div>
 

@@ -1,54 +1,64 @@
 // Streaming.scss
 .streaming-container {
     width: 100%;
-    height: 480px;
+    height: 380px;
+    padding-bottom: 56.25%; /* 16:9 비율 */
     background-color: #f0f0f0;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    background-color: #000;
+    border-radius: 8px;
     overflow: hidden;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    margin: 0 auto;
 
     .message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         text-align: center;
         padding: 20px;
         font-size: 16px;
-        color: #666;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 4px;
+        z-index: 10;
+        width: auto;
     }
 
     .loading-message {
-        color: #666;
+        color: #fff;
     }
 
     .error-message {
-        color: #d9534f;
+        color: #ff4d4f;
     }
 
     .inactive-message {
-        color: #5bc0de;
+        color: #40a9ff;
     }
 
     iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
+        height: 100%;
         border: none;
+        background: #000;
 
-        &.iframe-visible {
+        &.streaming-iframe {
             display: block;
-        }
-
-        &.iframe-hidden {
-            display: none;
         }
     }
 
-    // 반응형 스타일링 (필요시)
-    @media (max-width: 768px) {
-        height: 320px;
+    &.is-loading {
+        background: #000;
+    }
 
-        .message {
-            font-size: 14px;
-        }
+    &.has-error {
+        background: #000;
     }
 }
