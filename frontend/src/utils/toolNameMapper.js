@@ -12,7 +12,6 @@ export const TOOL_NAME_MAPPING = {
     'hexKey': '육각렌치',
     'level': '수평기',
     'tapeMeasure': '테이프 메저',
-    'cutter': '절단기',
     'rubberHammer': '고무망치',
     'glueGun': '글루건',
     'solderingIron': '인두기'
