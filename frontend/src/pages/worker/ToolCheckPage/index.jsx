@@ -43,7 +43,7 @@ export const ToolCheckPage = () => {
     const [tools, setTools] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastDetectionRequest, setLastDetectionRequest] = useState('start');
-    const [streamingReady, setStreamingReady] = useState(false);
+    const [streamingReady, setStreamingReady] = useState(true);
     const [isConnected, setIsConnected] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -123,6 +123,8 @@ export const ToolCheckPage = () => {
             websocketService.setOnCloseCallback(() => {
                 setIsConnected(false);
                 setDetectionStatus(DETECTION_STATUS.PAUSED);
+                console.log('1. 여기냐?');
+                
                 setStreamingReady(false);
             });
             
@@ -130,6 +132,8 @@ export const ToolCheckPage = () => {
             websocketService.setOnErrorCallback((error) => {
                 setErrorMessage(`연결 오류: ${error.message}`);
                 setDetectionStatus(DETECTION_STATUS.PAUSED);
+                console.log('2. 여기냐?');
+
                 setStreamingReady(false);
             });
             
@@ -139,11 +143,16 @@ export const ToolCheckPage = () => {
             
             // 스트리밍 준비 완료
             setStreamingReady(true);
+            console.log('3. true 여기냐?');
+
             
         } catch (error) {
+            console.log('[StreamingReady true로 변경 실패');
             setErrorMessage(`오류 발생: ${error.message}`);
             setDetectionStatus(DETECTION_STATUS.PAUSED);
             setIsConnected(false);
+            console.log('4. 여기냐?');
+
             setStreamingReady(false);
         }
     };
@@ -164,6 +173,8 @@ export const ToolCheckPage = () => {
                 websocketService.closeConnection();
             }
             setIsConnected(false);
+            console.log('5. 여기냐?');
+
             setStreamingReady(false);
         } catch (error) {
             console.error('Failed to stop websocket:', error);
