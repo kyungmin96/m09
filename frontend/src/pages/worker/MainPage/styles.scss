@@ -9,6 +9,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     padding: 20px;
 
     .loading-spinner {
@@ -18,7 +19,7 @@
       width: 100px;
       height: 100px;
       animation: spin 1.5s linear infinite;
-      margin-bottom: 15px;
+      margin-bottom: 2rem;
     }
 
     @keyframes spin {
@@ -29,6 +30,10 @@
       100% {
         transform: rotate(360deg);
       }
+    }
+
+    .loading-info {
+      margin-bottom: 1rem;
     }
   }
 
