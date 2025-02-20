@@ -51,25 +51,24 @@
   }
 
   &__user-info {
-    padding: 20px 0;
-    border-bottom: 1px solid #eee;
+    padding: 1rem 0;
+    border-bottom: 1px solid $color-lightgray;
   }
 
   &__name {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 8px;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
   }
 
   &__id {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 4px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem
   }
 
   &__position {
-    font-size: 14px;
-    color: #888;
+    font-size: 1rem;
+    margin-bottom: 0.5rem
   }
 
   &__cart-info {
@@ -106,19 +105,18 @@
   }
 
   .status-label {
-    color: #666;
+    color: $color-darkgray;
   }
 
   .status-indicator {
-    padding: 4px 12px;
+    padding: 0.3rem 0.75rem;
     border-radius: 12px;
-    background-color: #f0f0f0;
-    color: #888;
-    font-size: 14px;
+    background-color: $color-lightgray;
+    font-size: 1rem;
 
     &.active {
       background-color: #e8f5e9;
-      color: #2e7d32;
+      color: $color-safety;
     }
   }
 
