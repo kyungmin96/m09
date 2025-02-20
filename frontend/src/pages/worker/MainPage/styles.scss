@@ -5,18 +5,19 @@
 
   .rfid-registration-modal {
     display: flex;
+    height: 100%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
 
     .loading-spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
+      border: 10px solid #f3f3f3;
+      border-top: 10px solid $color-primary-hover;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
+      width: 100px;
+      height: 100px;
+      animation: spin 1.5s linear infinite;
       margin-bottom: 15px;
     }
 
@@ -24,89 +25,102 @@
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }
     }
   }
 
-  .main-header {
-    margin-bottom: 24px;
+  .cart-section {
+    display: flex;
+    flex-direction: column;
+    background: $color-white-hover;
+    margin-top: 1rem;
 
     h1 {
       font-size: 24px;
-      margin-bottom: 16px;
+      margin: 16px 0;
+      font-weight: 600;
     }
   }
 
   .cart-section {
-    background: #f5f5f5;
+    display: flex;
+    width: 100%;
     padding: 1rem;
     border-radius: 8px;
-    margin-top: 1rem;
 
     .cart-registration {
+      width: 100%;
       text-align: center;
 
       .cart-empty {
         display: flex;
-        flex-direction: column;
+        justify-content: space-around;
         align-items: center;
         gap: 0.5rem;
-        margin-bottom: 1rem;
 
-        .cart-icon {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background: #e0e0e0;
+        .cart-empty-notion {
+          font-size: 20px;
+        }
+
+        .cart-image {
+          position: relative;
+          height: 250px;
           display: flex;
-          align-items: center;
           justify-content: center;
-          font-size: 24px;
-          color: #666;
-        }
-      }
+          margin: 10px 0;
 
-      .register-button {
-        padding: 0.5rem 1rem;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+          img {
+            max-width: 100%;
+            height: auto;
+          }
 
-        &:disabled {
-          background: #ccc;
-          cursor: not-allowed;
-        }
-
-        &:hover:not(:disabled) {
-          background: #0056b3;
+          .cart-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: $color-darkgray;
+            color: $color-white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          span {
+            font-size: 30px;
+            font-weight: bold;
+            padding-bottom: 5px;
+          }
         }
       }
     }
 
     .cart-info {
       padding: 1rem;
-      background: white;
       border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-      .cart-name {
-        font-size: 1.1rem;
-        font-weight: 600;
-        display: block;
-        margin-bottom: 1rem;
-      }
+      display: flex;
+      justify-content: space-around;
 
       .cart-status {
         display: flex;
-        gap: 1rem;
+        flex-direction: column;
+        justify-content: center;
+
+        .cart-name {
+          font-size: 1.1rem;
+          font-weight: 600;
+          display: block;
+          margin-bottom: 1rem;
+        }
 
         .battery-status,
         .connection-status {
-          flex: 1;
+          margin-bottom: 1rem;
         }
 
         .status-indicator {
@@ -144,27 +158,41 @@
           }
         }
       }
+      
+      .cart-image {
+        height: 250px;
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      }
     }
   }
 
   .work-schedule {
-    background: #fff;
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
+    border: 1px solid $color-lightgray;
+    margin: 2rem 0 2.5rem;
+    padding: 1rem;
 
     .schedule-header {
       margin-bottom: 16px;
 
       h2 {
-        font-size: 18px;
-        margin-bottom: 8px;
+        font-size: 20px;
+        margin: 1rem 0 0.5rem;
+        font-weight: 600;
       }
 
       .today-date {
         display: block;
-        color: #666;
+        color: $color-darkgray;
         font-size: 14px;
+        margin-bottom: 1rem;
       }
     }
 
@@ -224,35 +252,8 @@
     flex-direction: column;
     gap: 12px;
 
-    button {
+    .button {
       width: 100%;
-      padding: 16px;
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-
-      &:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-      }
-    }
-
-    .work-setting-button {
-      background: #a5d6a7;
-
-      &:hover {
-        background: color.scale(#a5d6a7, $lightness: -5%);
-      }
-    }
-
-    .start-work-button {
-      background: #4caf50;
-
-      &:hover:not(:disabled) {
-        background: color.scale(#4caf50, $lightness: -5%);
-      }
     }
   }
 }
