@@ -1,38 +1,46 @@
 .work-page {
-    padding: 1rem;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
-    .work-header {
-        margin-bottom: 2rem;
-
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #333;
-        }
+    main {
+        min-height: 620px;
     }
 
     section {
-        background: white;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 0.5rem 1rem;
+        padding-bottom: 2rem;
 
-        h2 {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            color: #444;
+        .tools-head {
+            display: flex;
+            min-height: 2.5rem;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+
+            h2 {
+                font-size: 20px;
+                font-weight: 600;
+                color: #444;
+            }
+
+            .additional-head {
+                margin-top: 1rem;
+            }
         }
     }
 
+    .required-tools {
+        border-bottom: 1px solid lightgray;
+    }
+    
     .tool-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.75rem;
+        padding: 0.5rem 0.75rem;
         border-radius: 6px;
-        background: #f8f9fa;
         margin-bottom: 0.5rem;
         transition: all 0.3s ease;
 
@@ -41,12 +49,12 @@
         }
 
         &.active {
-            border-left: 4px solid #4caf50;
+            border-left: 0.5rem solid $color-safety;
         }
 
         &.inactive {
-            background: #f5f5f5;
-            border-left: 4px solid #f44336;
+            background: $color-white-hover;
+            border-left: 0.5rem solid $color-error;
             opacity: 0.7;
 
             .tool-name {
@@ -57,6 +65,7 @@
 
         span {
             font-size: 1rem;
+            font-weight: 600;
             color: #333;
         }
     }
@@ -75,26 +84,25 @@
         .tool-item {
             cursor: pointer;
             transition: background-color 0.2s;
-            border: 1px solid #e9ecef;
+            padding: 1rem;
 
             &:hover {
                 background: #e9ecef;
             }
 
             &.selected {
-                background: #e3f2fd;
-                border-color: #90caf9;
+                border-left: 0.5rem solid $color-primary;
             }
 
             .checkbox {
-                width: 20px;
-                height: 20px;
-                border: 2px solid #adb5bd;
-                border-radius: 4px;
+                width: 25px;
+                height: 25px;
+                border: 2px solid $color-primary;
+                border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                color: #1976d2;
+                color: $color-primary-hover;
                 font-weight: bold;
 
                 .selected & {
@@ -108,8 +116,7 @@
 
     .additional-tools {
         .tool-item {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
+            border-left: 0.5rem solid rgb(252, 198, 97);
         }
     }
 }

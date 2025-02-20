@@ -13,7 +13,7 @@ export const PrepareToolPage = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { selectedWorks } = useWorks();
-    const { 
+    const {
         requiredTools,
         additionalTools,
         availableTools,
@@ -121,52 +121,61 @@ export const PrepareToolPage = () => {
 
     return (
         <div className="work-page">
-            <Header isMainPage={false} pageName="공구 확정"/>
-            <section className="required-tools">
-                <h2>필요한 공구</h2>
-                {koreanRequiredTools.map(tool => (
-                    <div 
-                        key={tool.id} 
-                        className={`tool-item ${tool.isActive ? 'active' : 'inactive'}`}
-                    >
-                        <span className="tool-name">{tool.name}</span>
-                        <Button 
-                            variant={tool.isActive ? "secondary" : "main"}
-                            onClick={() => toggleToolStatus(tool.id)}
+            <Header isMainPage={false} pageName="공구 확정" />
+            <main>
+                <section className="required-tools">
+                    <div className="tools-head">
+                        <h2>필요한 공구</h2>
+                        <Button
+                            variant="main"
+                            size="small"
+                            onClick={handleOpenToolModal}
+                            disabled={isLoading}
                         >
-                            {tool.isActive ? '제외' : '추가'}
+                            공구 추가
                         </Button>
                     </div>
-                ))}
-            </section>
-
-            {koreanAdditionalTools.length > 0 && (
-                <section className="additional-tools">
-                    <h2>추가된 공구</h2>
-                    {koreanAdditionalTools.map(tool => (
-                        <div key={tool.id} className="tool-item">
-                            <span>{tool.name}</span>
-                            <Button 
-                                variant="secondary" 
-                                onClick={() => removeAdditionalTool(tool.id)}
+                    {koreanRequiredTools.map(tool => (
+                        <div
+                            key={tool.id}
+                            className={`tool-item ${tool.isActive ? 'active' : 'inactive'}`}
+                        >
+                            <span className="tool-name">{tool.name}</span>
+                            <Button
+                                size="small"
+                                variant={tool.isActive ? "secondary" : "main"}
+                                onClick={() => toggleToolStatus(tool.id)}
                             >
-                                삭제
+                                {tool.isActive ? '제외' : '추가'}
                             </Button>
                         </div>
                     ))}
                 </section>
-            )}
 
+                {koreanAdditionalTools.length > 0 && (
+                    <section className="additional-tools">
+                        <div className="tools-head">
+                            <h2 className="additional-head">추가된 공구</h2>
+                        </div>
+                        {koreanAdditionalTools.map(tool => (
+                            <div key={tool.id} className="tool-item">
+                                <span>{tool.name}</span>
+                                <Button
+                                    size="small"
+                                    variant="secondary"
+                                    onClick={() => removeAdditionalTool(tool.id)}
+                                >
+                                    삭제
+                                </Button>
+                            </div>
+                        ))}
+                    </section>
+                )}
+            </main>
             <div className="tool-actions">
-                <Button 
-                    variant="main" 
-                    onClick={handleOpenToolModal}
-                    disabled={isLoading}
-                >
-                    공구 추가
-                </Button>
-                <Button 
-                    variant="main" 
+                <Button
+                    variant="main"
+                    size="full"
                     onClick={handleNextStep}
                     disabled={isLoading}
                 >
@@ -194,8 +203,8 @@ export const PrepareToolPage = () => {
             >
                 <div className="tool-selection">
                     {koreanAvailableTools.map(tool => (
-                        <div 
-                            key={tool.id} 
+                        <div
+                            key={tool.id}
                             className={`tool-item ${selectedToolIds.has(tool.id) ? 'selected' : ''}`}
                             onClick={() => handleToolSelection(tool.id)}
                         >

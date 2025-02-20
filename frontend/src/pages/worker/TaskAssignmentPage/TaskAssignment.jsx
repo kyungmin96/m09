@@ -253,7 +253,7 @@ export const TaskAssignment = () => {
                 onClick={() => handleWorkerSelect(worker.id)}
               >
                 <span className="worker-name">{worker.name}</span>
-                <span className="worker-id">({worker.employeeId})</span>
+                <span className="worker-id">(사번 : {worker.employeeId})</span>
               </div>
             ))}
         </div>
