@@ -9,7 +9,7 @@ import os
 
 # 추적 구조체
 class trace:
-    def __init__(self, motor_control, camera, _headless, min_distance_range=100, max_distance_range=500):
+    def __init__(self, motor_control, camera, _headless, min_distance_range=75, max_distance_range=500):
         self.motor_controller = motor_control
         self._headless = _headless
         # 모델 설정
@@ -69,16 +69,16 @@ class trace:
 
         prev_speed = 0
 
+        # 구 프레임 버리기
+        for _ in range(2):
+            self.camera.cap.grab()
+            
         self._initiated = True
         while self._initiated:
             ret, frame = self.camera.read()
             if not ret:
                 print("[OrinCar] Error: Could not read frame.")
                 break
-
-            # 구 프레임 버리기
-            for _ in range(2):
-                self.camera.cap.grab()
 
             # GPU를 사용한 이미지 처리
             if use_cuda:
@@ -163,9 +163,12 @@ class trace:
 
                         if is_danger:
                             continue
+                        
+                        if object_distance > self.max_distance_range * 0.75:
+                            speed = 0.85
 
                         if object_distance > self.max_distance_range:
-                            speed = 0.85
+                            speed = 1.0
 
                         steer_value = (object_center_x - frame_center_x) / 150 * (0.99 ** (object_distance / 100))
                         print(f"[OrinCar] trace_steer: {steer_value}")
@@ -195,6 +198,7 @@ class trace:
 
             # new logic
             frame_focus_y = self.camera.cam_height * 2 // 3
+            frame_sub_focus_y = self.camera.cam_height * 5 // 6
             dander_ref_x = frame_center_x
             danger_ref_dist = 998244353
 
@@ -202,7 +206,10 @@ class trace:
                 cur_depth = spline(frame_focus_y, i)[0][0]
                 cur_distance = self._depth_to_distance(cur_depth, depth_scale=depth_scale)
 
-                if cur_distance > self.max_distance_range * 0.75 and ref_dist < cur_distance + 100:
+                sub_depth = spline(frame_sub_focus_y, i)[0][0]
+                sub_distance = self._depth_to_distance(sub_depth, depth_scale=depth_scale)
+
+                if sub_distance > self.max_distance_range * 0.3125 and cur_distance > self.max_distance_range * 0.75 and ref_dist < cur_distance + 100:
                     continue
 
                 danger_ref_dist = min(cur_distance, danger_ref_dist)
@@ -215,6 +222,7 @@ class trace:
                 print("[OrinCar] Danger!")
                 danger_steer_value = dir * (0.75 ** (danger_ref_dist / 100))
                 self.motor_controller.set_steering((danger_steer_value * 4 + steer_value * 6) / 10)
+                speed *= 0.875
 
 
             self.motor_controller.set_throttle((speed + prev_speed) / 2)
