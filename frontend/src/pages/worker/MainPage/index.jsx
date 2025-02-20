@@ -24,14 +24,14 @@ export const MainPage = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { todayWorks, selectedWorks, updateTodayWorks, isAllocated, allocateCompanions, prepareWorkersAllocation, resetAllocation } = useWorks();
-    const { 
+    const {
         cartInfo,
         isRegistering,
         registrationError,
         startRfidRegistration,
         setCartInfo,
     } = useCart();
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const [isRfidModalOpen, setIsRfidModalOpen] = useState(false);
     const [currentDate] = useState(new Date());
@@ -41,7 +41,7 @@ export const MainPage = () => {
         try {
             const response = await getTodayWorks();
             // console.log('API 응답 데이터: ', response);
-            
+
             if (response && response.data) {
                 updateTodayWorks(response.data);
             }
@@ -57,12 +57,14 @@ export const MainPage = () => {
     const fetchCartInfo = async () => {
         try {
             const response = await getCartInfo();
-            if (response.success) {                
+            if (response && response.success && response.data && response.data.length > 0) {
                 // API 응답 구조에 맞게 카트 정보 변환
                 const cartData = {
-                    name: response.name || `카트-${response.data[0].name}`,
-                    hasBattery: response.batteryStatus === 'FULL',  // 또는 적절한 조건
-                    isConnected: response.connectionStatus === 'CONNECTED',  // 또는 적절한 조건
+                    id: response.data[0].id,
+                    name: response.data[0].name,
+                    location: response.data[0].location,
+                    hasBattery: true,  // 적절한 필드가 있으면 해당 값으로 대체
+                    isConnected: true,  // 적절한 필드가 있으면 해당 값으로 대체
                 };
                 setCartInfo(cartData);
             }
@@ -75,7 +77,7 @@ export const MainPage = () => {
     const startWorkAndFetchTools = async (workIds) => {
         try {
             await simulateApiDelay();
-            
+
             // 작업 시작 시뮬레이션
             const startSuccess = Math.random() > 0.1; // 90% 성공률
             if (!startSuccess) {
@@ -93,14 +95,13 @@ export const MainPage = () => {
     useEffect(() => {
         if (user) {
             fetchTodayWorks();
-            fetchCartInfo();
         }
     }, [user]);
 
     // 카트 등록 핸들러
     const handleCartRegister = async () => {
         setIsRfidModalOpen(true);
-        
+
         try {
             await startRfidRegistration();
             setIsRfidModalOpen(false);
@@ -118,7 +119,7 @@ export const MainPage = () => {
     const handleStartWorkClick = async () => {
         try {
             setIsLoading(true);
-            
+
             if (!isAllocated) {
                 const workersAllocation = prepareWorkersAllocation();
                 await allocateCompanions(workersAllocation);
@@ -126,10 +127,10 @@ export const MainPage = () => {
 
             // 작업 시작 처리
             await startWorkAndFetchTools(selectedWorks.map(work => work.id));
-            
+
             // 작업 시작 후 allocation 상태 초기화
             resetAllocation();
-            
+
             // 공구 준비 페이지로 이동
             navigate('/worker/prepare-tool');
         } catch (error) {
@@ -205,10 +206,10 @@ export const MainPage = () => {
                                 selected => selected.id === work.id
                             );
                             const configuredWork = selectedWorks.find(w => w.id === work.id);
-                            
+
                             return (
-                                <div 
-                                    key={work.id} 
+                                <div
+                                    key={work.id}
                                     className={`work-item ${isConfigured ? 'configured' : ''}`}
                                 >
                                     <div className="work-info">
