@@ -4,9 +4,13 @@ import './styles.scss';
 
 export const LoginWorkerPage = () => {
   return (
-    <div className="worker-login">
-      <Logo size="large" />
-      <LoginForm />
+    <div className="control-login-page">
+      <div className="login--left">
+        <Logo size="large" />
+      </div>
+      <div className="login--right">
+        <LoginForm />
+      </div>
     </div>
   );
 };

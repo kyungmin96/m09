@@ -6,7 +6,11 @@ import { useCart } from '@/contexts/CartContext';
 import { ModalFrame } from '@/shared/ui/ModalWorker/ModalFrame';
 import { Button } from '@/shared/ui/Button/Button';
 import './styles.scss';
+import cartEmptyImage from '@/shared/assets/images/cart-empty.png';
+import cartHasImage from '@/shared/assets/images/cart-origin.png'
 import { getCartInfo, getTodayWorks } from './workers.api';
+import { Header } from '@/shared/ui/Header/Header';
+
 
 // Mock 데이터 생성 함수들
 const generateMockTools = (workIds) => ({
@@ -29,6 +33,7 @@ export const MainPage = () => {
         isRegistering,
         registrationError,
         startRfidRegistration,
+        cancelRfidRegistration,
         setCartInfo,
     } = useCart();
 
@@ -142,52 +147,63 @@ export const MainPage = () => {
 
     // 모달 닫기 핸들러
     const handleModalClose = () => {
-        if (!isRegistering) {
-            setIsRfidModalOpen(false);
+        if (isRegistering) {
+            // 등록 중인 경우 취소 함수 호출
+            cancelRfidRegistration();
         }
+        setIsRfidModalOpen(false);
     };
 
     return (
         <div className="main-page">
-            <header className="main-header">
-                <h1>안녕하세요, {user?.name}님</h1>
-
-                <div className="cart-section">
-                    {!cartInfo ? (
-                        <div className="cart-registration">
-                            <div className="cart-empty">
-                                <div className="cart-icon">+</div>
-                                <p>카트 정보 없음</p>
-                            </div>
-                            <button
-                                className="register-button"
-                                onClick={handleCartRegister}
-                                disabled={isRegistering}
-                            >
-                                {isRegistering ? '등록 중...' : '카트 등록'}
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="cart-info">
-                            <span className="cart-name">{cartInfo.name}</span>
-                            <div className="cart-status">
-                                <div className="battery-status">
-                                    <span className={`status-indicator ${cartInfo.hasBattery ? 'active' : 'inactive'}`}>
-                                        {cartInfo.hasBattery ? '배터리 있음' : '배터리 없음'}
-                                    </span>
-                                </div>
-                                <div className="connection-status">
-                                    <span className={`status-indicator ${cartInfo.isConnected ? 'active' : 'inactive'}`}>
-                                        {cartInfo.isConnected ? '연결됨' : '연결 끊김'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </header>
-
+            <Header isMainPage={true} pageName="메인페이지"/>
             <main className="main-content">
+                <section className="cart-section">
+                    <h1>안녕하세요, {user?.name}님</h1>
+                    <div className="cart-content">
+                        {!cartInfo ? (
+                            <div className="cart-registration">
+                                <div className="cart-empty">
+                                    <p className="cart-empty-notion">카트 정보 없음</p>
+                                    <div className="cart-image">
+                                        <img src={cartEmptyImage} alt="빈 카트" />
+                                        <div className="cart-icon">
+                                            <span>+</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="main" // 또는 적절한 variant
+                                    size="full"
+                                    className="register-button"
+                                    onClick={handleCartRegister}
+                                    disabled={isRegistering}
+                                >
+                                    {isRegistering ? '등록 중...' : '카트 등록'}
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="cart-info">
+                                <div className="cart-status">
+                                    <span className="cart-name">{cartInfo.name}</span>
+                                    <div className="battery-status">
+                                        <span className={`status-indicator ${cartInfo.hasBattery ? 'active' : 'inactive'}`}>
+                                            {cartInfo.hasBattery ? '배터리 있음' : '배터리 없음'}
+                                        </span>
+                                    </div>
+                                    <div className="connection-status">
+                                        <span className={`status-indicator ${cartInfo.isConnected ? 'active' : 'inactive'}`}>
+                                            {cartInfo.isConnected ? '연결됨' : '연결 끊김'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="cart-image">
+                                    <img src={cartHasImage} alt="카트 있음" />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
                 <section className="work-schedule">
                     <div className="schedule-header">
                         <h2>오늘의 작업</h2>
@@ -242,19 +258,23 @@ export const MainPage = () => {
                 </section>
 
                 <div className="action-buttons">
-                    <button
+                    <Button
+                        variant="main"
+                        size="full"
                         className="work-setting-button"
                         onClick={handleWorkSettingClick}
                     >
                         오늘의 작업 설정하기
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="main"
+                        size="full"
                         className="start-work-button"
                         onClick={handleStartWorkClick}
-                        disabled={!cartInfo || !selectedWorks.length || isLoading}
+                        disabled={!cartInfo || selectedWorks.length === 0 || isLoading}
                     >
                         {isLoading ? '작업 시작 처리 중...' : '작업하러 가기'}
-                    </button>
+                    </Button>
                 </div>
             </main>
 
