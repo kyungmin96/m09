@@ -3,7 +3,9 @@ import { api } from '@/shared/api/axios';
 import { API_ROUTES } from '@/shared/api/routes';
 
 // const WEBSOCKET_URL = "ws://70.12.246.80:8080/api/v1/ws";
-const WEBSOCKET_URL = "ws://i12a202.p.ssafy.io/api/v1/ws";
+// const WEBSOCKET_URL = "ws://i12a202.p.ssafy.io/api/v1/ws";
+const baseWsUrl = import.meta.env.VITE_WS_URL;
+const WEBSOCKET_URL = `${baseWsUrl}`;
 
 /**
  * WebSocket 서비스 클래스
