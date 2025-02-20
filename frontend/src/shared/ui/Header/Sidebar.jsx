@@ -39,15 +39,15 @@ export const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         <div className="sidebar__user-info">
-          <h2 className="sidebar__name">{user?.name || '사용자'}</h2>
-          <p className="sidebar__id">{user?.employeeId || '000000'}</p>
-          <p className="sidebar__position">{user?.position || '직책'}</p>
+          <h2 className="sidebar__name">{user?.name || '사용자 없음'}</h2>
+          <p className="sidebar__id">사번 : {user?.employeeId || '사번 없음'}</p>
+          <p className="sidebar__position">직책 : {user?.position || '직책 없음'}</p>
         </div>
 
         <div className="sidebar__cart-info">
           <div className="sidebar__cart-header">
             <span className="sidebar__cart-icon">🛒</span>
-            <span className="sidebar__cart-name">{cartInfo?.name || '카트 이름 없음'}</span>
+            <span className="sidebar__cart-name">{cartInfo?.name || '연결된 카트 없음'}</span>
           </div>
 
           <div className="sidebar__cart-status">

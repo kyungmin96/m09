@@ -23,6 +23,7 @@ const LogoutButton = () => {
   return (
     <Button
       onClick={handleLogout}
+      size="full"
       disabled={isLoading}
       variant="destructive"
     >

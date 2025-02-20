@@ -284,7 +284,9 @@ export const MainPage = () => {
                 title="카트 등록"
                 footerContent={
                     registrationError ? (
-                        <Button onClick={handleCartRegister}>
+                        <Button
+                        size="full"
+                        onClick={handleCartRegister}>
                             재시도
                         </Button>
                     ) : null
@@ -294,16 +296,16 @@ export const MainPage = () => {
                     {isRegistering ? (
                         <>
                             <div className="loading-spinner"></div>
-                            <p>RFID 카트 등록 중입니다...</p>
-                            <p>카드를 리더기에 태그해주세요.</p>
-                            <p className="timeout-notice">
+                            <p className="loading-info">RFID 카트 등록 중입니다...</p>
+                            <p className="loading-info">카드를 리더기에 태그해주세요.</p>
+                            <p className="loading-info">
                                 30초 이내에 카드를 태그해주세요.
                             </p>
                         </>
                     ) : registrationError ? (
                         <div className="error-message">
-                            <p>{registrationError}</p>
-                            <p>카트 등록을 다시 시도해주세요.</p>
+                            <p className="loading-info">{registrationError}</p>
+                            <p className="loading-info">카트 등록을 다시 시도해주세요.</p>
                         </div>
                     ) : null}
                 </div>

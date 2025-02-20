@@ -9,32 +9,32 @@ import './TaskAssignment.scss';
 import { getAllWorkers } from './workers.api';
 
 // 임시 전체 작업자 데이터
-const DUMMY_ALL_WORKERS = [
-  {
-    id: 1,
-    employeeId: '7859885',
-    name: '김철수',
-    position: 'ROLE_MEMBER',
-  },
-  {
-    id: 2,
-    employeeId: '7859886',
-    name: '이영희',
-    position: 'ROLE_MEMBER',
-  },
-  {
-    id: 3,
-    employeeId: '7859887',
-    name: '박지민',
-    position: 'ROLE_MEMBER',
-  },
-  {
-    id: 4,
-    employeeId: '7859888',
-    name: '최민수',
-    position: 'ROLE_MEMBER',
-  }
-];
+// const DUMMY_ALL_WORKERS = [
+//   {
+//     id: 1,
+//     employeeId: '7859885',
+//     name: '김철수',
+//     position: 'ROLE_MEMBER',
+//   },
+//   {
+//     id: 2,
+//     employeeId: '7859886',
+//     name: '이영희',
+//     position: 'ROLE_MEMBER',
+//   },
+//   {
+//     id: 3,
+//     employeeId: '7859887',
+//     name: '박지민',
+//     position: 'ROLE_MEMBER',
+//   },
+//   {
+//     id: 4,
+//     employeeId: '7859888',
+//     name: '최민수',
+//     position: 'ROLE_MEMBER',
+//   }
+// ];
 
 export const TaskAssignment = () => {
   const navigate = useNavigate();
@@ -166,13 +166,14 @@ export const TaskAssignment = () => {
                   </div>
                 )}
                 <div className="task-details">
-                  <p><strong>위치:</strong> {task.location}</p>
-                  <p><strong>내용:</strong> {task.content}</p>
-                  <p><strong>예정 종료 시간:</strong> {task.scheduledEndTime}</p>
-                  {task.comment && <p><strong>비고:</strong> {task.comment}</p>}
+                  <p className="task-info"><strong>위치:</strong> {task.location}</p>
+                  <p className="task-info"><strong>내용:</strong> {task.content}</p>
+                  <p className="task-info"><strong>납기일:</strong> {task.scheduledEndTime}</p>
+                  {task.comment && <p className="task-info"><strong>비고:</strong> {task.comment}</p>}
                 </div>
                 <Button 
                   variant="secondary"
+                  size="full"
                   onClick={() => handleTaskRemove(task)}
                 >
                   작업 해제
@@ -200,6 +201,7 @@ export const TaskAssignment = () => {
                 </div>
                 <Button 
                   variant="main"
+                  size="full"
                   onClick={() => handleTaskSelect(task)}
                 >
                   작업 선택하기
