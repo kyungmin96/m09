@@ -24,7 +24,7 @@ export const Streaming = ({ isActive = true, streamingReady = false, onRetry }) 
     if (isActive && streamingReady) {
       // 부모 컴포넌트에서 API 통신이 성공한 경우
       // [필독] .env VITE_STREAM_URL 에서 로컬/서버 스트리밍 URL 설정
-      const baseUrl = import.meta.evn.VITE_STREAM_URL
+      const baseUrl = import.meta.env.VITE_STREAM_URL
       const baseStreamUrl = `${baseUrl}/stream`;
       setStreamUrl(baseStreamUrl);
       setStreamStatus('success');
