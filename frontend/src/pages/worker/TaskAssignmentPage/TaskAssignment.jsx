@@ -194,9 +194,9 @@ export const TaskAssignment = () => {
               <div key={task.id} className="task-item">
                 <h3>{task.title}</h3>
                 <div className="task-details">
-                  <p><strong>위치:</strong> {task.location}</p>
-                  <p><strong>내용:</strong> {task.content}</p>
-                  <p><strong>예정 종료 시간:</strong> {task.scheduledEndTime}</p>
+                  <p className="task-info"><strong>위치:</strong> {task.location}</p>
+                  <p className="task-info"><strong>내용:</strong> {task.content}</p>
+                  <p className="task-info"><strong>예정 종료 시간:</strong> {task.scheduledEndTime}</p>
                   {task.comment && <p><strong>비고:</strong> {task.comment}</p>}
                 </div>
                 <Button 

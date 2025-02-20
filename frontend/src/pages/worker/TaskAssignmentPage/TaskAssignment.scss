@@ -6,8 +6,7 @@
 
   section {
     background: #fff;
-    border-radius: 12px;
-    padding: 20px;
+    padding: 20px 0;
 
     h2 {
       font-size: 20px;
@@ -17,8 +16,17 @@
   }
 
   .today-tasks {
-    border-radius: 10px;
-    border: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+
+    .worker-tags {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .task-details {
+    .task-info {
+      margin-bottom: 0.5rem;
+    }
   }
 
   .task-list {
@@ -35,6 +43,7 @@
       border-radius: 8px;
       padding: 16px;
       border: 1px solid #eee;
+      margin-bottom: 0.5rem;
 
       &.configured {
         border-color: #a5d6a7;
@@ -59,14 +68,7 @@
           border-radius: 4px;
           font-size: 14px;
         }
-
-        .task-details {
-          .task-info {
-            margin-bottom: 0.5rem;
-          }
-        }
       }
-
       button {
         margin-top: 12px;
       }
