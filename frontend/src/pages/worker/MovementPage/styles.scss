@@ -140,7 +140,7 @@ $warning-yellow: #ffc107;
       transition: background-color 0.3s ease;
       
       &:hover {
-        background-color: darken($primary-green, 10%);
+        background-color: $primary-green, 10%;
       }
       
       &:disabled {

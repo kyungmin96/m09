@@ -89,7 +89,7 @@ export const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 30000, // 30초
+  timeout: 10000, // 30초
 });
 
 // 인터셉터 설정
