@@ -49,8 +49,8 @@ export const API_ROUTES = {
   EMBEDDED: {
     // NFC 카트 관련
     NFC: {
-      START: '/nfc/start',
-      STOP: '/nfc/stop',
+      START: '/embedded/nfc/start',
+      STOP: '/embedded/nfc/stop',
     },
     // 공구 탐지 관련
     DETECTION_TOOL: {

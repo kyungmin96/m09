@@ -28,17 +28,17 @@ class camera:
         else:
             print("[OrinCar] Unable to activate CUDA, Using CPU...")
         
+        # 구 프레임 버리기
+        for _ in range(2):
+            self.camera.cap.grab()
+
         self._initiated = True
         while self._initiated:
             ret, frame = self.cap.read()
             if not ret:
                 print("[OrinCar] Error: Could not read frame.")
                 break
-
-            # 구 프레임 버리기
-            for _ in range(2):
-                self.cap.grab()
-
+            
             # GPU를 사용한 이미지 처리
             if use_cuda:
                 gpu_frame = cv2.cuda_GpuMat()
