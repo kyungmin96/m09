@@ -36,6 +36,16 @@
     }
   }
 
+  &.secondary {
+    background-color: $color-lightgray;
+    font-weight: 600;
+  
+    &:hover:not(.disabled) {
+      background-color: $color-gray;
+      color: $color-white;
+    }
+  }
+  
   &.sub {
     background-color: $color-white;
     color: $color-primary;

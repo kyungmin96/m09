@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Streaming.scss';
 
-export const Streaming = ({ isActive = true, streamingReady = false, onRetry }) => {
+export const Streaming = ({ isActive = true, streamingReady = true, onRetry }) => {
   const location = useLocation();
   const [streamStatus, setStreamStatus] = useState('loading'); // 'loading', 'success', 'error'
   const [streamUrl, setStreamUrl] = useState('');
