@@ -3,9 +3,7 @@
 **AIoT 작업현장 보조 서비스**<br>
 배포된 링크 : https://i12a202.p.ssafy.io
 
-![favicon](./etc/assets/image/favicon.ico)
-
-<img src="./etc/assets/image/favicon.ico">
+![favicon](./etc/assets/image/favicon.png)
 
 ![영상최종v1_압축_10](/uploads/ba002721548c933b98a1e011e4ba89bd/영상최종v1_압축_10.gif)
 
