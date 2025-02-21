@@ -57,9 +57,7 @@ class trace:
         else:
             print("[OrinCar] Unable to activate CUDA, Using CPU for TRACE...")
 
-        prev_depth = 0.0
         depth_scale = 1.0
-        direction_trace_range = self.camera.cam_width // 32
         tick_count = 0
 
         transforms = torch.hub.load('intel-isl/MiDaS','transforms')
@@ -123,7 +121,7 @@ class trace:
             # YOLO 모델을 사용하여 객체 감지
             yolo_results = self.yolo(frame, verbose=False)
             speed = 0
-            is_danger = False
+            is_danger = 0
             ref_dist = 998244353
             found_target = False
             steer_value = 0
@@ -161,7 +159,7 @@ class trace:
                         if object_distance < self.min_distance_range:
                             speed = 0
 
-                        if is_danger:
+                        if is_danger > 0:
                             continue
                         
                         if object_distance > self.max_distance_range * 0.75:
@@ -180,18 +178,15 @@ class trace:
                         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
                         cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-                        # tmp
-                        continue
+                        # if ref_dist < object_distance + 100:
+                        #     continue
 
-                        if ref_dist < object_distance + 100:
-                            continue
-
-                        is_danger = True
-                        ref_dist = object_distance
-                        dir = -1 if frame_center_x - object_center_x < 0 else 1
-                        steer_value = (dir * threshold / (abs(frame_center_x - object_center_x) + 1)) * (0.99 ** (object_distance / 100))
-                        print(f"[OrinCar] evade_steer: {steer_value}")
-                        self.motor_controller.set_steering(steer_value)
+                        # is_danger = 1
+                        # ref_dist = object_distance
+                        # dir = -1 if frame_center_x - object_center_x < 0 else 1
+                        # steer_value = (dir * threshold / (abs(frame_center_x - object_center_x) + 1)) * (0.99 ** (object_distance / 100))
+                        # print(f"[OrinCar] evade_steer: {steer_value}")
+                        # self.motor_controller.set_steering(steer_value)
                     else:
                         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (255, 255, 0), 2)
                         cv2.putText(frame, label + f" dist: {object_distance}", (int(x1), int((y1 + y2) //2)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
@@ -199,7 +194,6 @@ class trace:
             # new logic
             frame_focus_y = self.camera.cam_height * 2 // 3
             frame_sub_focus_y = self.camera.cam_height * 5 // 6
-            dander_ref_x = frame_center_x
             danger_ref_dist = 998244353
 
             for i in range(frame_center_x - threshold, frame_center_x + threshold):
@@ -209,15 +203,26 @@ class trace:
                 sub_depth = spline(frame_sub_focus_y, i)[0][0]
                 sub_distance = self._depth_to_distance(sub_depth, depth_scale=depth_scale)
 
-                if sub_distance > self.max_distance_range * 0.3125 and cur_distance > self.max_distance_range * 0.75 and ref_dist < cur_distance + 100:
+                if cur_distance > self.max_distance_range * 0.75 and ref_dist < cur_distance + 100:
                     continue
 
                 danger_ref_dist = min(cur_distance, danger_ref_dist)
-                is_danger = True
+                is_danger = 1
 
-            if is_danger:
-                left_avg = sum([self._depth_to_distance(spline(frame_focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x - threshold)])
-                right_avg = sum([self._depth_to_distance(spline(frame_focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x + threshold, self.camera.cam_width)])
+            for i in range(frame_center_x - threshold * 1.25, frame_center_x + threshold * 1.25):
+                sub_depth = spline(frame_sub_focus_y, i)[0][0]
+                sub_distance = self._depth_to_distance(sub_depth, depth_scale=depth_scale)
+
+                if cur_distance > self.max_distance_range * 0.375 and ref_dist < cur_distance + 100:
+                    continue
+
+                danger_ref_dist = min(sub_distance, danger_ref_dist)
+                is_danger = 2
+
+            if is_danger > 0:
+                focus_y = frame_focus_y if is_danger == 1 else frame_sub_focus_y
+                left_avg = sum([self._depth_to_distance(spline(focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x - threshold * (1.25 ** (is_danger - 1)))])
+                right_avg = sum([self._depth_to_distance(spline(focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x + threshold * (1.25 ** (is_danger - 1)), self.camera.cam_width)])
                 dir = 1 if left_avg < right_avg else -1
                 print("[OrinCar] Danger!")
                 danger_steer_value = dir * (0.75 ** (danger_ref_dist / 100))
@@ -240,16 +245,20 @@ class trace:
                 stream_cv_frame(frame)
                 
     def start(self):
-        if self._thread:
+        self.stop()
+        if self._thread != None or self.camera.is_busy():
+            print("[OrinCar] Failed to start TRACE")
             return
         if self._headless:
             from m09_socketio import stream_cv_frame
+        self.camera.set_busy(True)
         self._thread = Thread(target=self._run)
         self._thread.start()
 
     def stop(self):
         self._initiated = False
-        if self._thread and self._thread.is_alive():
+        if self._thread != None and self._thread.is_alive():
             self._thread.join()
+        self.camera.set_busy(False)
         self._thread = None
         print("[OrinCar] Stopped TRACE")

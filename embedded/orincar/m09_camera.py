@@ -13,6 +13,7 @@ class camera:
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cam_height)
         self.cam_width = cam_width
         self.cam_height = cam_height
+        self._is_busy = False
 
     def read(self):
         return self.cap.read()
@@ -56,14 +57,24 @@ class camera:
             stream_cv_frame(frame)
 
     def start(self):
-        if self._thread:
+        self.stop()
+        if self._thread != None or self.is_busy():
+            print("[OrinCar] Failed to start CAMERA")
             return
+        self.set_busy(True)
         self._thread = Thread(target=self._run)
         self._thread.start()
 
     def stop(self):
         self._initiated = False
-        if self._thread and self._thread.is_alive():
+        if self._thread != None and self._thread.is_alive():
             self._thread.join()
+        self.set_busy(False)
         self._thread = None
         print("[OrinCar] Stopped CAMERA")
+
+    def is_busy(self):
+        return self._is_busy
+    
+    def set_busy(self, busy):
+        self._is_busy = busy

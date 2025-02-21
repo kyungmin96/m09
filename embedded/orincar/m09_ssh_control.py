@@ -36,13 +36,14 @@ class ssh_control:
             self.motor_controller.middle()
 
     def start(self):
-        if self._thread:
+        self.stop()
+        if self._thread != None:
             return
         self._thread = Thread(target=listen_keyboard, args=(self._on_press, self._on_release))
         self._thread.start()
     
     def stop(self):
         self._on_press("p")
-        if self._thread and self._thread.is_alive():
+        if self._thread != None and self._thread.is_alive():
             self._thread.join()
         self._thread = None
