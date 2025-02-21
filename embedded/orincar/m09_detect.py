@@ -19,6 +19,7 @@ class detect:
     
     def _run(self, detect_list):
         # 메인 루프
+        print(detect_list)
         detect_state = {}
         for item in detect_list:
             detect_state[item] = 0
@@ -90,14 +91,18 @@ class detect:
             stream_cv_frame(frame)
 
     def start(self, detect_list=[]):
-        if self._thread:
+        self.stop()
+        if self._thread != None or self.camera.is_busy():
+            print("[OrinCar] Failed to start DETECT")
             return
+        self.camera.set_busy(True)
         self._thread = Thread(target=self._run, args=(detect_list,))
         self._thread.start()
 
     def stop(self):
         self._initiated = False
-        if self._thread and self._thread.is_alive():
+        if self._thread != None and self._thread.is_alive():
             self._thread.join()
+        self.camera.set_busy(False)
         self._thread = None
         print("[OrinCar] Stopped DETECT")
