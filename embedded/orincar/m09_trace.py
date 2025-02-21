@@ -209,7 +209,7 @@ class trace:
                 danger_ref_dist = min(cur_distance, danger_ref_dist)
                 is_danger = 1
 
-            for i in range(frame_center_x - threshold * 1.25, frame_center_x + threshold * 1.25):
+            for i in range(frame_center_x - int(threshold * 1.25), frame_center_x + int(threshold * 1.25)):
                 sub_depth = spline(frame_sub_focus_y, i)[0][0]
                 sub_distance = self._depth_to_distance(sub_depth, depth_scale=depth_scale)
 
@@ -221,8 +221,8 @@ class trace:
 
             if is_danger > 0:
                 focus_y = frame_focus_y if is_danger == 1 else frame_sub_focus_y
-                left_avg = sum([self._depth_to_distance(spline(focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x - threshold * (1.25 ** (is_danger - 1)))])
-                right_avg = sum([self._depth_to_distance(spline(focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x + threshold * (1.25 ** (is_danger - 1)), self.camera.cam_width)])
+                left_avg = sum([self._depth_to_distance(spline(focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x - threshold * int(1.25 ** (is_danger - 1)))])
+                right_avg = sum([self._depth_to_distance(spline(focus_y, i)[0][0], depth_scale=depth_scale) *  0.9 ** abs(i - frame_center_x) for i in range(frame_center_x + threshold * int(1.25 ** (is_danger - 1)), self.camera.cam_width)])
                 dir = 1 if left_avg < right_avg else -1
                 print("[OrinCar] Danger!")
                 danger_steer_value = dir * (0.75 ** (danger_ref_dist / 100))
