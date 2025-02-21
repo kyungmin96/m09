@@ -5,9 +5,10 @@
 
 ![favicon](./etc/assets/image/favicon.ico)
 
+<img src="./etc/assets/image/favicon.ico">
+
 ![영상최종v1_압축_10](/uploads/ba002721548c933b98a1e011e4ba89bd/영상최종v1_압축_10.gif)
 
-<img src="/uploads/ba002721548c933b98a1e011e4ba89bd/영상최종v1_압축_10.gif">
 
 ### 📆 프로젝트 진행 기간
 
